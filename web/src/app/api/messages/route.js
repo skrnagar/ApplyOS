@@ -1,5 +1,5 @@
-import sql from "@/app/api/utils/sql";
-import { getOrCreateUser } from "@/app/api/utils/getUser";
+import sql from "./utils/sql";
+import { getOrCreateUser } from "./utils/getUser";
 
 // Get messages between user and assistant
 export async function GET() {
