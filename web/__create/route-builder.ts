@@ -1,4 +1,5 @@
 import { readdir, stat } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Hono } from 'hono';
@@ -8,8 +9,12 @@ import updatedFetch from '../src/__create/fetch';
 const API_BASENAME = '/api';
 const api = new Hono();
 
-// Get current directory
-const __dirname = join(fileURLToPath(new URL('.', import.meta.url)), '../src/app/api');
+const candidateApiDirs = [
+  join(process.cwd(), 'src/app/api'),
+  join(fileURLToPath(new URL('.', import.meta.url)), '../src/app/api'),
+];
+const __dirname =
+  candidateApiDirs.find((dir) => existsSync(dir)) ?? candidateApiDirs[0];
 if (globalThis.fetch) {
   globalThis.fetch = updatedFetch;
 }
