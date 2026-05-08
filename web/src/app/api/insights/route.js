@@ -1,5 +1,5 @@
-import sql from "./utils/sql";
-import { getOrCreateUser } from "./utils/getUser";
+import sql from "../utils/sql";
+import { getOrCreateUser } from "../utils/getUser";
 
 // Get AI insights for user
 export async function GET() {
