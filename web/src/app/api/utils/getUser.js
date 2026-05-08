@@ -1,5 +1,5 @@
-import { auth } from "@/auth";
-import sql from "./sql";
+import { auth } from "../../../auth.js";
+import sql from "./sql.js";
 
 // Get or create a user in our users table from the auth session
 export async function getOrCreateUser() {

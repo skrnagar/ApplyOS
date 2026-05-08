@@ -1,5 +1,5 @@
-import sql from "../../utils/sql";
-import { getOrCreateUser } from "../../utils/getUser";
+import sql from "../../utils/sql.js";
+import { getOrCreateUser } from "../../utils/getUser.js";
 
 // Delete resume
 export async function DELETE(request, { params }) {

@@ -1,4 +1,4 @@
-import sql from "../utils/sql";
+import sql from "../utils/sql.js";
 
 // Get notifications for user
 export async function GET(request) {
