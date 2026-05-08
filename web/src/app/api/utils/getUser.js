@@ -1,9 +1,16 @@
-import { auth } from "../../../auth.js";
 import sql from "./sql.js";
 
 // Get or create a user in our users table from the auth session
 export async function getOrCreateUser() {
-  const session = await auth();
+  let session = null;
+  try {
+    const authModule = await import("../../../auth.js");
+    session = await authModule.auth();
+  } catch (err) {
+    // In deployment environments where internal auth aliasing is unavailable,
+    // gracefully fall back to unauthenticated behavior.
+    return null;
+  }
   if (!session?.user?.email) return null;
 
   const email = session.user.email;
