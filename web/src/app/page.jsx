@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import CinematicBackdrop from "../components/CinematicBackdrop";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import LogoCloud from "../components/LogoCloud";
@@ -17,28 +18,30 @@ import ScrollProgress from "../components/ui/ScrollProgress";
 
 export default function LandingPage() {
   return (
-    <main className="relative font-inter">
-      <ScrollProgress />
-      <CursorGlow />
-      <Navbar />
+    <main className="relative min-h-screen font-inter">
+      <CinematicBackdrop />
+      <div className="relative z-[1]">
+        <ScrollProgress />
+        <CursorGlow />
+        <Navbar />
 
-      <Hero />
-      <LogoCloud />
-      <HowItWorks />
-      <DigitalTunnel />
-      <Pricing />
-      <PlatformPreview />
-      <OnboardingPreview />
-      <Testimonials />
-      <FAQ />
-      <CTA />
-      <Footer />
+        <Hero />
+        <LogoCloud />
+        <HowItWorks />
+        <DigitalTunnel />
+        <Pricing />
+        <PlatformPreview />
+        <OnboardingPreview />
+        <Testimonials />
+        <FAQ />
+        <CTA />
+        <Footer />
 
-      {/* Persistent grain overlay */}
-      <div
-        aria-hidden
-        className="fixed inset-0 pointer-events-none z-[2] opacity-[0.035] mix-blend-overlay noise"
-      />
+        <div
+          aria-hidden
+          className="fixed inset-0 pointer-events-none z-[2] opacity-[0.035] mix-blend-overlay noise"
+        />
+      </div>
     </main>
   );
 }

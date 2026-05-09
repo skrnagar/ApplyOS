@@ -1,11 +1,23 @@
 "use client";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { FileText, Check, ChevronRight } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
+import ResumeUploadZone from "@/components/ResumeUploadZone";
+import useUser from "@/utils/useUser";
+import { getLocalResumes } from "@/utils/localResumes";
 
 export default function OnboardingPreview() {
+  const { data: user } = useUser();
+  const [syncKey, setSyncKey] = useState(0);
+  const [savedName, setSavedName] = useState(null);
+
+  const existingCount = useMemo(() => {
+    void syncKey;
+    return getLocalResumes(user?.id).length;
+  }, [user?.id, syncKey]);
+
   return (
-    <section className="py-32 bg-black overflow-hidden">
+    <section className="py-32 bg-black/40 overflow-hidden relative">
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center gap-20">
           <div className="flex-1">
@@ -38,7 +50,7 @@ export default function OnboardingPreview() {
             </ul>
           </div>
 
-          <div className="flex-1 relative">
+          <div className="flex-1 relative w-full max-w-lg">
             <motion.div
               initial={{ rotateY: 20, rotateX: 10, scale: 0.9, opacity: 0 }}
               whileInView={{ rotateY: 0, rotateX: 0, scale: 1, opacity: 1 }}
@@ -58,26 +70,49 @@ export default function OnboardingPreview() {
               </div>
 
               <div className="space-y-6">
-                <div className="p-10 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center gap-4 bg-white/[0.02]">
-                  <FileText size={40} className="text-neutral-500" />
-                  <div className="text-sm font-medium text-neutral-400">
-                    Drag & Drop Resume
-                  </div>
-                  <button className="px-4 py-2 bg-white/5 text-xs text-white rounded-lg border border-white/10">
-                    Browse Files
-                  </button>
-                </div>
+                <ResumeUploadZone
+                  variant="marketing"
+                  userId={user?.id}
+                  existingCount={existingCount}
+                  onSuccess={({ resume }) => {
+                    setSavedName(resume.file_name);
+                    setSyncKey((k) => k + 1);
+                  }}
+                />
+
+                {savedName && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3"
+                  >
+                    <div className="flex items-center gap-2 text-sm font-medium text-emerald-300">
+                      <Sparkles size={16} />
+                      Saved: {savedName}
+                    </div>
+                    <p className="text-xs text-neutral-400">
+                      Same flow as your dashboard — stored locally if the API is
+                      unavailable. Manage versions anytime.
+                    </p>
+                    <a
+                      href="/dashboard/resumes"
+                      className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 underline-offset-2 hover:underline w-fit"
+                    >
+                      Open resume manager →
+                    </a>
+                  </motion.div>
+                )}
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-medium text-neutral-500">
-                    <span>Processing Data</span>
-                    <span>75%</span>
+                    <span>Ready for preferences</span>
+                    <span>{savedName ? "100%" : "0%"}</span>
                   </div>
                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      whileInView={{ width: "75%" }}
-                      transition={{ duration: 2, delay: 0.5 }}
+                      animate={{ width: savedName ? "100%" : "0%" }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
                       className="h-full bg-green-500"
                     />
                   </div>

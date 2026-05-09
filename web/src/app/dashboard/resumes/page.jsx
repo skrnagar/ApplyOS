@@ -2,27 +2,22 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Card, { CardContent } from "@/components/ui/Card";
+import ResumeUploadZone from "@/components/ResumeUploadZone";
 import { motion } from "motion/react";
 import {
   FileText,
-  Upload,
   Download,
   Trash2,
   Star,
   TrendingUp,
   CheckCircle2,
-  FileUp,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
-import { addLocalResume, getLocalResumes, setLocalResumes } from "@/utils/localResumes";
+import { getLocalResumes, setLocalResumes } from "@/utils/localResumes";
 
 export default function ResumesPage() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [error, setError] = useState(null);
   const { data: user } = useUser();
 
   useEffect(() => {
@@ -30,7 +25,6 @@ export default function ResumesPage() {
   }, [user?.id]);
 
   const fetchResumes = async () => {
-    setError(null);
     try {
       const response = await fetch("/api/resumes");
       if (response.ok) {
@@ -39,92 +33,16 @@ export default function ResumesPage() {
       } else {
         setResumes(getLocalResumes(user?.id));
       }
-    } catch (error) {
+    } catch {
       setResumes(getLocalResumes(user?.id));
     } finally {
       setLoading(false);
     }
   };
 
-  const uploadViaApi = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const uploadRes = await fetch("/_create/api/upload/", {
-      method: "POST",
-      body: formData,
-    });
-    if (!uploadRes.ok) throw new Error("upload-failed");
-    const uploadData = await uploadRes.json();
-    return uploadData?.url;
-  };
-
-  const uploadViaLocal = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("Failed to read file"));
-      reader.readAsDataURL(file);
-    });
-
-  const handleFileUpload = async (file) => {
-    if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      setError("File too large. Please upload files up to 8 MB.");
-      return;
-    }
-    const allowed = [".pdf", ".doc", ".docx"];
-    const name = file.name.toLowerCase();
-    if (!allowed.some((ext) => name.endsWith(ext))) {
-      setError("Only PDF, DOC, and DOCX files are supported.");
-      return;
-    }
-
-    setUploading(true);
-    setUploadProgress(12);
-    setError(null);
-    try {
-      let fileUrl;
-      setUploadProgress(38);
-      try {
-        fileUrl = await uploadViaApi(file);
-      } catch {
-        fileUrl = await uploadViaLocal(file);
-      }
-
-      setUploadProgress(70);
-      const payload = {
-        file_name: file.name,
-        file_url: fileUrl,
-        file_size: file.size,
-        ats_score: Math.floor(Math.random() * 30) + 70,
-      };
-
-      const response = await fetch("/api/resumes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        const created = await response.json();
-        setResumes((prev) => [created, ...prev]);
-      } else {
-        const localResume = {
-          id: `local_${Date.now()}`,
-          ...payload,
-          is_primary: resumes.length === 0,
-          created_at: new Date().toISOString(),
-        };
-        const next = addLocalResume(user?.id, localResume);
-        setResumes(next);
-      }
-    } catch (error) {
-      setError("Upload failed. Please try again.");
-    } finally {
-      setUploadProgress(100);
-      setTimeout(() => setUploadProgress(0), 400);
-      setUploading(false);
-    }
+  const handleUploadSuccess = ({ resume, resumes }) => {
+    if (resumes) setResumes(resumes);
+    else setResumes((prev) => [resume, ...prev]);
   };
 
   const handleDelete = async (id) => {
@@ -134,8 +52,12 @@ export default function ResumesPage() {
       });
       if (response.ok) {
         setResumes(resumes.filter((r) => r.id !== id));
+      } else {
+        const next = resumes.filter((r) => r.id !== id);
+        setResumes(next);
+        setLocalResumes(user?.id, next);
       }
-    } catch (error) {
+    } catch {
       const next = resumes.filter((r) => r.id !== id);
       setResumes(next);
       setLocalResumes(user?.id, next);
@@ -151,8 +73,12 @@ export default function ResumesPage() {
       });
       if (response.ok) {
         fetchResumes();
+      } else {
+        const next = resumes.map((r) => ({ ...r, is_primary: r.id === id }));
+        setResumes(next);
+        setLocalResumes(user?.id, next);
       }
-    } catch (error) {
+    } catch {
       const next = resumes.map((r) => ({ ...r, is_primary: r.id === id }));
       setResumes(next);
       setLocalResumes(user?.id, next);
@@ -168,7 +94,6 @@ export default function ResumesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900">Resumes</h1>
@@ -178,70 +103,17 @@ export default function ResumesPage() {
           </div>
         </div>
 
-        {/* Upload Area */}
         <Card>
           <CardContent className="p-8">
-            <label
-              className="block cursor-pointer"
-              onDragEnter={(e) => {
-                e.preventDefault();
-                setDragActive(true);
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragActive(true);
-              }}
-              onDragLeave={(e) => {
-                e.preventDefault();
-                setDragActive(false);
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragActive(false);
-                const dropped = e.dataTransfer.files?.[0];
-                if (dropped) handleFileUpload(dropped);
-              }}
-            >
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => handleFileUpload(e.target.files?.[0])}
-                className="hidden"
-                disabled={uploading}
-              />
-              <div
-                className={`border-2 border-dashed rounded-2xl p-12 transition-all text-center ${dragActive ? "border-blue-500 bg-blue-50/70" : "border-neutral-300 hover:border-blue-500 hover:bg-blue-50/50"}`}
-              >
-                {dragActive ? (
-                  <FileUp className="mx-auto text-blue-600 mb-4" size={48} />
-                ) : (
-                  <Upload className="mx-auto text-neutral-400 mb-4" size={48} />
-                )}
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">
-                  {uploading ? `Uploading... ${uploadProgress}%` : "Upload Resume"}
-                </h3>
-                <p className="text-sm text-neutral-600">
-                  Drag and drop or click to browse. PDF, DOC, DOCX supported.
-                </p>
-                {uploading && (
-                  <div className="mt-4 h-2 bg-neutral-200 rounded-full overflow-hidden max-w-xs mx-auto">
-                    <div
-                      className="h-full bg-blue-600 transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                )}
-                {error && (
-                  <div className="mt-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 inline-block">
-                    {error}
-                  </div>
-                )}
-              </div>
-            </label>
+            <ResumeUploadZone
+              variant="dashboard"
+              userId={user?.id}
+              existingCount={resumes.length}
+              onSuccess={handleUploadSuccess}
+            />
           </CardContent>
         </Card>
 
-        {/* AI Insights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardContent className="p-6">
@@ -298,7 +170,6 @@ export default function ResumesPage() {
           </Card>
         </div>
 
-        {/* Resumes List */}
         <div className="space-y-4">
           {resumes.map((resume, index) => {
             return (
@@ -341,7 +212,6 @@ export default function ResumesPage() {
                       </div>
 
                       <div className="flex items-center gap-6">
-                        {/* ATS Score */}
                         <div className="text-center">
                           <div
                             className={`text-3xl font-bold ${getATSScoreClass(resume.ats_score)}`}
@@ -353,10 +223,10 @@ export default function ResumesPage() {
                           </p>
                         </div>
 
-                        {/* Actions */}
                         <div className="flex items-center gap-2">
                           {!resume.is_primary && (
                             <button
+                              type="button"
                               onClick={() => handleSetPrimary(resume.id)}
                               className="p-2 hover:bg-blue-50 rounded-lg text-neutral-600 hover:text-blue-600 transition-colors"
                               title="Set as primary"
@@ -372,6 +242,7 @@ export default function ResumesPage() {
                             <Download size={20} />
                           </a>
                           <button
+                            type="button"
                             onClick={() => handleDelete(resume.id)}
                             className="p-2 hover:bg-red-50 rounded-lg text-neutral-600 hover:text-red-600 transition-colors"
                           >

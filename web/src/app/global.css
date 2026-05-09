@@ -14,10 +14,7 @@ html {
 
 html,
 body {
-  background:
-    radial-gradient(1200px 800px at 80% -10%, rgba(34, 197, 94, 0.07), transparent 60%),
-    radial-gradient(900px 700px at 0% 30%, rgba(59, 130, 246, 0.08), transparent 60%),
-    radial-gradient(circle at center, #060608 0%, #020203 60%, #000 100%);
+  background: #020203;
   color: #fff;
 }
 
@@ -127,4 +124,80 @@ body {
     linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+/* Cinematic full-page backdrop (CinematicBackdrop.jsx) */
+@keyframes cinematic-aurora-spin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1.08);
+  }
+}
+.cinematic-aurora-spin {
+  background: conic-gradient(
+    from 120deg at 50% 50%,
+    rgba(52, 211, 153, 0.22),
+    rgba(59, 130, 246, 0.28),
+    rgba(167, 139, 250, 0.2),
+    rgba(34, 211, 238, 0.18),
+    rgba(52, 211, 153, 0.22)
+  );
+  transform-origin: 50% 50%;
+  animation: cinematic-aurora-spin 70s linear infinite;
+}
+
+@keyframes cinematic-mesh-move {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-2%, 3%) scale(1.04);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.75;
+  }
+}
+.cinematic-mesh-drift {
+  background:
+    radial-gradient(800px 500px at 70% 20%, rgba(59, 130, 246, 0.12), transparent 55%),
+    radial-gradient(700px 480px at 15% 60%, rgba(52, 211, 153, 0.1), transparent 50%),
+    radial-gradient(600px 400px at 80% 85%, rgba(139, 92, 246, 0.08), transparent 55%);
+  animation: cinematic-mesh-move 28s ease-in-out infinite;
+}
+
+@keyframes cinematic-grid-shift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 40px 40px, -40px 40px;
+  }
+}
+.cinematic-grid-drift {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, black 15%, transparent 70%);
+  animation: cinematic-grid-shift 24s linear infinite;
+}
+
+@keyframes ambient-shimmer {
+  0% {
+    opacity: 0.35;
+    transform: translateX(-10%);
+  }
+  50% {
+    opacity: 0.55;
+    transform: translateX(10%);
+  }
+  100% {
+    opacity: 0.35;
+    transform: translateX(-10%);
+  }
 }
