@@ -81,6 +81,10 @@ export default defineConfig({
   build: {
     target: "esnext",
   },
+  // Bundle these for SSR instead of resolving raw ESM files from node_modules on Vercel (avoids GSAP "Cannot use import statement outside a module").
+  ssr: {
+    noExternal: ['gsap', 'lenis', 'three'],
+  },
   server: {
     allowedHosts: true,
     host: '0.0.0.0',
