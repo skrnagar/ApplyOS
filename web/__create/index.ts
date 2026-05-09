@@ -92,6 +92,8 @@ if (process.env.AUTH_SECRET) {
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
+        // Default /api/auth/error is not a React route; send users to sign-in with ?error=
+        error: '/account/signin',
       },
       skipCSRFCheck,
       session: {

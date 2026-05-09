@@ -1,8 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
 import { Eye, EyeOff, Zap } from "lucide-react";
 import AmbientBackground from "@/components/AmbientBackground";
+
+const URL_ERROR_MESSAGES = {
+  Configuration:
+    "Server auth configuration is missing or invalid. If you’re the admin, set AUTH_SECRET and AUTH_URL.",
+  AccessDenied: "You don’t have permission to sign in.",
+  Verification: "This sign-in link has expired or was already used.",
+  CredentialsSignin: "Incorrect email or password.",
+  OAuthSignin: "Could not complete sign-in with the provider.",
+  OAuthCallback: "Something went wrong during the OAuth callback.",
+  Default: "Sign-in could not be completed.",
+};
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -11,6 +22,16 @@ export default function SignInPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { signInWithCredentials } = useAuth();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
+    if (!code) return;
+    setError(URL_ERROR_MESSAGES[code] || URL_ERROR_MESSAGES.Default);
+    const next = new URL(window.location.href);
+    next.searchParams.delete("error");
+    window.history.replaceState({}, "", next.pathname + next.search);
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
