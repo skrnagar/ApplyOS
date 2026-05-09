@@ -11,10 +11,10 @@ export default function OnboardingPreview() {
   const [syncKey, setSyncKey] = useState(0);
   const [savedName, setSavedName] = useState(null);
 
-  const existingCount = useMemo(() => {
-    void syncKey;
-    return getLocalResumes(user?.id).length;
-  }, [user?.id, syncKey]);
+  const existingCount = useMemo(
+    () => getLocalResumes(user?.id).length,
+    [user?.id, syncKey],
+  );
 
   return (
     <section className="py-32 bg-black/40 overflow-hidden relative">
