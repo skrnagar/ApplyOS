@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { Upload, Target, CheckCircle } from "lucide-react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 const steps = [
   {

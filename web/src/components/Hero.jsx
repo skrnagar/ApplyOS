@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ArrowRight, PhoneCall, Sparkles } from "lucide-react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ScrollTrigger from "gsap/ScrollTrigger";
 import HeroScene from "./three/HeroScene";
 import MagneticButton from "./ui/MagneticButton";
 import AnimatedCounter from "./ui/AnimatedCounter";

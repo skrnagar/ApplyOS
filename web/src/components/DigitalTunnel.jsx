@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { motion, useScroll, useTransform } from "motion/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 export default function DigitalTunnel() {
   const containerRef = useRef();
