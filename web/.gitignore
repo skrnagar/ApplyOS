@@ -3,6 +3,10 @@
 .env
 .env.*
 
+# npm (local cache should never be committed)
+.npm-cache/
+
 # React Router
 /.react-router/
 /build/
+.vercel
