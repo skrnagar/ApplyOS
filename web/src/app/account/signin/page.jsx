@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
-import { Eye, EyeOff, Zap } from "lucide-react";
-import AmbientBackground from "@/components/AmbientBackground";
+import { Eye, EyeOff } from "lucide-react";
+import AccountAuthShell from "@/components/auth/AccountAuthShell";
+import { AccountInput } from "@/components/auth/AccountInput";
 
 const URL_ERROR_MESSAGES = {
   Configuration:
@@ -60,90 +61,70 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
-      <AmbientBackground />
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-green-400 rounded-xl flex items-center justify-center">
-              <Zap size={20} className="text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">ApplyAI</span>
+    <AccountAuthShell
+      title="Welcome back"
+      subtitle="Sign in to your HireOrbit workspace."
+      footer={
+        <p>
+          New here?{" "}
+          <a href="/account/signup" className="font-semibold text-emerald-700 hover:text-emerald-800">
+            Create an account
           </a>
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
-          <p className="text-neutral-400">
-            Sign in to continue your job search
-          </p>
+        </p>
+      }
+    >
+      <form onSubmit={onSubmit} className="space-y-5">
+        <AccountInput
+          id="signin-email"
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          required
+          autoComplete="email"
+        />
+
+        <div className="space-y-1.5">
+          <label htmlFor="signin-password" className="text-sm font-medium text-neutral-700">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              id="signin-password"
+              type={showPass ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+              className="w-full px-4 py-3 pr-12 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60 transition-shadow"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-neutral-500 hover:text-neutral-800 rounded-lg"
+              aria-label={showPass ? "Hide password" : "Show password"}
+            >
+              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 space-y-5"
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800 text-sm">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3.5 rounded-xl bg-neutral-900 text-white font-semibold hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-300">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-300">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPass ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all pr-12"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white"
-              >
-                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/30"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-
-          <p className="text-center text-sm text-neutral-400">
-            Don't have an account?{" "}
-            <a
-              href="/account/signup"
-              className="text-blue-400 hover:text-blue-300 font-medium"
-            >
-              Create one
-            </a>
-          </p>
-        </form>
-      </div>
-    </div>
+          {loading ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+    </AccountAuthShell>
   );
 }

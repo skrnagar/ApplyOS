@@ -1,5 +1,7 @@
-const USERS_KEY = "applyai_local_users";
-const SESSION_KEY = "applyai_local_session";
+const USERS_KEY_NEW = "hireorbit_local_users";
+const SESSION_KEY_NEW = "hireorbit_local_session";
+const USERS_KEY_OLD = "applyai_local_users";
+const SESSION_KEY_OLD = "applyai_local_session";
 
 function safeParse(value, fallback) {
   try {
@@ -9,28 +11,49 @@ function safeParse(value, fallback) {
   }
 }
 
+function migrateAuthKeys() {
+  if (typeof window === "undefined") return;
+  if (!window.localStorage.getItem(USERS_KEY_NEW) && window.localStorage.getItem(USERS_KEY_OLD)) {
+    window.localStorage.setItem(
+      USERS_KEY_NEW,
+      window.localStorage.getItem(USERS_KEY_OLD),
+    );
+  }
+  if (!window.localStorage.getItem(SESSION_KEY_NEW) && window.localStorage.getItem(SESSION_KEY_OLD)) {
+    window.localStorage.setItem(
+      SESSION_KEY_NEW,
+      window.localStorage.getItem(SESSION_KEY_OLD),
+    );
+  }
+}
+
 export function getLocalUsers() {
   if (typeof window === "undefined") return [];
-  return safeParse(window.localStorage.getItem(USERS_KEY), []);
+  migrateAuthKeys();
+  return safeParse(window.localStorage.getItem(USERS_KEY_NEW), []);
 }
 
 export function setLocalUsers(users) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  migrateAuthKeys();
+  window.localStorage.setItem(USERS_KEY_NEW, JSON.stringify(users));
 }
 
 export function getLocalSession() {
   if (typeof window === "undefined") return null;
-  return safeParse(window.localStorage.getItem(SESSION_KEY), null);
+  migrateAuthKeys();
+  return safeParse(window.localStorage.getItem(SESSION_KEY_NEW), null);
 }
 
 export function setLocalSession(session) {
   if (typeof window === "undefined") return;
+  migrateAuthKeys();
   if (!session) {
-    window.localStorage.removeItem(SESSION_KEY);
+    window.localStorage.removeItem(SESSION_KEY_NEW);
   } else {
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    window.localStorage.setItem(SESSION_KEY_NEW, JSON.stringify(session));
   }
+  window.dispatchEvent(new Event("hireorbit:auth-changed"));
   window.dispatchEvent(new Event("applyai:auth-changed"));
 }
 

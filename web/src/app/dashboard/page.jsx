@@ -39,9 +39,34 @@ export default function DashboardPage() {
       if (res.ok) {
         const data = await res.json();
         setStats(data);
+      } else {
+        setStats({
+          stats: {
+            totalApplications: 0,
+            interviews: 0,
+            offers: 0,
+            rejections: 0,
+            responseRate: 0,
+          },
+          recentApplications: [],
+          upcomingInterviews: [],
+          demoStats: true,
+        });
       }
     } catch (err) {
       console.error(err);
+      setStats({
+        stats: {
+          totalApplications: 0,
+          interviews: 0,
+          offers: 0,
+          rejections: 0,
+          responseRate: 0,
+        },
+        recentApplications: [],
+        upcomingInterviews: [],
+        demoStats: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -120,8 +145,15 @@ export default function DashboardPage() {
             , {firstName}! 👋
           </h1>
           <p className="text-neutral-500 mt-1 text-sm">
-            Here's your job search overview for today
+            Here&apos;s your job search overview for today
           </p>
+          {stats?.demoStats ? (
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <strong className="font-semibold">Live stats need a linked account.</strong> You&apos;re
+              signed in with a local session or preview mode — numbers below are placeholders until
+              the API can attach your profile to the database.
+            </div>
+          ) : null}
         </div>
 
         {/* Stats */}

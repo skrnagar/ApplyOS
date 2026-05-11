@@ -1,46 +1,48 @@
 "use client";
 import React from "react";
 import { Twitter, Linkedin, Github, Instagram } from "lucide-react";
+import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
 
 export default function Footer() {
   return (
-    <footer className="py-20 bg-black border-t border-white/5">
-      <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-4 gap-12 mb-20">
+    <footer className="py-16 md:py-20 bg-white border-t border-neutral-200/90">
+      <div className="container mx-auto px-5 sm:px-6">
+        <div className="grid md:grid-cols-4 gap-10 md:gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-tr from-green-400 to-blue-500 rounded-lg" />
-              <span className="text-xl font-bold tracking-tight text-white">
-                ApplyAI
-              </span>
+            <div className="mb-5">
+              <HireOrbitLogo size="md" variant="light" />
             </div>
-            <p className="text-neutral-500 text-sm leading-relaxed mb-6">
-              The world's first AI-powered job application service. We blend
-              elite human oversight with proprietary AI to accelerate your
-              career.
+            <p className="text-neutral-600 text-sm leading-relaxed mb-6">
+              HireOrbit is your AI career operating system: transparent applications,
+              resume &amp; LinkedIn optimization, assistant support, and analytics —
+              built for trust, not spam.
             </p>
             <div className="flex gap-4">
               <a
-                href="#"
-                className="text-neutral-500 hover:text-white transition-colors"
+                href="https://twitter.com"
+                className="text-neutral-400 hover:text-neutral-800 transition-colors"
+                aria-label="Twitter"
               >
                 <Twitter size={20} />
               </a>
               <a
-                href="#"
-                className="text-neutral-500 hover:text-white transition-colors"
+                href="https://linkedin.com"
+                className="text-neutral-400 hover:text-neutral-800 transition-colors"
+                aria-label="LinkedIn"
               >
                 <Linkedin size={20} />
               </a>
               <a
-                href="#"
-                className="text-neutral-500 hover:text-white transition-colors"
+                href="https://instagram.com"
+                className="text-neutral-400 hover:text-neutral-800 transition-colors"
+                aria-label="Instagram"
               >
                 <Instagram size={20} />
               </a>
               <a
-                href="#"
-                className="text-neutral-500 hover:text-white transition-colors"
+                href="https://github.com"
+                className="text-neutral-400 hover:text-neutral-800 transition-colors"
+                aria-label="GitHub"
               >
                 <Github size={20} />
               </a>
@@ -48,95 +50,101 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-6">Platform</h4>
-            <ul className="space-y-4 text-sm text-neutral-500">
+            <h4 className="text-neutral-900 font-bold mb-5 text-sm uppercase tracking-wide">Platform</h4>
+            <ul className="space-y-3 text-sm text-neutral-600">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="/#how-it-works" className="hover:text-neutral-900 transition-colors">
                   How it Works
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="/#testimonials" className="hover:text-neutral-900 transition-colors">
                   Success Stories
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Pricing Plans
+                <a href="/pricing" className="hover:text-neutral-900 transition-colors">
+                  Pricing
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Enterprise
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-bold mb-6">Resources</h4>
-            <ul className="space-y-4 text-sm text-neutral-500">
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Career Blog
+                <a href="/contact" className="hover:text-neutral-900 transition-colors">
+                  Talk to Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Resume Guide
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Interview Prep
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  ATS Checker
+                <a href="/#signup" className="hover:text-neutral-900 transition-colors">
+                  Create account
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-6">Company</h4>
-            <ul className="space-y-4 text-sm text-neutral-500">
+            <h4 className="text-neutral-900 font-bold mb-5 text-sm uppercase tracking-wide">Resources</h4>
+            <ul className="space-y-3 text-sm text-neutral-600">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  About Us
+                <a href="/#resources" className="hover:text-neutral-900 transition-colors">
+                  Insightful resources
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="/tools" className="hover:text-neutral-900 transition-colors">
+                  Free Tools
+                </a>
+              </li>
+              <li>
+                <a href="/tools#resume" className="hover:text-neutral-900 transition-colors">
+                  Resume guide
+                </a>
+              </li>
+              <li>
+                <a href="/tools#interview" className="hover:text-neutral-900 transition-colors">
+                  Interview prep
+                </a>
+              </li>
+              <li>
+                <a href="/#faq" className="hover:text-neutral-900 transition-colors">
+                  FAQ
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-neutral-900 font-bold mb-5 text-sm uppercase tracking-wide">Company</h4>
+            <ul className="space-y-3 text-sm text-neutral-600">
+              <li>
+                <a href="/" className="hover:text-neutral-900 transition-colors">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="hover:text-neutral-900 transition-colors">
                   Contact
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Privacy Policy
+                <a href="/contact#privacy" className="hover:text-neutral-900 transition-colors">
+                  Privacy
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Terms of Service
+                <a href="/contact#terms" className="hover:text-neutral-900 transition-colors">
+                  Terms
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-neutral-600 text-xs">
-            © 2026 ApplyAI. All rights reserved. Built for the future of work.
+        <div className="pt-8 border-t border-neutral-200/90 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-neutral-500 text-xs">
+            © {new Date().getFullYear()} HireOrbit. All rights reserved.
           </p>
           <div className="flex gap-8">
-            <span className="text-xs text-neutral-600 font-medium cursor-pointer hover:text-white transition-colors">
-              Status: Operational
-            </span>
-            <span className="text-xs text-neutral-600 font-medium cursor-pointer hover:text-white transition-colors">
-              Region: Global
-            </span>
+            <span className="text-xs text-neutral-500 font-medium">Status: Operational</span>
+            <span className="text-xs text-neutral-500 font-medium">Region: Global</span>
           </div>
         </div>
       </div>

@@ -37,11 +37,15 @@ export default function MagneticButton({
 
   const variants = {
     primary:
-      "bg-white text-black hover:bg-neutral-100 shadow-[0_8px_30px_rgba(255,255,255,0.18)]",
+      "bg-white text-black hover:bg-neutral-100 shadow-[0_8px_30px_rgba(15,23,42,0.08)] border border-neutral-200/80",
     secondary:
       "bg-white/[0.04] text-white border border-white/10 hover:bg-white/[0.08] hover:border-white/30 backdrop-blur-xl",
     glow:
       "bg-gradient-to-r from-green-500 to-emerald-400 text-black shadow-[0_8px_40px_rgba(34,197,94,0.45)] hover:shadow-[0_8px_50px_rgba(34,197,94,0.65)]",
+    cta:
+      "bg-emerald-600 text-white hover:bg-emerald-700 border border-emerald-700/20 shadow-sm",
+    outline:
+      "bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300",
   };
 
   const inner = (
@@ -69,9 +73,11 @@ export default function MagneticButton({
       style={{ transformStyle: "preserve-3d", perspective: 800 }}
     >
       {inner}
-      <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-        <span className="absolute inset-[-1px] rounded-full bg-gradient-to-r from-blue-500 via-emerald-400 to-purple-500 opacity-30 blur-md" />
-      </span>
+      {(variant === "primary" || variant === "secondary" || variant === "glow") && (
+        <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="absolute inset-[-1px] rounded-full bg-gradient-to-r from-blue-500 via-emerald-400 to-purple-500 opacity-30 blur-md" />
+        </span>
+      )}
     </Component>
   );
 }

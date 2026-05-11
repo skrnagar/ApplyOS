@@ -12,9 +12,9 @@ import {
   X,
   LogOut,
   User,
-  Zap,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
+import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -59,10 +59,7 @@ export default function DashboardLayout({ children }) {
       >
         <div className="p-6 border-b border-neutral-100">
           <a href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-gradient-to-tr from-blue-600 to-green-400 rounded-xl flex items-center justify-center">
-              <Zap size={18} className="text-white" />
-            </div>
-            <span className="text-xl font-bold text-neutral-900">ApplyAI</span>
+            <HireOrbitLogo size="sm" variant="light" />
           </a>
         </div>
 

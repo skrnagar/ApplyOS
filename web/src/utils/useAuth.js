@@ -15,12 +15,14 @@ function devSocialShim(provider, callbackUrl) {
 }
 
 function useAuth() {
-  const callbackUrl = typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search).get('callbackUrl')
-    : null;
+  const resolveCallbackUrl = (options) => {
+    if (typeof window === "undefined") return options?.callbackUrl ?? "/dashboard";
+    const fromUrl = new URLSearchParams(window.location.search).get("callbackUrl");
+    return fromUrl ?? options?.callbackUrl ?? "/dashboard";
+  };
 
   const signInWithCredentials = useCallback(async (options) => {
-    const finalCallbackUrl = callbackUrl ?? options?.callbackUrl ?? "/dashboard";
+    const finalCallbackUrl = resolveCallbackUrl(options);
     try {
       await signIn("credentials-signin", {
         ...options,
@@ -35,10 +37,10 @@ function useAuth() {
       }
       return { ok: true };
     }
-  }, [callbackUrl])
+  }, [])
 
   const signUpWithCredentials = useCallback(async (options) => {
-    const finalCallbackUrl = callbackUrl ?? options?.callbackUrl ?? "/dashboard";
+    const finalCallbackUrl = resolveCallbackUrl(options);
     try {
       await signIn("credentials-signup", {
         ...options,
@@ -53,13 +55,13 @@ function useAuth() {
       }
       return { ok: true };
     }
-  }, [callbackUrl])
+  }, [])
 
   const signInWithGoogle = useCallback((options) => {
-    const cb = callbackUrl ?? options?.callbackUrl;
+    const cb = resolveCallbackUrl(options);
     if (isDevIframe()) return devSocialShim("google", cb);
     return signIn("google", { ...options, callbackUrl: cb });
-  }, [callbackUrl]);
+  }, []);
   const signInWithFacebook = useCallback((options) => {
     const cb = options?.callbackUrl;
     if (isDevIframe()) return devSocialShim("facebook", cb);
@@ -71,10 +73,10 @@ function useAuth() {
     return signIn("twitter", options);
   }, []);
   const signInWithApple = useCallback((options) => {
-    const cb = callbackUrl ?? options?.callbackUrl;
+    const cb = resolveCallbackUrl(options);
     if (isDevIframe()) return devSocialShim("apple", cb);
     return signIn("apple", { ...options, callbackUrl: cb });
-  }, [callbackUrl]);
+  }, []);
 
   return {
     signInWithCredentials,

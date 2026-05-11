@@ -1,47 +1,44 @@
 "use client";
 import React from "react";
-import CinematicBackdrop from "../components/CinematicBackdrop";
-import Navbar from "../components/Navbar";
+import MarketingShell from "../components/marketing/MarketingShell";
 import Hero from "../components/Hero";
 import LogoCloud from "../components/LogoCloud";
+import DifferenceSection from "../components/marketing/DifferenceSection";
+import HumanWorkSection from "../components/marketing/HumanWorkSection";
+import DMSection from "../components/marketing/DMSection";
 import HowItWorks from "../components/HowItWorks";
-import DigitalTunnel from "../components/DigitalTunnel";
+import ImpactSection from "../components/marketing/ImpactSection";
+import ValueTeaser from "../components/marketing/ValueTeaser";
+import LightFeatureBand from "../components/LightFeatureBand";
 import Pricing from "../components/Pricing";
 import PlatformPreview from "../components/PlatformPreview";
 import OnboardingPreview from "../components/OnboardingPreview";
+import InsightfulResources from "../components/marketing/InsightfulResources";
 import Testimonials from "../components/Testimonials";
 import FAQ from "../components/FAQ";
 import CTA from "../components/CTA";
-import Footer from "../components/Footer";
-import CursorGlow from "../components/CursorGlow";
-import ScrollProgress from "../components/ui/ScrollProgress";
+import NewUserSection from "../components/marketing/NewUserSection";
 
 export default function LandingPage() {
   return (
-    <main className="relative min-h-screen font-inter">
-      <CinematicBackdrop />
-      <div className="relative z-[1]">
-        <ScrollProgress />
-        <CursorGlow />
-        <Navbar />
-
-        <Hero />
-        <LogoCloud />
-        <HowItWorks />
-        <DigitalTunnel />
-        <Pricing />
-        <PlatformPreview />
-        <OnboardingPreview />
-        <Testimonials />
-        <FAQ />
-        <CTA />
-        <Footer />
-
-        <div
-          aria-hidden
-          className="fixed inset-0 pointer-events-none z-[2] opacity-[0.035] mix-blend-overlay noise"
-        />
-      </div>
-    </main>
+    <MarketingShell>
+      <Hero />
+      <LogoCloud />
+      <DifferenceSection />
+      <HumanWorkSection />
+      <DMSection />
+      <HowItWorks />
+      <ImpactSection />
+      <ValueTeaser />
+      <LightFeatureBand />
+      <Pricing />
+      <PlatformPreview />
+      <OnboardingPreview />
+      <InsightfulResources />
+      <Testimonials />
+      <NewUserSection />
+      <FAQ />
+      <CTA />
+    </MarketingShell>
   );
 }

@@ -37,6 +37,17 @@ import type { Route } from './+types/root';
 
 export const links = () => [];
 
+export function meta() {
+  return [
+    { title: 'HireOrbit — AI career operating system' },
+    {
+      name: 'description',
+      content:
+        'HireOrbit optimizes your full job search pipeline: curated applications, resume & LinkedIn upgrades, assistant support, and transparent progress — premium UX, AI-native workflows.',
+    },
+  ];
+}
+
 if (globalThis.window && globalThis.window !== undefined) {
   globalThis.window.fetch = fetch;
 }
@@ -268,7 +279,11 @@ export const ClientOnly: React.FC<ClientOnlyProps> = ({ loader }) => {
   // as the throwing child; keeping the boundary always-mounted avoids that.
   return (
     <ErrorBoundaryWrapper>
-      {isMounted ? <LoaderWrapper loader={loader} /> : null}
+      {isMounted ? (
+        <LoaderWrapper loader={loader} />
+      ) : (
+        <div className="min-h-screen bg-[#f4f6f8]" aria-busy="true" aria-label="Loading" />
+      )}
     </ErrorBoundaryWrapper>
   );
 };
@@ -445,7 +460,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <link rel="icon" href="/src/__create/favicon.png" />
         {LoadFontsSSR ? <LoadFontsSSR /> : null}
       </head>
-      <body>
+      <body className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900">
         <ClientOnly loader={() => children} />
         <Toaster position={isMobile ? 'top-center' : 'bottom-right'} />
         <ScrollRestoration />

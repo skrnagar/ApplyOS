@@ -1,10 +1,28 @@
 import sql from "../../utils/sql.js";
 import { getOrCreateUser } from "../../utils/getUser.js";
 
+const emptyPayload = {
+  stats: {
+    totalApplications: 0,
+    interviews: 0,
+    offers: 0,
+    rejections: 0,
+    responseRate: 0,
+  },
+  recentApplications: [],
+  unreadMessages: 0,
+  upcomingInterviews: [],
+  user: null,
+  /** Set when no server session / DB user — client still shows dashboard (e.g. local auth). */
+  demoStats: true,
+};
+
 export async function GET() {
   try {
     const user = await getOrCreateUser();
-    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user) {
+      return Response.json(emptyPayload);
+    }
     const userId = user.id;
 
     const [totalApps] =

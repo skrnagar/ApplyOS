@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { AlertCircle, ArrowLeft, Zap } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
+import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
 import AmbientBackground from "@/components/AmbientBackground";
 
 const ERROR_MESSAGES = {
@@ -44,11 +45,8 @@ export default function AuthErrorPage() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-green-400 rounded-xl flex items-center justify-center">
-              <Zap size={20} className="text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">ApplyAI</span>
+          <a href="/" className="inline-flex justify-center mb-6">
+            <HireOrbitLogo size="lg" variant="dark" />
           </a>
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-red-500/15 border border-red-500/25 mb-4">
             <AlertCircle className="text-red-400" size={28} />

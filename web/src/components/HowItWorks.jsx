@@ -7,25 +7,25 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 const steps = [
   {
-    title: "Upload Your Resume",
+    title: "Upload your resume",
     description:
-      "Our AI analyzes your experience and identifies high-impact keywords to beat ATS filters.",
+      "Our AI analyzes your experience and surfaces high-impact keywords to clear ATS gates.",
     icon: Upload,
-    color: "from-blue-500 to-cyan-400",
+    color: "from-sky-500 to-cyan-500",
   },
   {
-    title: "Define Your Target",
+    title: "Define your target",
     description:
-      "Tell us your dream roles, salary expectations, and preferred companies. We handle the rest.",
+      "Roles, salary bands, geography, and must-haves — we align search rules to your story.",
     icon: Target,
-    color: "from-green-500 to-emerald-400",
+    color: "from-emerald-500 to-teal-500",
   },
   {
-    title: "Daily Applications",
+    title: "Daily applications",
     description:
-      "Your dedicated assistant applies to curated jobs daily, sending you real-time updates.",
+      "Assistants execute a steady cadence of curated submissions with transparent updates.",
     icon: CheckCircle,
-    color: "from-purple-500 to-pink-500",
+    color: "from-violet-500 to-indigo-500",
   },
 ];
 
@@ -40,17 +40,17 @@ export default function HowItWorks() {
         if (!card) return;
         gsap.fromTo(
           card,
-          { opacity: 0.4, y: 60, scale: 0.92 },
+          { opacity: 0.5, y: 48, scale: 0.98 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.8,
+            duration: 0.75,
             ease: "power3.out",
             scrollTrigger: {
               trigger: card,
-              start: "top 82%",
-              end: "top 45%",
+              start: "top 88%",
+              end: "top 48%",
               scrub: true,
             },
           },
@@ -65,56 +65,57 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       ref={containerRef}
-      className="py-32 bg-black relative overflow-hidden"
+      className="py-20 md:py-28 bg-[#fafbfc] relative overflow-hidden border-y border-neutral-200/70"
     >
-      <div className="container mx-auto px-6">
-        <div className="mb-20 text-center">
+      <div className="container mx-auto px-5 sm:px-6">
+        <div className="mb-14 md:mb-16 text-center max-w-2xl mx-auto">
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-white mb-6"
+            className="text-3xl md:text-4xl font-semibold text-neutral-900 tracking-tight"
           >
-            A Cinematic Approach To <br />
-            <span className="text-neutral-500">Your Next Career Move</span>
+            A clear playbook for{' '}
+            <span className="text-neutral-500">your next move</span>
           </motion.h2>
+          <p className="mt-4 text-neutral-600 text-sm md:text-base leading-relaxed">
+            No mystery mechanics — upload, aim, execute. Visibility lives in your dashboard from day one.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Progress Line */}
-          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 hidden md:block" />
+        <div className="grid md:grid-cols-3 gap-5 md:gap-6 relative">
+          <div className="absolute top-[42%] left-0 w-full h-px bg-neutral-200/90 hidden md:block pointer-events-none" />
 
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
               <motion.div
-                key={index}
+                key={step.title}
                 ref={(el) => {
                   cardsRef.current[index] = el;
                 }}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                className="group relative p-8 rounded-3xl bg-neutral-900/50 border border-white/5 backdrop-blur-sm hover:border-white/20 transition-all duration-500 overflow-hidden"
+                transition={{ delay: index * 0.06 }}
+                className="group relative p-6 md:p-7 rounded-2xl bg-white border border-neutral-200/90 shadow-sm hover:border-emerald-200/80 hover:shadow-md transition-all duration-300"
               >
-                <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-blue-500/0 via-blue-400 to-green-400/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div
-                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-6 shadow-lg shadow-black/50 group-hover:scale-110 transition-transform duration-500`}
+                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-5 shadow-md shadow-neutral-900/10`}
                 >
-                  <Icon size={28} className="text-white" />
+                  <Icon size={24} className="text-white" aria-hidden />
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-lg md:text-xl font-semibold text-neutral-900 mb-3">
                   {step.title}
                 </h3>
-                <p className="text-neutral-400 leading-relaxed">
+                <p className="text-neutral-600 text-sm md:text-[15px] leading-relaxed">
                   {step.description}
                 </p>
 
-                <div className="mt-8 flex items-center gap-2 text-sm font-medium text-neutral-500">
-                  <span className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                    0{index + 1}
+                <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-neutral-500 uppercase tracking-wide">
+                  <span className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center border border-neutral-200 text-neutral-800 tabular-nums">
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                   Step
                 </div>
@@ -122,11 +123,6 @@ export default function HowItWorks() {
             );
           })}
         </div>
-      </div>
-
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-green-500/10 blur-[120px] rounded-full" />
       </div>
     </section>
   );

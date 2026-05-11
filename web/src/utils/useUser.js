@@ -32,8 +32,12 @@ const useUser = () => {
       if (!local && status !== "authenticated") setUser(null);
     };
     syncLocal();
+    window.addEventListener("hireorbit:auth-changed", syncLocal);
     window.addEventListener("applyai:auth-changed", syncLocal);
-    return () => window.removeEventListener("applyai:auth-changed", syncLocal);
+    return () => {
+      window.removeEventListener("hireorbit:auth-changed", syncLocal);
+      window.removeEventListener("applyai:auth-changed", syncLocal);
+    };
   }, [status]);
 
   if (process.env.NEXT_PUBLIC_CREATE_ENV !== "PRODUCTION") {

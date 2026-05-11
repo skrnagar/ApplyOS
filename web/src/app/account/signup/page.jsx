@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import useAuth from "@/utils/useAuth";
-import { Eye, EyeOff, Zap } from "lucide-react";
-import AmbientBackground from "@/components/AmbientBackground";
+import { Eye, EyeOff } from "lucide-react";
+import AccountAuthShell from "@/components/auth/AccountAuthShell";
+import { AccountInput } from "@/components/auth/AccountInput";
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
@@ -18,7 +19,7 @@ export default function SignUpPage() {
     setLoading(true);
     setError(null);
     if (!email || !password) {
-      setError("Please fill in all fields");
+      setError("Please fill in email and password");
       setLoading(false);
       return;
     }
@@ -46,113 +47,92 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
-      <AmbientBackground />
-
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-green-400 rounded-xl flex items-center justify-center">
-              <Zap size={20} className="text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">ApplyAI</span>
+    <AccountAuthShell
+      title="Create your account"
+      subtitle="Launch your job search pipeline with HireOrbit."
+      footer={
+        <p>
+          Already have an account?{" "}
+          <a href="/account/signin" className="font-semibold text-emerald-700 hover:text-emerald-800">
+            Sign in
           </a>
-          <h1 className="text-3xl font-bold text-white mb-2">Start for free</h1>
-          <p className="text-neutral-400">
-            Let AI handle your job applications
-          </p>
+        </p>
+      }
+    >
+      <form onSubmit={onSubmit} className="space-y-5">
+        <AccountInput
+          id="signup-name"
+          label="Full name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Alex Morgan"
+          autoComplete="name"
+        />
+
+        <AccountInput
+          id="signup-email"
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          required
+          autoComplete="email"
+        />
+
+        <div className="space-y-1.5">
+          <label htmlFor="signup-password" className="text-sm font-medium text-neutral-700">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              id="signup-password"
+              type={showPass ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className="w-full px-4 py-3 pr-12 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60 transition-shadow"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-neutral-500 hover:text-neutral-800 rounded-lg"
+              aria-label={showPass ? "Hide password" : "Show password"}
+            >
+              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 space-y-5"
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800 text-sm">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-300">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Smith"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
-            />
-          </div>
+          {loading ? "Creating account…" : "Create free account"}
+        </button>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-300">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-300">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPass ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 8 characters"
-                required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all pr-12"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white"
-              >
-                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/30"
-          >
-            {loading ? "Creating account..." : "Create Free Account"}
-          </button>
-
-          <p className="text-center text-xs text-neutral-500">
-            By signing up, you agree to our{" "}
-            <a href="#" className="text-neutral-400 underline">
-              Terms
-            </a>{" "}
-            and{" "}
-            <a href="#" className="text-neutral-400 underline">
-              Privacy Policy
-            </a>
-          </p>
-
-          <p className="text-center text-sm text-neutral-400">
-            Already have an account?{" "}
-            <a
-              href="/account/signin"
-              className="text-blue-400 hover:text-blue-300 font-medium"
-            >
-              Sign in
-            </a>
-          </p>
-        </form>
-      </div>
-    </div>
+        <p className="text-center text-xs text-neutral-500 leading-relaxed">
+          By signing up, you agree to our{" "}
+          <a href="/contact#terms" className="text-emerald-700 font-medium hover:underline">
+            Terms
+          </a>{" "}
+          and{" "}
+          <a href="/contact#privacy" className="text-emerald-700 font-medium hover:underline">
+            Privacy
+          </a>
+          .
+        </p>
+      </form>
+    </AccountAuthShell>
   );
 }

@@ -25,28 +25,35 @@ const modules = [
 
 export default function PlatformPreview() {
   return (
-    <section className="py-28">
-      <div className="container mx-auto px-6">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-[0.28em] text-blue-300 mb-4">Platform Modules</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white text-glow">Complete AI Job Search Operating System</h2>
+    <section className="py-20 md:py-28 bg-white border-y border-neutral-200/80">
+      <div className="container mx-auto px-5 sm:px-6">
+        <div className="max-w-2xl">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-emerald-700 font-semibold mb-3">
+            Platform modules
+          </p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-neutral-900 tracking-tight">
+            Your career operating system
+          </h2>
+          <p className="mt-4 text-neutral-600 text-sm md:text-base leading-relaxed">
+            Everything you need to run a serious search — not a patchwork of spreadsheets and tabs.
+          </p>
         </div>
 
-        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {modules.map((item, i) => {
             const Icon = item.icon;
             return (
               <motion.div
                 key={item.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.04 }}
-                className="glass-card rounded-2xl p-5 hover:border-blue-400/30 transition-colors"
+                transition={{ delay: i * 0.03 }}
+                className="rounded-2xl border border-neutral-200/90 bg-[#fafbfc] p-5 hover:border-emerald-200/80 hover:bg-white hover:shadow-sm transition-all"
               >
-                <Icon className="text-blue-300 mb-4" size={20} />
-                <h3 className="text-white font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-neutral-400 leading-relaxed">{item.desc}</p>
+                <Icon className="text-emerald-700 mb-3" size={20} aria-hidden />
+                <h3 className="text-neutral-900 font-semibold mb-2 text-[15px]">{item.title}</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
               </motion.div>
             );
           })}

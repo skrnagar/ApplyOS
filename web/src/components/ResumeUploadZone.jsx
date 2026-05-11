@@ -75,10 +75,10 @@ export default function ResumeUploadZone({
   const isMarketing = variant === "marketing";
 
   const shell = isMarketing
-    ? `rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center gap-4 bg-white/[0.02] ${
+    ? `rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center gap-4 bg-neutral-50 ${
         dragActive
-          ? "border-emerald-400/50 bg-emerald-500/10 shadow-[0_0_40px_rgba(52,211,153,0.15)]"
-          : "border-white/10 hover:border-white/20"
+          ? "border-emerald-500/50 bg-emerald-50 shadow-sm ring-1 ring-emerald-200/60"
+          : "border-neutral-200 hover:border-emerald-300/70 hover:bg-emerald-50/40"
       }`
     : `border-2 border-dashed rounded-2xl p-12 transition-all text-center ${
         dragActive
@@ -118,13 +118,13 @@ export default function ResumeUploadZone({
             <FileUp
               className={
                 isMarketing
-                  ? "text-emerald-400"
+                  ? "text-emerald-600"
                   : "mx-auto text-blue-600 mb-4"
               }
               size={isMarketing ? 40 : 48}
             />
           ) : isMarketing ? (
-            <FileText size={40} className="text-neutral-500" />
+            <FileText size={40} className="text-neutral-400" />
           ) : (
             <Upload className="mx-auto text-neutral-400 mb-4" size={48} />
           )}
@@ -132,7 +132,7 @@ export default function ResumeUploadZone({
           <div className="text-sm font-medium text-center">
             {isMarketing ? (
               <>
-                <span className="text-neutral-400 block mb-1">
+                <span className="text-neutral-700 block mb-1">
                   {uploading
                     ? "Uploading your resume…"
                     : "Drag & drop your resume"}
@@ -154,7 +154,7 @@ export default function ResumeUploadZone({
           </div>
 
           {isMarketing && (
-            <span className="px-4 py-2 bg-white/5 text-xs text-white rounded-lg border border-white/10 pointer-events-none">
+            <span className="px-4 py-2 bg-white text-xs text-neutral-800 rounded-lg border border-neutral-200 shadow-sm pointer-events-none font-medium">
               Browse files
             </span>
           )}
@@ -163,7 +163,7 @@ export default function ResumeUploadZone({
             <div
               className={
                 isMarketing
-                  ? "w-full max-w-xs h-1.5 bg-white/5 rounded-full overflow-hidden"
+                  ? "w-full max-w-xs h-1.5 bg-neutral-200 rounded-full overflow-hidden"
                   : "mt-4 h-2 bg-neutral-200 rounded-full overflow-hidden max-w-xs mx-auto"
               }
             >
@@ -182,7 +182,7 @@ export default function ResumeUploadZone({
             <div
               className={
                 isMarketing
-                  ? "text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"
+                  ? "text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2"
                   : "mt-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 inline-block"
               }
             >
