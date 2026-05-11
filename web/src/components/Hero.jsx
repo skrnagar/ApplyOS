@@ -14,8 +14,8 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 hero-atmosphere-grid opacity-[0.55]" aria-hidden />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#f4f6f8] via-[#f4f6f8]/80 to-transparent" aria-hidden />
 
-      <div className="relative z-10 container mx-auto px-5 sm:px-6 pt-24 sm:pt-28 pb-16 md:pb-20">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-start max-w-7xl 2xl:max-w-[1360px] mx-auto">
+      <div className="relative z-10 mx-auto w-full max-w-[min(100%,92rem)] px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-16 md:pb-20">
+        <div className="grid grid-cols-1 gap-10 lg:gap-12 xl:gap-16 items-start lg:grid-cols-[minmax(0,1fr)_minmax(0,1.48fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,1.62fr)] 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.72fr)] max-w-[min(100%,90rem)] mx-auto">
           <div className="order-1 space-y-7">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -104,7 +104,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="max-w-7xl 2xl:max-w-[1360px] mx-auto mt-10 md:mt-12">
+        <div className="max-w-[min(100%,90rem)] mx-auto mt-10 md:mt-12">
           <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto lg:mx-0 lg:max-w-xl">
             <Stat label="Customers" value={700} suffix="+" />
             <Stat label="Applications" value={250} suffix="K+" />
