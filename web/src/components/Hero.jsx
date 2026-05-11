@@ -15,7 +15,7 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#f4f6f8] via-[#f4f6f8]/80 to-transparent" aria-hidden />
 
       <div className="relative z-10 container mx-auto px-5 sm:px-6 pt-24 sm:pt-28 pb-16 md:pb-20">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-start max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-start max-w-7xl 2xl:max-w-[1360px] mx-auto">
           <div className="order-1 space-y-7">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -99,13 +99,13 @@ export default function Hero() {
             </ul>
           </div>
 
-          <div className="order-2 w-full max-w-md md:max-w-2xl mx-auto lg:max-w-none">
+          <div className="order-2 w-full max-w-md md:max-w-2xl mx-auto lg:mx-0 lg:max-w-none lg:w-full min-w-0">
             <HeroWorkspacePreview className="w-full" />
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto mt-10 md:mt-12">
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto lg:mx-0">
+        <div className="max-w-7xl 2xl:max-w-[1360px] mx-auto mt-10 md:mt-12">
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto lg:mx-0 lg:max-w-xl">
             <Stat label="Customers" value={700} suffix="+" />
             <Stat label="Applications" value={250} suffix="K+" />
             <Stat label="Avg. rating" value={4.9} decimals={1} suffix="" />
