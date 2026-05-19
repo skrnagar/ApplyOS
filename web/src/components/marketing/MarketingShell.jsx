@@ -4,6 +4,8 @@ import ProMarketingBackdrop from "@/components/marketing/ProMarketingBackdrop";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ui/ScrollProgress";
+import LeadGenPopup from "@/components/marketing/LeadGenPopup";
+import MobileFooterNav from "@/components/marketing/MobileFooterNav";
 
 export default function MarketingShell({ children, showBackdrop = true }) {
   return (
@@ -12,8 +14,12 @@ export default function MarketingShell({ children, showBackdrop = true }) {
       <div className="relative z-10 isolation-isolate">
         <ScrollProgress />
         <Navbar />
-        {children}
+        <div className="pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+          {children}
+        </div>
         <Footer />
+        <MobileFooterNav />
+        <LeadGenPopup />
       </div>
     </main>
   );

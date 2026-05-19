@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
-import { Eye, EyeOff } from "lucide-react";
+import { isServerAuthEnabled } from "@/utils/authMode";
+import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
 
@@ -16,6 +17,11 @@ const URL_ERROR_MESSAGES = {
   Default: "Sign-in could not be completed.",
 };
 
+const FIELD_ERRORS = {
+  CredentialsSignin: "Incorrect email or password.",
+  AccessDenied: "You don't have permission to sign in.",
+};
+
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +29,7 @@ export default function SignInPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { signInWithCredentials } = useAuth();
+  const serverAuth = isServerAuthEnabled();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -38,24 +45,27 @@ export default function SignInPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    if (!email || !password) {
+    if (!email?.trim() || !password) {
       setError("Please fill in all fields");
       setLoading(false);
       return;
     }
     try {
       await signInWithCredentials({
-        email,
+        email: email.trim(),
         password,
-        callbackUrl: "/dashboard",
         redirect: true,
       });
     } catch (err) {
-      const msgs = {
-        CredentialsSignin: "Incorrect email or password.",
-        AccessDenied: "You don't have permission to sign in.",
-      };
-      setError(msgs[err.message] || err.message || "Something went wrong. Please try again.");
+      setError(
+        FIELD_ERRORS[err?.message] ||
+          (err?.message === "Incorrect email or password."
+            ? err.message
+            : null) ||
+          err?.message ||
+          "Something went wrong. Please try again.",
+      );
+    } finally {
       setLoading(false);
     }
   };
@@ -64,13 +74,32 @@ export default function SignInPage() {
     <AccountAuthShell
       title="Welcome back"
       subtitle="Sign in to your HireOrbit workspace."
+      banner={
+        !serverAuth ? (
+          <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
+            Demo mode: accounts are stored in this browser until server auth is configured (
+            <code className="text-xs">AUTH_SECRET</code>).
+          </p>
+        ) : null
+      }
       footer={
-        <p>
-          New here?{" "}
-          <a href="/account/signup" className="font-semibold text-emerald-700 hover:text-emerald-800">
-            Create an account
-          </a>
-        </p>
+        <>
+          <p>
+            New here?{" "}
+            <a href="/account/signup" className="font-semibold text-emerald-700 hover:text-emerald-800">
+              Create an account
+            </a>
+          </p>
+          <p className="mt-4">
+            <a
+              href="/contact"
+              className="inline-flex items-center justify-center gap-2 font-semibold text-neutral-700 hover:text-emerald-800"
+            >
+              <Calendar size={16} aria-hidden />
+              Schedule a call
+            </a>
+          </p>
+        </>
       }
     >
       <form onSubmit={onSubmit} className="space-y-5">

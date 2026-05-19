@@ -1,9 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
-import { Eye, EyeOff } from "lucide-react";
+import { isServerAuthEnabled } from "@/utils/authMode";
+import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
+
+const FIELD_ERRORS = {
+  CredentialsSignin: "This email is already registered. Try signing in.",
+  AccessDenied: "Unable to create account. Please try again.",
+};
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
@@ -13,12 +19,21 @@ export default function SignUpPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { signUpWithCredentials } = useAuth();
+  const serverAuth = isServerAuthEnabled();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromEmail = params.get("email");
+    const fromName = params.get("name");
+    if (fromEmail) setEmail(fromEmail);
+    if (fromName) setName(fromName);
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    if (!email || !password) {
+    if (!email?.trim() || !password) {
       setError("Please fill in email and password");
       setLoading(false);
       return;
@@ -30,18 +45,21 @@ export default function SignUpPage() {
     }
     try {
       await signUpWithCredentials({
-        email,
+        email: email.trim(),
         password,
-        name,
-        callbackUrl: "/dashboard",
+        name: name.trim(),
         redirect: true,
       });
     } catch (err) {
-      const msgs = {
-        CredentialsSignin: "This email is already registered. Try signing in.",
-        AccessDenied: "Unable to create account. Please try again.",
-      };
-      setError(msgs[err.message] || err.message || "Something went wrong. Please try again.");
+      setError(
+        FIELD_ERRORS[err?.message] ||
+          (err?.message === "This email is already registered."
+            ? err.message
+            : null) ||
+          err?.message ||
+          "Something went wrong. Please try again.",
+      );
+    } finally {
       setLoading(false);
     }
   };
@@ -50,13 +68,32 @@ export default function SignUpPage() {
     <AccountAuthShell
       title="Create your account"
       subtitle="Launch your job search pipeline with HireOrbit."
+      banner={
+        !serverAuth ? (
+          <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
+            Demo mode: your account is saved in this browser until server auth is configured (
+            <code className="text-xs">AUTH_SECRET</code> + database).
+          </p>
+        ) : null
+      }
       footer={
-        <p>
-          Already have an account?{" "}
-          <a href="/account/signin" className="font-semibold text-emerald-700 hover:text-emerald-800">
-            Sign in
-          </a>
-        </p>
+        <>
+          <p>
+            Already have an account?{" "}
+            <a href="/account/signin" className="font-semibold text-emerald-700 hover:text-emerald-800">
+              Sign in
+            </a>
+          </p>
+          <p className="mt-4">
+            <a
+              href="/contact"
+              className="inline-flex items-center justify-center gap-2 font-semibold text-neutral-700 hover:text-emerald-800"
+            >
+              <Calendar size={16} aria-hidden />
+              Schedule a call
+            </a>
+          </p>
+        </>
       }
     >
       <form onSubmit={onSubmit} className="space-y-5">

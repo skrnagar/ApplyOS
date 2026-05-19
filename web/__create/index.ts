@@ -288,10 +288,20 @@ app.all('/integrations/:path{.+}', async (c, next) => {
 });
 
 app.use('/api/auth/*', async (c, next) => {
-  if (isAuthAction(c.req.path)) {
-    return authHandler()(c, next);
+  if (!isAuthAction(c.req.path)) {
+    return next();
   }
-  return next();
+  if (!process.env.AUTH_SECRET) {
+    return c.json(
+      {
+        error: 'Configuration',
+        message:
+          'Server authentication is not configured (AUTH_SECRET missing). Use email/password sign-in for local demo mode.',
+      },
+      503,
+    );
+  }
+  return authHandler()(c, next);
 });
 app.route(API_BASENAME, api);
 

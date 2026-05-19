@@ -20,6 +20,25 @@ export default function ContactPage() {
 
         <div className="space-y-4 mb-12">
           <a
+            href="/contact#schedule"
+            className="flex items-center gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 to-white shadow-sm p-6 hover:border-emerald-300 transition-colors"
+          >
+            <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0">
+              <MessageCircle className="text-white" size={22} aria-hidden />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-wider text-emerald-800 mb-1 font-semibold">
+                Schedule a call
+              </p>
+              <p className="text-neutral-900 font-semibold">Talk with our team</p>
+              <p className="text-xs text-neutral-600 mt-1" id="schedule">
+                Same flow as Hiredeasy onboarding — we map your goals, visa status, and application volume.
+                Add your Calendly or booking link here when ready.
+              </p>
+            </div>
+          </a>
+
+          <a
             href="mailto:hello@hireorbit.com"
             className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white shadow-sm p-6 hover:border-emerald-300/70 transition-colors"
           >

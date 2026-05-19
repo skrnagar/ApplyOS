@@ -36,7 +36,6 @@ export default function NewUserSection() {
         email: email.trim(),
         password,
         name: name.trim(),
-        callbackUrl: "/dashboard",
         redirect: true,
       });
     } catch (err) {
@@ -45,6 +44,7 @@ export default function NewUserSection() {
           ? "That email is already registered — try signing in."
           : err?.message || "Something went wrong. Try again or use the full sign-up page.";
       setError(msg);
+    } finally {
       setLoading(false);
     }
   };

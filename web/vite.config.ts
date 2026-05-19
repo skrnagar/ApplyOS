@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { reactRouter } from '@react-router/dev/vite';
 import { reactRouterHonoServer } from 'react-router-hono-server/dev';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import babel from 'vite-plugin-babel';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { addRenderIds } from './plugins/addRenderIds';
@@ -13,9 +13,16 @@ import { nextPublicProcessEnv } from './plugins/nextPublicProcessEnv';
 import { restart } from './plugins/restart';
 import { restartEnvFileChange } from './plugins/restartEnvFileChange';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const serverAuth = Boolean(env.AUTH_SECRET);
+
+  return {
   // Keep them available via import.meta.env.NEXT_PUBLIC_*
   envPrefix: 'NEXT_PUBLIC_',
+  define: {
+    'import.meta.env.NEXT_PUBLIC_SERVER_AUTH': JSON.stringify(serverAuth ? 'true' : 'false'),
+  },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
     // don't want that to cause a re-bundle.
@@ -99,4 +106,5 @@ export default defineConfig({
       clientFiles: ['./src/app/**/*', './src/app/root.tsx', './src/app/routes.ts'],
     },
   },
+};
 });

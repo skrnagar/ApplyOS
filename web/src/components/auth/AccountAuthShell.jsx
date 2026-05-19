@@ -5,7 +5,7 @@ import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
 /**
  * Shared account pages shell — matches marketing light UI (readable, professional).
  */
-export default function AccountAuthShell({ title, subtitle, children, footer }) {
+export default function AccountAuthShell({ title, subtitle, children, footer, banner }) {
   return (
     <div className="min-h-screen bg-[#f4f6f8] text-neutral-900 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       <div
@@ -33,6 +33,8 @@ export default function AccountAuthShell({ title, subtitle, children, footer }) 
             <p className="text-neutral-600 text-sm sm:text-base leading-relaxed">{subtitle}</p>
           ) : null}
         </div>
+
+        {banner ? <div className="mb-4">{banner}</div> : null}
 
         <div className="rounded-2xl border border-neutral-200/90 bg-white/95 backdrop-blur-md shadow-[0_24px_64px_-32px_rgba(15,23,42,0.18)] p-6 sm:p-8">
           {children}
