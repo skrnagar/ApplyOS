@@ -1,4 +1,5 @@
 import { addLocalResume } from "@/utils/localResumes";
+import { getApiAuthHeaders } from "@/utils/apiAuthHeaders";
 
 export const RESUME_MAX_BYTES = 8 * 1024 * 1024;
 export const RESUME_ACCEPT = ".pdf,.doc,.docx";
@@ -20,6 +21,21 @@ export function validateResumeFile(file) {
     };
   }
   return { ok: true };
+}
+
+export async function uploadResumeToStorage(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch("/api/resumes/upload", {
+    method: "POST",
+    headers: getApiAuthHeaders(),
+    body: formData,
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || "upload-failed");
+  }
+  return response.json();
 }
 
 export async function uploadResumeToUrl(file) {
@@ -51,17 +67,30 @@ export async function getResumeFileUrlWithFallback(file) {
   }
 }
 
-export async function saveResumeRecord(file, fileUrl, userId, existingCount) {
+export async function saveResumeRecord(file, _fileUrl, userId, existingCount) {
+  try {
+    const data = await uploadResumeToStorage(file);
+    return { resume: data.resume, resumes: null, source: data.source || "supabase" };
+  } catch (storageErr) {
+    const msg = storageErr?.message || "";
+    const canFallback =
+      msg.includes("not configured") ||
+      msg.includes("Unauthorized") ||
+      msg.includes("upload-failed") ||
+      msg.includes("storage");
+    if (!canFallback) throw storageErr;
+  }
+
+  const fileUrl = await getResumeFileUrlWithFallback(file);
   const payload = {
     file_name: file.name,
     file_url: fileUrl,
     file_size: file.size,
-    ats_score: Math.floor(Math.random() * 30) + 70,
   };
 
   const response = await fetch("/api/resumes", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getApiAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
 

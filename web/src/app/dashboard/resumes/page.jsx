@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { getLocalResumes, setLocalResumes } from "@/utils/localResumes";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 
 export default function ResumesPage() {
   const [resumes, setResumes] = useState([]);
@@ -26,7 +27,7 @@ export default function ResumesPage() {
 
   const fetchResumes = async () => {
     try {
-      const response = await fetch("/api/resumes");
+      const response = await fetchWithAuth("/api/resumes");
       if (response.ok) {
         const data = await response.json();
         setResumes(data);
@@ -47,7 +48,7 @@ export default function ResumesPage() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/resumes/${id}`, {
+      const response = await fetchWithAuth(`/api/resumes/${id}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -66,7 +67,7 @@ export default function ResumesPage() {
 
   const handleSetPrimary = async (id) => {
     try {
-      const response = await fetch(`/api/resumes/${id}`, {
+      const response = await fetchWithAuth(`/api/resumes/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_primary: true }),

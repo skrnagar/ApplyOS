@@ -5,6 +5,7 @@ import Card, { CardHeader, CardContent } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { motion } from "motion/react";
 import { Send, Paperclip, Smile, MoreVertical } from "lucide-react";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState([]);
@@ -23,7 +24,7 @@ export default function MessagesPage() {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch("/api/messages");
+      const response = await fetchWithAuth("/api/messages");
       if (response.ok) {
         const data = await response.json();
         setMessages(data);
@@ -41,7 +42,7 @@ export default function MessagesPage() {
     if (!newMessage.trim() || sending) return;
     setSending(true);
     try {
-      const response = await fetch("/api/messages", {
+      const response = await fetchWithAuth("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: newMessage }),

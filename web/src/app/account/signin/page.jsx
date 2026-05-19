@@ -74,6 +74,10 @@ export default function SignInPage() {
     <AccountAuthShell
       title="Welcome back"
       subtitle="Sign in to your HireOrbit workspace."
+      backHref="/"
+      backLabel="Home"
+      secondaryBackHref="/account/signup"
+      secondaryBackLabel="Sign up"
       banner={
         !serverAuth ? (
           <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">

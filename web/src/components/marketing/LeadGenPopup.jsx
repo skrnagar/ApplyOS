@@ -5,7 +5,8 @@ import { useLocation } from "react-router";
 import { X, ArrowRight, Sparkles } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { getLocalSession } from "@/utils/localAuth";
-import LeadGenSocialProof from "./LeadGenSocialProof";
+import LeadGenPopupProof from "./LeadGenPopupProof";
+import { captureLead } from "@/utils/captureLead";
 
 const STORAGE_KEY = "hireorbit_lead_popup_dismissed";
 const LEADS_KEY = "hireorbit_lead_captures";
@@ -64,7 +65,6 @@ export default function LeadGenPopup() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
-  const [useCollageImage, setUseCollageImage] = useState(true);
 
   const close = useCallback(() => {
     dismissPopup();
@@ -100,16 +100,21 @@ export default function LeadGenPopup() {
     };
   }, [open, close]);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError("Enter a valid work email.");
+      setError("Enter a valid email.");
       return;
     }
     setSubmitting(true);
     saveLead({ email: trimmed, name: name.trim() });
+    await captureLead({
+      email: trimmed,
+      name: name.trim() || undefined,
+      source: "lead_popup",
+    });
     setSubmitted(true);
     setSubmitting(false);
     window.setTimeout(() => {
@@ -145,65 +150,49 @@ export default function LeadGenPopup() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            className="relative w-full max-w-4xl max-h-[min(92vh,720px)] overflow-hidden rounded-2xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.35)] flex flex-col lg:flex-row"
+            className="relative w-full max-w-md sm:max-w-lg max-h-[min(92vh,680px)] overflow-y-auto rounded-2xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.35)]"
           >
             <button
               type="button"
               onClick={close}
-              className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/90 border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 shadow-sm"
+              className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 shadow-sm"
               aria-label="Close"
             >
               <X size={18} />
             </button>
 
-            {/* Social proof — image or built collage */}
-            <div className="lg:w-[52%] bg-[#f0f2f5] p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-neutral-200/80 overflow-y-auto">
-              <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-neutral-500 mb-2">
+            <div className="p-5 sm:p-6 border-b border-neutral-100 bg-gradient-to-b from-[#f0f4f8] to-white">
+              <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-neutral-500 mb-1 pr-10">
                 Straight from our DMs
               </p>
-              <p className="text-sm sm:text-base font-semibold text-neutral-900 mb-3 leading-snug pr-8">
+              <p className="text-sm font-semibold text-neutral-900 mb-4 leading-snug">
                 Real chatter from people dodging burnout.
               </p>
-
-              {useCollageImage ? (
-                <div className="relative rounded-xl overflow-hidden border border-neutral-200/90 shadow-sm bg-white">
-                  <img
-                    src="/images/lead-dm-collage.png"
-                    alt="Customer messages and results: interview calls up 450%, ATS score 42 to 91, job offers from top companies"
-                    className="w-full h-auto object-cover"
-                    onError={() => setUseCollageImage(false)}
-                  />
-                </div>
-              ) : (
-                <LeadGenSocialProof compact />
-              )}
-
-              <p className="mt-3 text-[11px] text-neutral-500 leading-relaxed">
-                700+ customers · 250K+ applications · 4.9★ avg. rating
-              </p>
+              <LeadGenPopupProof />
             </div>
 
-            {/* Lead form */}
-            <div className="lg:w-[48%] p-5 sm:p-7 flex flex-col justify-center min-h-0 overflow-y-auto">
-              <div className="inline-flex items-center gap-1.5 w-fit rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 mb-4">
+            <div className="p-5 sm:p-6">
+              <div className="inline-flex items-center gap-1.5 w-fit rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 mb-3">
                 <Sparkles size={12} aria-hidden />
                 Free to start
               </div>
 
-              <h2 id="lead-popup-title" className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 text-balance">
+              <h2
+                id="lead-popup-title"
+                className="text-xl font-semibold tracking-tight text-neutral-900 text-balance"
+              >
                 We apply to jobs so you don&apos;t have to.
               </h2>
               <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
-                Get a curated pipeline, human-reviewed applications, and daily updates — without
-                spending nights on forms.
+                Curated applications, human review, and daily pipeline updates.
               </p>
 
               {submitted ? (
-                <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-900 text-sm">
+                <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-900 text-sm">
                   You&apos;re in — taking you to create your account…
                 </div>
               ) : (
-                <form onSubmit={onSubmit} className="mt-6 space-y-3">
+                <form onSubmit={onSubmit} className="mt-5 space-y-3">
                   <div>
                     <label htmlFor="lead-name" className="sr-only">
                       Name
@@ -227,7 +216,7 @@ export default function LeadGenPopup() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Work email"
+                      placeholder="Email"
                       required
                       autoComplete="email"
                       className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60 text-sm"
@@ -252,8 +241,12 @@ export default function LeadGenPopup() {
               )}
 
               <p className="mt-4 text-[11px] text-neutral-500 leading-relaxed">
-                No spam. Unsubscribe anytime. Prefer a human?{" "}
-                <a href="/contact#schedule" className="font-semibold text-emerald-700 hover:underline" onClick={close}>
+                No spam. Prefer a human?{" "}
+                <a
+                  href="/contact#schedule"
+                  className="font-semibold text-emerald-700 hover:underline"
+                  onClick={close}
+                >
                   Schedule a call
                 </a>
                 .
@@ -262,7 +255,7 @@ export default function LeadGenPopup() {
               <button
                 type="button"
                 onClick={close}
-                className="mt-3 text-xs text-neutral-400 hover:text-neutral-600 w-fit"
+                className="mt-3 text-xs text-neutral-400 hover:text-neutral-600"
               >
                 Not now
               </button>

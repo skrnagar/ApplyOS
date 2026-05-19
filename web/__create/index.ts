@@ -18,6 +18,8 @@ import NeonAdapter from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
+import { isSupabaseConfigured } from '../src/utils/supabase/config';
+import { supabaseSessionMiddleware } from '../src/utils/supabase/middleware';
 neonConfig.webSocketConstructor = ws;
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
@@ -50,6 +52,10 @@ app.use('*', (c, next) => {
 });
 
 app.use(contextStorage());
+
+if (isSupabaseConfigured()) {
+  app.use('*', supabaseSessionMiddleware);
+}
 
 app.onError((err, c) => {
   if (c.req.method !== 'GET') {

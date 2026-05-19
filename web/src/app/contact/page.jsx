@@ -1,9 +1,61 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import MarketingShell from "@/components/marketing/MarketingShell";
-import { Mail, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle, Send } from "lucide-react";
+import { captureLead } from "@/utils/captureLead";
 
 export default function ContactPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState(null);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError("Enter a valid email.");
+      return;
+    }
+    if (message.trim().length < 10) {
+      setError("Message must be at least 10 characters.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: trimmedEmail,
+          message: message.trim(),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Could not send message. Try again.");
+        return;
+      }
+      await captureLead({
+        email: trimmedEmail,
+        name: name.trim() || undefined,
+        source: "contact",
+      });
+      setSent(true);
+      setName("");
+      setEmail("");
+      setMessage("");
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <MarketingShell>
       <div className="pt-28 pb-20 md:pb-28 container mx-auto px-5 sm:px-6 max-w-2xl">
@@ -17,6 +69,57 @@ export default function ContactPage() {
           Tell us about your role targets, timeline, and how aggressive you want applications.
           We&apos;ll map a HireOrbit plan — same transparency standards we ship in-product.
         </p>
+
+        <form
+          onSubmit={onSubmit}
+          className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm mb-12 space-y-4"
+        >
+          <h2 className="text-sm font-semibold text-neutral-900">Send a message</h2>
+          {sent ? (
+            <p className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+              Thanks — we received your message and will follow up soon.
+            </p>
+          ) : (
+            <>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                required
+                className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
+              />
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="How can we help?"
+                rows={4}
+                required
+                className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm resize-none"
+              />
+              {error && (
+                <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                  {error}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 disabled:opacity-60"
+              >
+                <Send size={16} />
+                {submitting ? "Sending…" : "Send message"}
+              </button>
+            </>
+          )}
+        </form>
 
         <div className="space-y-4 mb-12">
           <a
@@ -32,7 +135,6 @@ export default function ContactPage() {
               </p>
               <p className="text-neutral-900 font-semibold">Talk with our team</p>
               <p className="text-xs text-neutral-600 mt-1" id="schedule">
-                Same flow as Hiredeasy onboarding — we map your goals, visa status, and application volume.
                 Add your Calendly or booking link here when ready.
               </p>
             </div>
@@ -48,9 +150,6 @@ export default function ContactPage() {
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">Email</p>
               <p className="text-neutral-900 font-semibold truncate">hello@hireorbit.com</p>
-              <p className="text-xs text-neutral-500 mt-1">
-                Replace with your live address in production.
-              </p>
             </div>
           </a>
 

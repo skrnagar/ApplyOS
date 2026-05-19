@@ -5,6 +5,7 @@ import { isServerAuthEnabled } from "@/utils/authMode";
 import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
+import { captureLead } from "@/utils/captureLead";
 
 const FIELD_ERRORS = {
   CredentialsSignin: "This email is already registered. Try signing in.",
@@ -50,6 +51,11 @@ export default function SignUpPage() {
         name: name.trim(),
         redirect: true,
       });
+      captureLead({
+        email: email.trim(),
+        name: name.trim() || undefined,
+        source: "signup",
+      });
     } catch (err) {
       setError(
         FIELD_ERRORS[err?.message] ||
@@ -68,6 +74,10 @@ export default function SignUpPage() {
     <AccountAuthShell
       title="Create your account"
       subtitle="Launch your job search pipeline with HireOrbit."
+      backHref="/"
+      backLabel="Home"
+      secondaryBackHref="/account/signin"
+      secondaryBackLabel="Sign in"
       banner={
         !serverAuth ? (
           <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
