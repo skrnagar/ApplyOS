@@ -11,3 +11,17 @@ export function isServerAuthEnabled() {
   }
   return false;
 }
+
+/** True when Supabase URL + anon/publishable key are set (email/password + OAuth via Supabase). */
+export function isSupabaseAuthEnabled() {
+  const url =
+    (typeof import.meta !== "undefined" && import.meta.env?.NEXT_PUBLIC_SUPABASE_URL) ||
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_SUPABASE_URL);
+  const key =
+    (typeof import.meta !== "undefined" &&
+      (import.meta.env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        import.meta.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY)) ||
+    (typeof process !== "undefined" &&
+      (process.env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY));
+  return Boolean(url && key);
+}

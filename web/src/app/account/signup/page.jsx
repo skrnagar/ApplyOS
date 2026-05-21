@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
-import { isServerAuthEnabled } from "@/utils/authMode";
+import { isServerAuthEnabled, isSupabaseAuthEnabled } from "@/utils/authMode";
 import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
@@ -9,7 +9,10 @@ import { captureLead } from "@/utils/captureLead";
 
 const FIELD_ERRORS = {
   CredentialsSignin: "This email is already registered. Try signing in.",
+  UserAlreadyRegistered: "This email is already registered. Try signing in.",
   AccessDenied: "Unable to create account. Please try again.",
+  EmailConfirmationRequired:
+    "Check your email to confirm your account before signing in. (You can disable email confirmation in Supabase for local dev.)",
 };
 
 export default function SignUpPage() {
@@ -21,6 +24,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const { signUpWithCredentials } = useAuth();
   const serverAuth = isServerAuthEnabled();
+  const supabaseAuth = isSupabaseAuthEnabled();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -79,9 +83,10 @@ export default function SignUpPage() {
       secondaryBackHref="/account/signin"
       secondaryBackLabel="Sign in"
       banner={
-        !serverAuth ? (
+        !serverAuth && !supabaseAuth ? (
           <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
-            Demo mode: your account is saved in this browser until server auth is configured (
+            Demo mode: your account is saved in this browser until you configure Supabase (
+            <code className="text-xs">NEXT_PUBLIC_SUPABASE_*</code>) or server auth (
             <code className="text-xs">AUTH_SECRET</code> + database).
           </p>
         ) : null

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
-import { isServerAuthEnabled } from "@/utils/authMode";
+import { isServerAuthEnabled, isSupabaseAuthEnabled } from "@/utils/authMode";
 import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
@@ -20,6 +20,7 @@ const URL_ERROR_MESSAGES = {
 const FIELD_ERRORS = {
   CredentialsSignin: "Incorrect email or password.",
   AccessDenied: "You don't have permission to sign in.",
+  EmailNotConfirmed: "Confirm your email first, then try signing in again.",
 };
 
 export default function SignInPage() {
@@ -30,6 +31,7 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const { signInWithCredentials } = useAuth();
   const serverAuth = isServerAuthEnabled();
+  const supabaseAuth = isSupabaseAuthEnabled();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -79,9 +81,10 @@ export default function SignInPage() {
       secondaryBackHref="/account/signup"
       secondaryBackLabel="Sign up"
       banner={
-        !serverAuth ? (
+        !serverAuth && !supabaseAuth ? (
           <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
-            Demo mode: accounts are stored in this browser until server auth is configured (
+            Demo mode: accounts are stored in this browser until you configure Supabase (
+            <code className="text-xs">NEXT_PUBLIC_SUPABASE_*</code>) or server auth (
             <code className="text-xs">AUTH_SECRET</code>).
           </p>
         ) : null

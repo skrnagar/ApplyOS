@@ -21,3 +21,16 @@ export function createClient() {
 
   return createBrowserClient(url, key);
 }
+
+/** Returns browser client or null when env is missing (safe for optional Supabase). */
+export function tryCreateBrowserClient() {
+  const { url, key } = getSupabaseConfig();
+  if (!url || !key) return null;
+  if (typeof window !== "undefined") {
+    if (!browserClient) {
+      browserClient = createBrowserClient(url, key);
+    }
+    return browserClient;
+  }
+  return createBrowserClient(url, key);
+}

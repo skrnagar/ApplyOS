@@ -14,5 +14,9 @@ export function getApiAuthHeaders(extra = {}) {
 
 export async function fetchWithAuth(url, options = {}) {
   const headers = getApiAuthHeaders(options.headers || {});
-  return fetch(url, { ...options, headers });
+  return fetch(url, {
+    ...options,
+    headers,
+    credentials: options.credentials ?? "same-origin",
+  });
 }
