@@ -63,12 +63,6 @@ export default function Navbar() {
             >
               How it works
             </a>
-            <a
-              href="#signup"
-              className="relative px-3.5 py-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-900 transition-colors rounded-full hover:bg-emerald-50"
-            >
-              Sign up
-            </a>
           </div>
 
           <div className="hidden md:flex items-center gap-2">
@@ -140,13 +134,6 @@ export default function Navbar() {
                 className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
               >
                 How it works
-              </a>
-              <a
-                href="#signup"
-                onClick={() => setMobileOpen(false)}
-                className="block px-4 py-3 rounded-xl text-sm font-semibold text-emerald-800 hover:bg-emerald-50"
-              >
-                Sign up form
               </a>
               <div className="grid grid-cols-2 gap-2 p-2 pt-1">
                 <a

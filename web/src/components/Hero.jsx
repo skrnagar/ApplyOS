@@ -27,9 +27,13 @@ export default function Hero() {
               <span className="tracking-wide uppercase">HireOrbit · AI career OS</span>
             </motion.div>
 
+            <p className="hidden lg:block text-sm text-neutral-600 leading-snug max-w-sm">
+              We apply to jobs so you don&rsquo;t have to.
+            </p>
+
             <h1 className="text-[clamp(2.35rem,7vw,4.25rem)] font-semibold tracking-[-0.04em] leading-[1.05] text-neutral-900">
               <motion.span
-                className="block bg-gradient-to-b from-neutral-900 via-neutral-800 to-neutral-700 bg-clip-text text-transparent"
+                className="block bg-gradient-to-b from-neutral-900 via-neutral-800 to-neutral-700 bg-clip-text text-transparent lg:hidden"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
@@ -37,12 +41,20 @@ export default function Hero() {
                 We apply to jobs
               </motion.span>
               <motion.span
-                className="block mt-1 md:mt-2 text-emerald-600"
+                className="block mt-1 md:mt-2 text-emerald-600 lg:hidden"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
               >
                 so you don&rsquo;t have to.
+              </motion.span>
+              <motion.span
+                className="hidden lg:block bg-gradient-to-b from-neutral-900 via-neutral-800 to-neutral-700 bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              >
+                Your AI career operating system
               </motion.span>
             </h1>
 
