@@ -2,6 +2,7 @@
 import React from "react";
 import { Twitter, Linkedin, Github, Instagram } from "lucide-react";
 import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
 
 export default function Footer() {
   return (
@@ -12,10 +13,18 @@ export default function Footer() {
             <div className="mb-5">
               <HireOrbitLogo size="md" variant="light" />
             </div>
-            <p className="text-neutral-600 text-sm leading-relaxed mb-6">
+            <p className="text-neutral-600 text-sm leading-relaxed mb-4">
               HireOrbit is your AI career operating system: transparent applications,
               resume &amp; LinkedIn optimization, assistant support, and analytics —
               built for trust, not spam.
+            </p>
+            <p className="text-sm mb-6">
+              <a
+                href={CONTACT_MAILTO}
+                className="font-medium text-emerald-700 hover:text-emerald-800 hover:underline"
+              >
+                {CONTACT_EMAIL}
+              </a>
             </p>
             <div className="flex gap-4">
               <a
@@ -122,6 +131,11 @@ export default function Footer() {
               <li>
                 <a href="/contact" className="hover:text-neutral-900 transition-colors">
                   Contact
+                </a>
+              </li>
+              <li>
+                <a href={CONTACT_MAILTO} className="hover:text-neutral-900 transition-colors">
+                  {CONTACT_EMAIL}
                 </a>
               </li>
               <li>

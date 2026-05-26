@@ -31,7 +31,7 @@ export async function DELETE(request, { params }) {
       return Response.json({ success: true });
     }
 
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const result =
       await sql`DELETE FROM resumes WHERE id = ${id} AND user_id = ${user.id} RETURNING *`;
@@ -85,7 +85,7 @@ export async function PATCH(request, { params }) {
       });
     }
 
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     if (is_primary) {
       await sql`UPDATE resumes SET is_primary = false WHERE user_id = ${user.id}`;

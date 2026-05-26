@@ -32,7 +32,7 @@ export async function GET(request) {
       return Response.json((data || []).map(mapChatRow));
     }
 
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const messages = await sql`
       SELECT m.*, a.name as assistant_name, a.avatar as assistant_avatar
@@ -73,7 +73,7 @@ export async function POST(request) {
       return Response.json(mapChatRow(data), { status: 201 });
     }
 
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const result = await sql`
       INSERT INTO messages (user_id, assistant_id, sender_type, content)

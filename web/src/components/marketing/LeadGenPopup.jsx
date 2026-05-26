@@ -110,11 +110,14 @@ export default function LeadGenPopup() {
     }
     setSubmitting(true);
     saveLead({ email: trimmed, name: name.trim() });
-    await captureLead({
+    const leadResult = await captureLead({
       email: trimmed,
       name: name.trim() || undefined,
       source: "lead_popup",
     });
+    if (!leadResult.stored && leadResult.error) {
+      console.warn("Lead capture:", leadResult.error);
+    }
     setSubmitted(true);
     setSubmitting(false);
     window.setTimeout(() => {

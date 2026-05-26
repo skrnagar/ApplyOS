@@ -64,6 +64,8 @@ export default function AdminPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [errorDetails, setErrorDetails] = useState(null);
+  const [errorHint, setErrorHint] = useState(null);
 
   useEffect(() => {
     if (getAdminSecret()) setUnlocked(true);
@@ -72,11 +74,15 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setErrorDetails(null);
+    setErrorHint(null);
     try {
       const res = await adminFetch("/api/admin/overview");
       const json = await res.json();
       if (!res.ok) {
         setError(json.error || "Failed to load");
+        setErrorDetails(json.details || null);
+        setErrorHint(json.hint || null);
         if (res.status === 401) {
           setAdminSecret(null);
           setUnlocked(false);
@@ -174,8 +180,23 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {error && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            {error}
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 space-y-2">
+            <p className="font-medium">{error}</p>
+            {errorHint && <p className="text-red-900/90">{errorHint}</p>}
+            {errorDetails?.length > 0 && (
+              <ul className="list-disc pl-5 text-xs text-red-900/80 space-y-0.5">
+                {errorDetails.map((d) => (
+                  <li key={d}>{d}</li>
+                ))}
+              </ul>
+            )}
+            {error.includes("SUPABASE_SERVICE_ROLE_KEY") && (
+              <p className="text-xs text-red-900/80">
+                Add <code className="bg-red-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> to{" "}
+                <code className="bg-red-100 px-1 rounded">web/.env.local</code>, then restart{" "}
+                <code className="bg-red-100 px-1 rounded">npm run dev</code>.
+              </p>
+            )}
           </div>
         )}
 

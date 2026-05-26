@@ -2,9 +2,9 @@ import sql from "../utils/sql.js";
 import { getOrCreateUser } from "../utils/getUser.js";
 
 // Get job preferences
-export async function GET() {
+export async function GET(request) {
   try {
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const prefs =
       await sql`SELECT * FROM job_preferences WHERE user_id = ${user.id}`;
@@ -18,7 +18,7 @@ export async function GET() {
 // Create or update job preferences
 export async function POST(request) {
   try {
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const userId = user.id;
     const body = await request.json();

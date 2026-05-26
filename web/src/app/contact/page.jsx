@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { Mail, MessageCircle, Send } from "lucide-react";
 import { captureLead } from "@/utils/captureLead";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -40,6 +41,10 @@ export default function ContactPage() {
         setError(data.error || "Could not send message. Try again.");
         return;
       }
+      if (!data.stored) {
+        setError("Message could not be saved. Check server env and Supabase tables.");
+        return;
+      }
       await captureLead({
         email: trimmedEmail,
         name: name.trim() || undefined,
@@ -65,9 +70,16 @@ export default function ContactPage() {
         <h1 className="text-4xl md:text-5xl font-semibold text-neutral-900 mb-4 text-balance tracking-tight">
           Book a call or write the team
         </h1>
-        <p className="text-lg text-neutral-600 mb-10 leading-relaxed">
+        <p className="text-lg text-neutral-600 mb-4 leading-relaxed">
           Tell us about your role targets, timeline, and how aggressive you want applications.
           We&apos;ll map a HireOrbit plan — same transparency standards we ship in-product.
+        </p>
+        <p className="text-sm text-neutral-600 mb-10">
+          Reach us anytime at{" "}
+          <a href={CONTACT_MAILTO} className="font-semibold text-emerald-700 hover:underline">
+            {CONTACT_EMAIL}
+          </a>
+          .
         </p>
 
         <form
@@ -77,7 +89,7 @@ export default function ContactPage() {
           <h2 className="text-sm font-semibold text-neutral-900">Send a message</h2>
           {sent ? (
             <p className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-              Thanks — we received your message and will follow up soon.
+              Thanks — your message is saved and our team at {CONTACT_EMAIL} will follow up soon.
             </p>
           ) : (
             <>
@@ -141,7 +153,7 @@ export default function ContactPage() {
           </a>
 
           <a
-            href="mailto:hello@hireorbit.com"
+            href={CONTACT_MAILTO}
             className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white shadow-sm p-6 hover:border-emerald-300/70 transition-colors"
           >
             <div className="w-12 h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
@@ -149,7 +161,7 @@ export default function ContactPage() {
             </div>
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">Email</p>
-              <p className="text-neutral-900 font-semibold truncate">hello@hireorbit.com</p>
+              <p className="text-neutral-900 font-semibold truncate">{CONTACT_EMAIL}</p>
             </div>
           </a>
 

@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 
 const statusColors = {
   applied: "bg-blue-100 text-blue-700",
@@ -27,15 +28,16 @@ const statusColors = {
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { data: authUser } = useUser();
+  const { data: authUser, loading: authLoading } = useUser();
 
   useEffect(() => {
+    if (authLoading) return;
     fetchData();
-  }, []);
+  }, [authLoading, authUser?.email]);
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/dashboard/stats");
+      const res = await fetchWithAuth("/api/dashboard/stats");
       if (res.ok) {
         const data = await res.json();
         setStats(data);

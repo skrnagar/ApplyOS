@@ -6,7 +6,8 @@ import { Check, Sparkles, ArrowRight } from "lucide-react";
 const plans = [
   {
     name: "Basic",
-    price: 199,
+    priceMonthly: 149,
+    priceYearly: 100,
     tagline: "Get the engine running.",
     features: [
       "250 applications / month",
@@ -18,7 +19,8 @@ const plans = [
   },
   {
     name: "Standard",
-    price: 250,
+    priceMonthly: 199,
+    priceYearly: 149,
     tagline: "Scale volume without losing quality.",
     features: [
       "350 applications / month",
@@ -31,7 +33,8 @@ const plans = [
   },
   {
     name: "Best Value",
-    price: 350,
+    priceMonthly: 299,
+    priceYearly: 199,
     tagline: "Most teams land here.",
     features: [
       "800 applications / month",
@@ -46,7 +49,8 @@ const plans = [
   },
   {
     name: "Ultimate",
-    price: 500,
+    priceMonthly: 349,
+    priceYearly: 299,
     tagline: "Executive search experience.",
     features: [
       "1,200+ applications / month",
@@ -60,7 +64,7 @@ const plans = [
   },
 ];
 
-function PlanCard({ plan, index }) {
+function PlanCard({ plan, billing, index }) {
   const ref = useRef(null);
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
@@ -129,11 +133,16 @@ function PlanCard({ plan, index }) {
 
           <p className="text-sm text-neutral-600 mb-5">{plan.tagline}</p>
 
-          <div className="flex items-end gap-1 mb-6">
-            <span className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">
-              ${plan.price}
-            </span>
-            <span className="text-neutral-500 text-sm pb-1.5">/mo</span>
+          <div className="mb-6">
+            <div className="flex items-end gap-1">
+              <span className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">
+                ${billing === "yearly" ? plan.priceYearly : plan.priceMonthly}
+              </span>
+              <span className="text-neutral-500 text-sm pb-1.5">/mo</span>
+            </div>
+            {billing === "yearly" && (
+              <p className="text-xs text-neutral-500 mt-1">Billed annually</p>
+            )}
           </div>
 
           <a
@@ -222,7 +231,7 @@ export default function Pricing() {
                 <span className="relative z-10">
                   {option}
                   {option === "yearly" && (
-                    <span className="ml-2 text-[9px] text-emerald-400 font-bold">−20%</span>
+                    <span className="ml-2 text-[9px] text-emerald-600 font-bold">Save</span>
                   )}
                 </span>
               </button>
@@ -232,17 +241,7 @@ export default function Pricing() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 max-w-7xl mx-auto">
           {plans.map((plan, i) => (
-            <PlanCard
-              key={plan.name}
-              plan={{
-                ...plan,
-                price:
-                  billing === "yearly"
-                    ? Math.round(plan.price * 0.8)
-                    : plan.price,
-              }}
-              index={i}
-            />
+            <PlanCard key={plan.name} plan={plan} billing={billing} index={i} />
           ))}
         </div>
       </div>

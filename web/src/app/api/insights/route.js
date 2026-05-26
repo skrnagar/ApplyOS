@@ -2,9 +2,9 @@ import sql from "../utils/sql.js";
 import { getOrCreateUser } from "../utils/getUser.js";
 
 // Get AI insights for user
-export async function GET() {
+export async function GET(request) {
   try {
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const insights = await sql`
       SELECT * FROM ai_insights WHERE user_id = ${user.id} AND status = 'active'
@@ -20,7 +20,7 @@ export async function GET() {
 // Dismiss an insight
 export async function PATCH(request) {
   try {
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const body = await request.json();
     const { insightId } = body;

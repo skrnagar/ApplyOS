@@ -36,7 +36,7 @@ async function listFromSupabase(request) {
 }
 
 async function listFromNeon() {
-  const user = await getOrCreateUser();
+  const user = await getOrCreateUser(request);
   if (!user) return null;
   const resumes =
     await sql`SELECT * FROM resumes WHERE user_id = ${user.id} ORDER BY is_primary DESC, created_at DESC`;
@@ -93,7 +93,7 @@ export async function POST(request) {
       return Response.json(mapResumeRow(data), { status: 201 });
     }
 
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const body = await request.json();
     const { file_name, file_url, file_size, is_primary, ats_score } = body;

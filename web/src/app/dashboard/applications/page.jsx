@@ -12,6 +12,7 @@ import {
   Building2,
   MoreHorizontal,
 } from "lucide-react";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 
 const STATUSES = [
   {
@@ -74,7 +75,7 @@ export default function ApplicationsPage() {
 
   const fetchApplications = async () => {
     try {
-      const res = await fetch("/api/applications");
+      const res = await fetchWithAuth("/api/applications");
       if (res.ok) setApplications(await res.json());
       else if (res.status === 401 && typeof window !== "undefined")
         window.location.href = "/account/signin";
@@ -93,7 +94,7 @@ export default function ApplicationsPage() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/applications", {
+      const res = await fetchWithAuth("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -111,13 +112,13 @@ export default function ApplicationsPage() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`/api/applications/${id}`, { method: "DELETE" });
+    await fetchWithAuth(`/api/applications/${id}`, { method: "DELETE" });
     setApplications((prev) => prev.filter((a) => a.id !== id));
     setActiveMenu(null);
   };
 
   const handleStatusChange = async (id, newStatus) => {
-    await fetch(`/api/applications/${id}`, {
+    await fetchWithAuth(`/api/applications/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),

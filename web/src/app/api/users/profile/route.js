@@ -2,9 +2,9 @@ import sql from "../../utils/sql.js";
 import { getOrCreateUser } from "../../utils/getUser.js";
 
 // Get user profile
-export async function GET() {
+export async function GET(request) {
   try {
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     return Response.json(user);
   } catch (error) {
@@ -15,7 +15,7 @@ export async function GET() {
 // Update user profile
 export async function PATCH(request) {
   try {
-    const user = await getOrCreateUser();
+    const user = await getOrCreateUser(request);
     if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
     const body = await request.json();
     const fields = [

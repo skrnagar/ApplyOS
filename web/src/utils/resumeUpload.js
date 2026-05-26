@@ -28,7 +28,7 @@ export async function uploadResumeToStorage(file) {
   formData.append("file", file);
   const response = await fetch("/api/resumes/upload", {
     method: "POST",
-    headers: getApiAuthHeaders(),
+    headers: await getApiAuthHeaders(),
     body: formData,
   });
   if (!response.ok) {
@@ -90,7 +90,7 @@ export async function saveResumeRecord(file, _fileUrl, userId, existingCount) {
 
   const response = await fetch("/api/resumes", {
     method: "POST",
-    headers: getApiAuthHeaders({ "Content-Type": "application/json" }),
+    headers: await getApiAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
 

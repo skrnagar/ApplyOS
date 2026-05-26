@@ -54,10 +54,15 @@ export async function GET(request) {
 
     if (errors.length) {
       console.error("admin overview:", errors);
+      const missingTable = errors.some((e) =>
+        /could not find the table|relation.*does not exist/i.test(e.message || ""),
+      );
       return Response.json(
         {
-          error:
-            "Failed to load data. Run web/supabase/schema.sql in your Supabase project.",
+          error: missingTable
+            ? "Database tables are missing. Run the HireOrbit migration in your Supabase project (SQL Editor or supabase db push)."
+            : "Failed to load admin data from Supabase.",
+          hint: "Open Supabase → SQL Editor → paste web/supabase/migrations/20250520120000_init_hireorbit.sql → Run.",
           details: errors.map((e) => e.message),
         },
         { status: 500 },

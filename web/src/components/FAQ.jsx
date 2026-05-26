@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
 
 const items = [
   {
@@ -52,6 +53,17 @@ export default function FAQ() {
             </button>
           ))}
         </div>
+        <p className="mt-10 text-center text-sm text-neutral-600">
+          Still have questions?{" "}
+          <a href="/contact" className="font-semibold text-emerald-700 hover:underline">
+            Contact us
+          </a>{" "}
+          or email{" "}
+          <a href={CONTACT_MAILTO} className="font-semibold text-emerald-700 hover:underline">
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </p>
       </div>
     </section>
   );

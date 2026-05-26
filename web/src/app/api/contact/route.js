@@ -1,5 +1,8 @@
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
 
+const TEAM_INBOX =
+  process.env.CONTACT_EMAIL || process.env.SUPPORT_EMAIL || "hireorbit.1@gmail.com";
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -17,7 +20,14 @@ export async function POST(request) {
     }
 
     if (!isSupabaseAdminConfigured()) {
-      return Response.json({ ok: true, stored: false, reason: "supabase_not_configured" });
+      return Response.json(
+        {
+          error:
+            "Supabase is not configured on the server. Add SUPABASE_SERVICE_ROLE_KEY to .env.local and restart npm run dev.",
+          stored: false,
+        },
+        { status: 503 },
+      );
     }
 
     const admin = getSupabaseAdmin();
@@ -36,10 +46,16 @@ export async function POST(request) {
       email,
       name,
       source: "contact",
-      metadata: { message_preview: message.slice(0, 200) },
+      metadata: {
+        message_preview: message.slice(0, 200),
+        team_inbox: TEAM_INBOX,
+      },
     });
 
-    return Response.json({ ok: true, stored: true, submission: data }, { status: 201 });
+    return Response.json(
+      { ok: true, stored: true, submission: data, teamEmail: TEAM_INBOX },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("POST /api/contact:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

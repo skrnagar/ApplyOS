@@ -1,11 +1,13 @@
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
-import { getOrCreateUser } from "./getUser.js";
+import { loadServerEnv } from "@/utils/loadServerEnv.js";
+import { getOrCreateUserFromAuthJs } from "./getUser.js";
 
 /**
  * Resolve the current user and ensure a `profiles` row in Supabase.
  * Supports: Supabase Auth cookie, legacy Auth.js + Neon user, local demo session headers.
  */
 export async function resolveRequestProfile(request) {
+  loadServerEnv();
   const admin = getSupabaseAdmin();
   if (!admin) return null;
 
@@ -45,7 +47,7 @@ export async function resolveRequestProfile(request) {
   }
 
   if (!email) {
-    const neonUser = await getOrCreateUser();
+    const neonUser = await getOrCreateUserFromAuthJs();
     if (neonUser?.email) {
       email = neonUser.email.toLowerCase();
       fullName = neonUser.full_name || neonUser.name || null;

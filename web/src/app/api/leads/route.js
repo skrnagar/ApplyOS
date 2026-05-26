@@ -15,7 +15,14 @@ export async function POST(request) {
     }
 
     if (!isSupabaseAdminConfigured()) {
-      return Response.json({ ok: true, stored: false, reason: "supabase_not_configured" });
+      return Response.json(
+        {
+          error:
+            "Supabase is not configured on the server. Add SUPABASE_SERVICE_ROLE_KEY to .env.local and restart npm run dev.",
+          stored: false,
+        },
+        { status: 503 },
+      );
     }
 
     const admin = getSupabaseAdmin();
