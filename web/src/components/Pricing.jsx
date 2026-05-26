@@ -6,7 +6,7 @@ import { Check, Sparkles, ArrowRight } from "lucide-react";
 const plans = [
   {
     name: "Basic",
-    priceMonthly: 199,
+    priceMonthly: 149,
     priceYearly: 100,
     tagline: "Get the engine running.",
     features: [
@@ -19,7 +19,7 @@ const plans = [
   },
   {
     name: "Standard",
-    priceMonthly: 149,
+    priceMonthly: 199,
     priceYearly: 149,
     tagline: "Scale volume without losing quality.",
     features: [

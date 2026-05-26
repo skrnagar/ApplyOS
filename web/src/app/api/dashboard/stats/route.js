@@ -62,7 +62,16 @@ function linkedPayload(user, extras = {}) {
 
 export async function GET(request) {
   try {
-    const user = await getOrCreateUser(request);
+    let user = await getOrCreateUser(request);
+
+    if (!user && isSupabaseAdminConfigured()) {
+      const profile = await resolveRequestProfile(request);
+      if (profile?.email) {
+        const { userFromSupabaseProfile } = await import("../../utils/getUser.js");
+        user = userFromSupabaseProfile(profile);
+      }
+    }
+
     if (!user) {
       return Response.json(emptyPayload);
     }

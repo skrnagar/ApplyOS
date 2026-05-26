@@ -13,6 +13,8 @@
 | Lead popup, signup, contact | Postgres table `public.leads` |
 | Contact form messages | Postgres table `public.contact_submissions` |
 | Dashboard chat | Postgres table `public.chat_messages` |
+| Job applications | Postgres table `public.applications` |
+| Profile + job preferences | `public.profiles` (+ `job_preferences` jsonb column) |
 | Admin view | `/admin` + `GET /api/admin/overview` (service role) |
 
 Legacy **Neon** (`DATABASE_URL`) is only used if `AUTH_SECRET` + Auth.js paths are enabled; Supabase is the primary store when configured.
@@ -29,6 +31,8 @@ npx supabase login
 npx supabase link --project-ref <YOUR_PROJECT_REF>
 npm run db:push
 ```
+
+If tables already exist, run newer files in **SQL Editor** (Dashboard → SQL), e.g. `migrations/20250521120000_applications.sql` and `migrations/20250522120000_profile_fields.sql`.
 
 `<YOUR_PROJECT_REF>` is the id in your Supabase URL: `https://<ref>.supabase.co`.
 

@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import useUser from "@/utils/useUser";
 import useUpload from "@/utils/useUpload";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 
 export default function ProfilePage() {
-  const { data: authUser } = useUser();
+  const { data: authUser, loading: authLoading } = useUser();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -27,12 +28,14 @@ export default function ProfilePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!authUser?.email) return;
     fetchProfile();
-  }, []);
+  }, [authLoading, authUser?.email]);
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch("/api/users/profile");
+      const res = await fetchWithAuth("/api/users/profile");
       if (res.ok) {
         setProfile(await res.json());
       } else if (res.status === 401) {
@@ -49,7 +52,7 @@ export default function ProfilePage() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/users/profile", {
+      const res = await fetchWithAuth("/api/users/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile),

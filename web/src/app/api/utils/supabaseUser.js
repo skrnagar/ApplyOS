@@ -4,7 +4,7 @@ import { getOrCreateUserFromAuthJs } from "./getUser.js";
 
 /**
  * Resolve the current user and ensure a `profiles` row in Supabase.
- * Supports: Supabase Auth cookie, legacy Auth.js + Neon user, local demo session headers.
+ * Priority: Bearer JWT → Supabase cookies (Hono) → Auth.js → local demo headers.
  */
 export async function resolveRequestProfile(request) {
   loadServerEnv();
@@ -20,11 +20,22 @@ export async function resolveRequestProfile(request) {
   const localIdHeader = request.headers.get("x-hireorbit-user-id");
   const emailHeader = request.headers.get("x-hireorbit-email");
   const nameHeader = request.headers.get("x-hireorbit-name");
+  const hasBearer = Boolean(authHeader?.startsWith("Bearer "));
 
-  if (localIdHeader && emailHeader) {
-    localId = localIdHeader;
-    email = emailHeader.trim().toLowerCase();
-    fullName = nameHeader?.trim() || null;
+  if (hasBearer) {
+    const token = authHeader.slice(7).trim();
+    const { data, error } = await admin.auth.getUser(token);
+    if (error) {
+      console.error("resolveRequestProfile Bearer:", error.message);
+    }
+    if (data?.user?.email) {
+      email = data.user.email.toLowerCase();
+      authUserId = data.user.id;
+      fullName =
+        data.user.user_metadata?.full_name ||
+        data.user.user_metadata?.name ||
+        null;
+    }
   }
 
   if (!email) {
@@ -34,10 +45,16 @@ export async function resolveRequestProfile(request) {
       const c = getContext();
       if (c) {
         const supabase = createClientFromHono(c);
-        const { data } = await supabase.auth.getUser();
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error("resolveRequestProfile cookie:", error.message);
+        }
         if (data?.user?.email) {
           email = data.user.email.toLowerCase();
-          fullName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || null;
+          fullName =
+            data.user.user_metadata?.full_name ||
+            data.user.user_metadata?.name ||
+            null;
           authUserId = data.user.id;
         }
       }
@@ -54,19 +71,19 @@ export async function resolveRequestProfile(request) {
     }
   }
 
-  if (!email && authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.slice(7);
-    const { data } = await admin.auth.getUser(token);
-    if (data?.user?.email) {
-      email = data.user.email.toLowerCase();
-      authUserId = data.user.id;
-      fullName = data.user.user_metadata?.full_name || null;
-    }
+  if (!email && !hasBearer && emailHeader) {
+    localId = localIdHeader;
+    email = emailHeader.trim().toLowerCase();
+    fullName = nameHeader?.trim() || null;
   }
 
   if (!email) return null;
 
-  const { data: existing } = await admin.from("profiles").select("*").eq("email", email).maybeSingle();
+  const { data: existing } = await admin
+    .from("profiles")
+    .select("*")
+    .eq("email", email)
+    .maybeSingle();
 
   if (existing) {
     const updates = {};
@@ -85,16 +102,38 @@ export async function resolveRequestProfile(request) {
     return existing;
   }
 
+  if (authUserId) {
+    const { data: byAuth } = await admin
+      .from("profiles")
+      .select("*")
+      .eq("auth_user_id", authUserId)
+      .maybeSingle();
+    if (byAuth) return byAuth;
+  }
+
   const insert = {
     email,
     full_name: fullName,
     auth_user_id: authUserId,
-    local_id: localId || (authUserId ? null : `local_${email.replace(/[^a-z0-9]/gi, "_")}`),
+    local_id:
+      localId || (authUserId ? null : `local_${email.replace(/[^a-z0-9]/gi, "_")}`),
   };
 
-  const { data: created, error } = await admin.from("profiles").insert(insert).select("*").single();
+  const { data: created, error } = await admin
+    .from("profiles")
+    .insert(insert)
+    .select("*")
+    .single();
 
   if (error) {
+    if (error.code === "23505") {
+      const { data: retry } = await admin
+        .from("profiles")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+      if (retry) return retry;
+    }
     console.error("resolveRequestProfile insert:", error);
     return null;
   }

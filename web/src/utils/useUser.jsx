@@ -1,8 +1,9 @@
 import * as React from "react";
 import { useSession } from "@auth/create/react";
-import { getLocalSession } from "./localAuth";
+import { getLocalSession, signOutLocal } from "./localAuth";
 import { isSupabaseAuthEnabled } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
+import { syncAuthProfile } from "./apiAuthHeaders";
 
 function mapSupabaseUser(user) {
   if (!user) return null;
@@ -38,7 +39,12 @@ export function UserProvider({ children }) {
 
     const applySession = (sessionData) => {
       if (cancelled) return;
-      setSbUser(mapSupabaseUser(sessionData?.user ?? null));
+      const mapped = mapSupabaseUser(sessionData?.user ?? null);
+      if (mapped) {
+        signOutLocal();
+        void syncAuthProfile();
+      }
+      setSbUser(mapped);
       setSbLoading(false);
     };
 

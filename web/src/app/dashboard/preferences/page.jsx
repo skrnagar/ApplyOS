@@ -6,8 +6,11 @@ import Button from "@/components/ui/Button";
 import Input, { Textarea, Select } from "@/components/ui/Input";
 import { motion } from "motion/react";
 import { Save, CheckCircle } from "lucide-react";
+import useUser from "@/utils/useUser";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 
 export default function PreferencesPage() {
+  const { data: authUser, loading: authLoading } = useUser();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -27,12 +30,14 @@ export default function PreferencesPage() {
   });
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!authUser?.email) return;
     fetchPreferences();
-  }, []);
+  }, [authLoading, authUser?.email]);
 
   const fetchPreferences = async () => {
     try {
-      const response = await fetch("/api/preferences");
+      const response = await fetchWithAuth("/api/preferences");
       if (response.ok) {
         const data = await response.json();
         if (data) {
@@ -51,7 +56,7 @@ export default function PreferencesPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch("/api/preferences", {
+      const response = await fetchWithAuth("/api/preferences", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(preferences),

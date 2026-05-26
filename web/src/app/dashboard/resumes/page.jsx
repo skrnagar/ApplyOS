@@ -19,11 +19,13 @@ import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 export default function ResumesPage() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { data: user } = useUser();
+  const { data: user, loading: authLoading } = useUser();
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user?.email) return;
     fetchResumes();
-  }, [user?.id]);
+  }, [authLoading, user?.email, user?.id]);
 
   const fetchResumes = async () => {
     try {

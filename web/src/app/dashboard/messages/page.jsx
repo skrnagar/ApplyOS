@@ -6,8 +6,10 @@ import Button from "@/components/ui/Button";
 import { motion } from "motion/react";
 import { Send, Paperclip, Smile, MoreVertical } from "lucide-react";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
+import useUser from "@/utils/useUser";
 
 export default function MessagesPage() {
+  const { data: authUser, loading: authLoading } = useUser();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -15,8 +17,10 @@ export default function MessagesPage() {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!authUser?.email) return;
     fetchMessages();
-  }, []);
+  }, [authLoading, authUser?.email]);
 
   useEffect(() => {
     scrollToBottom();

@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import useUser from "@/utils/useUser";
+import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Card, { CardHeader, CardContent } from "@/components/ui/Card";
 import { motion } from "motion/react";
@@ -44,16 +46,19 @@ const priorityColors = {
 };
 
 export default function InsightsPage() {
+  const { data: authUser, loading: authLoading } = useUser();
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!authUser?.email) return;
     fetchInsights();
-  }, []);
+  }, [authLoading, authUser?.email]);
 
   const fetchInsights = async () => {
     try {
-      const response = await fetch("/api/insights");
+      const response = await fetchWithAuth("/api/insights");
       if (response.ok) {
         const data = await response.json();
         setInsights(data);
@@ -69,7 +74,7 @@ export default function InsightsPage() {
 
   const handleDismiss = async (insightId) => {
     try {
-      const response = await fetch("/api/insights", {
+      const response = await fetchWithAuth("/api/insights", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ insightId }),

@@ -6,8 +6,19 @@ export function userFromSupabaseProfile(profile) {
     id: profile.id,
     email: profile.email,
     full_name: profile.full_name,
+    phone: profile.phone ?? null,
+    profile_image: profile.profile_image ?? null,
+    current_title: profile.current_title ?? null,
+    current_company: profile.current_company ?? null,
+    years_of_experience: profile.years_of_experience ?? null,
+    location: profile.location ?? null,
+    linkedin_url: profile.linkedin_url ?? null,
+    github_url: profile.github_url ?? null,
+    portfolio_url: profile.portfolio_url ?? null,
+    bio: profile.bio ?? null,
     onboarding_completed: profile.onboarding_completed ?? false,
     _neonLinked: false,
+    _profile: profile,
   };
 }
 
@@ -40,7 +51,6 @@ export async function ensureNeonUserByEmail(email, name = null) {
   return { ...newUser[0], _neonLinked: true };
 }
 
-/** Auth.js session only — used as fallback inside resolveRequestProfile. */
 export async function getOrCreateUserFromAuthJs() {
   let session = null;
   try {
@@ -65,24 +75,10 @@ export async function getOrCreateUserFromAuthJs() {
 }
 
 /**
- * Resolve app user from the incoming request (Supabase profile, local headers, or Neon + Auth.js).
+ * Resolve app user from the incoming request (Supabase profile first, then Neon / Auth.js).
  */
 export async function getOrCreateUser(request) {
   if (request) {
-    const emailHeader = request.headers.get("x-hireorbit-email");
-    const nameHeader = request.headers.get("x-hireorbit-name");
-    if (emailHeader) {
-      if (isNeonDatabaseConfigured()) {
-        try {
-          const user = await ensureNeonUserByEmail(emailHeader, nameHeader);
-          if (user) return user;
-        } catch (err) {
-          console.error("getOrCreateUser local headers:", err);
-        }
-      }
-      return userFromLocalHeaders(emailHeader, nameHeader);
-    }
-
     try {
       const { resolveRequestProfile } = await import("./supabaseUser.js");
       const profile = await resolveRequestProfile(request);
@@ -95,13 +91,28 @@ export async function getOrCreateUser(request) {
             );
             if (neonUser) return neonUser;
           } catch (err) {
-            console.error("getOrCreateUser supabase bridge:", err);
+            console.error("getOrCreateUser neon bridge:", err);
           }
         }
         return userFromSupabaseProfile(profile);
       }
     } catch (err) {
       console.error("getOrCreateUser supabase:", err);
+    }
+
+    const emailHeader = request.headers.get("x-hireorbit-email");
+    const nameHeader = request.headers.get("x-hireorbit-name");
+    const hasBearer = request.headers.get("authorization")?.startsWith("Bearer ");
+    if (emailHeader && !hasBearer) {
+      if (isNeonDatabaseConfigured()) {
+        try {
+          const user = await ensureNeonUserByEmail(emailHeader, nameHeader);
+          if (user) return user;
+        } catch (err) {
+          console.error("getOrCreateUser local headers:", err);
+        }
+      }
+      return userFromLocalHeaders(emailHeader, nameHeader);
     }
   }
 

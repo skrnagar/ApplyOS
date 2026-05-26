@@ -15,7 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
-import { fetchWithAuth } from "@/utils/apiAuthHeaders";
+import { fetchWithAuth, syncAuthProfile } from "@/utils/apiAuthHeaders";
 
 const statusColors = {
   applied: "bg-blue-100 text-blue-700",
@@ -32,16 +32,23 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (authLoading) return;
-    fetchData();
+    if (!authUser?.email) return;
+    void loadStats();
   }, [authLoading, authUser?.email]);
 
-  const fetchData = async () => {
+  const loadStats = async () => {
+    setLoading(true);
     try {
+      await syncAuthProfile();
       const res = await fetchWithAuth("/api/dashboard/stats");
-      if (res.ok) {
-        const data = await res.json();
+      const data = res.ok ? await res.json() : null;
+
+      if (data && (!data.demoStats || data.user)) {
         setStats(data);
-      } else {
+        return;
+      }
+
+      if (authUser?.email) {
         setStats({
           stats: {
             totalApplications: 0,
@@ -52,11 +59,16 @@ export default function DashboardPage() {
           },
           recentApplications: [],
           upcomingInterviews: [],
-          demoStats: true,
+          unreadMessages: 0,
+          user: {
+            email: authUser.email,
+            full_name: authUser.name || null,
+          },
+          demoStats: false,
         });
+        return;
       }
-    } catch (err) {
-      console.error(err);
+
       setStats({
         stats: {
           totalApplications: 0,
@@ -69,6 +81,23 @@ export default function DashboardPage() {
         upcomingInterviews: [],
         demoStats: true,
       });
+    } catch (err) {
+      console.error(err);
+      if (authUser?.email) {
+        setStats({
+          stats: {
+            totalApplications: 0,
+            interviews: 0,
+            offers: 0,
+            rejections: 0,
+            responseRate: 0,
+          },
+          recentApplications: [],
+          upcomingInterviews: [],
+          demoStats: false,
+          user: { email: authUser.email, full_name: authUser.name || null },
+        });
+      }
     } finally {
       setLoading(false);
     }

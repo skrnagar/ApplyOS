@@ -13,6 +13,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
+import useUser from "@/utils/useUser";
 
 const STATUSES = [
   {
@@ -59,6 +60,7 @@ const defaultForm = {
 };
 
 export default function ApplicationsPage() {
+  const { data: authUser, loading: authLoading } = useUser();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -70,8 +72,10 @@ export default function ApplicationsPage() {
   const [activeMenu, setActiveMenu] = useState(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!authUser?.email) return;
     fetchApplications();
-  }, []);
+  }, [authLoading, authUser?.email]);
 
   const fetchApplications = async () => {
     try {
