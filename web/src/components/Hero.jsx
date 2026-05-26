@@ -24,7 +24,7 @@ export default function Hero() {
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200/90 bg-white/90 text-[11px] sm:text-xs font-medium text-emerald-800 shadow-sm"
             >
               <Sparkles size={12} className="text-emerald-600 shrink-0" aria-hidden />
-              <span className="tracking-wide uppercase">HireOrbit · AI career OS</span>
+              <span className="tracking-wide uppercase">HireOrbital · AI career OS</span>
             </motion.div>
 
             <p className="hidden lg:block text-sm text-neutral-600 leading-snug max-w-sm">
@@ -64,7 +64,7 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.25, duration: 0.45 }}
             >
-              HireOrbit runs your job search end-to-end: curated applications, resume + LinkedIn
+              HireOrbital runs your job search end-to-end: curated applications, resume + LinkedIn
               upgrades, outreach, and interview prep, all with transparent assistant updates.
             </motion.p>
 

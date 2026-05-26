@@ -14,7 +14,7 @@ import {
   User,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
-import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
+import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -59,7 +59,7 @@ export default function DashboardLayout({ children }) {
       >
         <div className="p-6 border-b border-neutral-100">
           <a href="/" className="flex items-center gap-2">
-            <HireOrbitLogo size="sm" variant="light" />
+            <HireOrbitalLogo size="sm" variant="light" />
           </a>
         </div>
 

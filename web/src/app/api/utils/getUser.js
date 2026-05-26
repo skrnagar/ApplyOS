@@ -100,8 +100,8 @@ export async function getOrCreateUser(request) {
       console.error("getOrCreateUser supabase:", err);
     }
 
-    const emailHeader = request.headers.get("x-hireorbit-email");
-    const nameHeader = request.headers.get("x-hireorbit-name");
+    const emailHeader = request.headers.get("x-hireorbital-email");
+    const nameHeader = request.headers.get("x-hireorbital-name");
     const hasBearer = request.headers.get("authorization")?.startsWith("Bearer ");
     if (emailHeader && !hasBearer) {
       if (isNeonDatabaseConfigured()) {

@@ -1,4 +1,4 @@
--- HireOrbit database schema
+-- HireOrbital database schema
 --
 -- Prefer the Supabase CLI (versioned migrations):
 --   cd web && npx supabase link --project-ref <ref> && npx supabase db push

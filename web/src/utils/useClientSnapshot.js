@@ -28,10 +28,10 @@ export function useClientSnapshot(readValue, serverValue = null) {
 }
 
 function subscribeLocalAuth(onStoreChange) {
-  window.addEventListener("hireorbit:auth-changed", onStoreChange);
+  window.addEventListener("hireorbital:auth-changed", onStoreChange);
   window.addEventListener("applyai:auth-changed", onStoreChange);
   return () => {
-    window.removeEventListener("hireorbit:auth-changed", onStoreChange);
+    window.removeEventListener("hireorbital:auth-changed", onStoreChange);
     window.removeEventListener("applyai:auth-changed", onStoreChange);
   };
 }

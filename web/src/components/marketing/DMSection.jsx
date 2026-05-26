@@ -10,7 +10,7 @@ const threads = [
     delay: 0,
   },
   {
-    handle: "HireOrbit · Assist",
+    handle: "HireOrbital · Assist",
     msg: "Weekly digest is live — 12 new matches, 3 replies, 1 phone screen Thurs. Want us to prioritize Series B infra roles?",
     tone: "brand",
     delay: 0.05,

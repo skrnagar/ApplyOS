@@ -10,7 +10,7 @@ const diy = [
   "Interview prep scattered across tabs",
 ];
 
-const hireorbit = [
+const hireOrbitalPoints = [
   "Curated applications with targeting rules",
   "Dashboard + assistant notes per submission",
   "Resume & LinkedIn upgrades in lockstep",
@@ -26,7 +26,7 @@ export default function DifferenceSection() {
             The difference
           </p>
           <h2 className="text-3xl md:text-[2.65rem] font-semibold tracking-tight text-neutral-900 text-balance leading-tight">
-            Job search gravity pulls you inward. HireOrbit pushes outcomes forward.
+            Job search gravity pulls you inward. HireOrbital pushes outcomes forward.
           </h2>
         </div>
 
@@ -60,10 +60,10 @@ export default function DifferenceSection() {
             className="rounded-2xl border border-emerald-200 bg-gradient-to-b from-emerald-50/90 to-white p-6 md:p-8 shadow-[0_0_0_1px_rgba(16,185,129,0.08)]"
           >
             <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-800 mb-6">
-              With HireOrbit
+              With HireOrbital
             </h3>
             <ul className="space-y-4">
-              {hireorbit.map((t) => (
+              {hireOrbitalPoints.map((t) => (
                 <li key={t} className="flex gap-3 text-neutral-800 text-sm md:text-[15px] leading-snug font-medium">
                   <span className="mt-0.5 shrink-0 w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-sm">
                     <Check size={15} aria-hidden strokeWidth={2.5} />

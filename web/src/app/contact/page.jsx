@@ -72,7 +72,7 @@ export default function ContactPage() {
         </h1>
         <p className="text-lg text-neutral-600 mb-4 leading-relaxed">
           Tell us about your role targets, timeline, and how aggressive you want applications.
-          We&apos;ll map a HireOrbit plan — same transparency standards we ship in-product.
+          We&apos;ll map a HireOrbital plan — same transparency standards we ship in-product.
         </p>
         <p className="text-sm text-neutral-600 mb-10">
           Reach us anytime at{" "}
@@ -185,7 +185,7 @@ export default function ContactPage() {
         <section id="privacy" className="mb-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <h2 className="text-sm font-semibold text-neutral-900 mb-2">Privacy</h2>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            HireOrbit is designed for minimal data retention and clear consent. A full policy
+            HireOrbital is designed for minimal data retention and clear consent. A full policy
             URL can replace this placeholder when legal copy is ready.
           </p>
         </section>

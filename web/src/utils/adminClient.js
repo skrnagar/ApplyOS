@@ -1,6 +1,6 @@
 import { getApiAuthHeaders } from "@/utils/apiAuthHeaders";
 
-const ADMIN_KEY = "hireorbit_admin_secret";
+const ADMIN_KEY = "hireorbital_admin_secret";
 
 /** Legacy optional secret (fallback if ADMIN_EMAILS not used). */
 export function getAdminSecret() {

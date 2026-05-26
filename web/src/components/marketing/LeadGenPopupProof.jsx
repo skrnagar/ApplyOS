@@ -9,7 +9,7 @@ const snippets = [
     tone: "from",
   },
   {
-    handle: "HireOrbit",
+    handle: "HireOrbital",
     msg: "12 new matches, 3 replies, 1 screen Thursday — all in your digest.",
     tone: "brand",
   },

@@ -8,7 +8,7 @@ const tools = [
     id: "resume",
     title: "Resume readiness checklist",
     icon: FileText,
-    body: "Structure, metrics, and keyword alignment before you upload — mirrors what HireOrbit assistants optimize first.",
+    body: "Structure, metrics, and keyword alignment before you upload — mirrors what HireOrbital assistants optimize first.",
   },
   {
     id: "linkedin",
@@ -20,7 +20,7 @@ const tools = [
     id: "interview",
     title: "Interview story bank",
     icon: Mic,
-    body: "STAR prompts for impact, conflict, and scope — prep material that pairs with mock interviews inside HireOrbit.",
+    body: "STAR prompts for impact, conflict, and scope — prep material that pairs with mock interviews inside HireOrbital.",
   },
   {
     id: "ats",
@@ -38,7 +38,7 @@ export default function FreeToolsPage() {
           Free tools
         </p>
         <h1 className="text-4xl md:text-5xl font-semibold text-neutral-900 mb-4 text-balance tracking-tight">
-          Practical guides, HireOrbit-grade
+          Practical guides, HireOrbital-grade
         </h1>
         <p className="text-lg text-neutral-600 mb-12 max-w-2xl leading-relaxed">
           No login required. Use these to sharpen your materials; connect with us when
@@ -72,7 +72,7 @@ export default function FreeToolsPage() {
             href="/account/signup"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors shadow-sm"
           >
-            Sign up — HireOrbit
+            Sign up — HireOrbital
           </a>
         </div>
       </div>

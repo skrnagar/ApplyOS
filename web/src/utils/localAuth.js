@@ -1,5 +1,5 @@
-const USERS_KEY_NEW = "hireorbit_local_users";
-const SESSION_KEY_NEW = "hireorbit_local_session";
+const USERS_KEY_NEW = "hireorbital_local_users";
+const SESSION_KEY_NEW = "hireorbital_local_session";
 const USERS_KEY_OLD = "applyai_local_users";
 const SESSION_KEY_OLD = "applyai_local_session";
 
@@ -53,7 +53,7 @@ export function setLocalSession(session) {
   } else {
     window.localStorage.setItem(SESSION_KEY_NEW, JSON.stringify(session));
   }
-  window.dispatchEvent(new Event("hireorbit:auth-changed"));
+  window.dispatchEvent(new Event("hireorbital:auth-changed"));
   window.dispatchEvent(new Event("applyai:auth-changed"));
 }
 

@@ -213,7 +213,7 @@ export default function AdminChatPanel({ profiles = [], initialProfileId = null 
                 type="text"
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
-                placeholder="Reply as HireOrbit assistant…"
+                placeholder="Reply as HireOrbital assistant…"
                 className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-200 text-sm"
               />
               <button

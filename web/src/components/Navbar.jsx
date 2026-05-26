@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import useUser from "@/utils/useUser";
 import { Menu, X } from "lucide-react";
-import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
+import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -38,7 +38,7 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-5 sm:px-6 flex items-center justify-between gap-4">
           <a href="/" className="flex items-center group min-w-0">
-            <HireOrbitLogo size="md" variant="light" />
+            <HireOrbitalLogo size="md" variant="light" />
           </a>
 
           <div className="hidden md:flex items-center gap-0.5 px-1 py-1 rounded-full border border-neutral-200/80 bg-white/80">

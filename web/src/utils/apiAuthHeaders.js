@@ -21,9 +21,9 @@ export async function getApiAuthHeaders(extra = {}) {
 
   const session = typeof window !== "undefined" ? getLocalSession() : null;
   if (session?.email) {
-    headers["X-HireOrbit-User-Id"] = session.id || session.email;
-    headers["X-HireOrbit-Email"] = session.email;
-    if (session.name) headers["X-HireOrbit-Name"] = session.name;
+    headers["X-HireOrbital-User-Id"] = session.id || session.email;
+    headers["X-HireOrbital-Email"] = session.email;
+    if (session.name) headers["X-HireOrbital-Name"] = session.name;
   }
 
   return headers;

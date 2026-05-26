@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Twitter, Linkedin, Github, Instagram } from "lucide-react";
-import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
+import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
 
 export default function Footer() {
@@ -11,10 +11,10 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-10 md:gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
             <div className="mb-5">
-              <HireOrbitLogo size="md" variant="light" />
+              <HireOrbitalLogo size="md" variant="light" />
             </div>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
-              HireOrbit is your AI career operating system: transparent applications,
+              HireOrbital is your AI career operating system: transparent applications,
               resume &amp; LinkedIn optimization, assistant support, and analytics —
               built for trust, not spam.
             </p>
@@ -154,7 +154,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-neutral-200/90 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-neutral-500 text-xs">
-            © {new Date().getFullYear()} HireOrbit. All rights reserved.
+            © {new Date().getFullYear()} HireOrbital. All rights reserved.
           </p>
           <div className="flex gap-8">
             <span className="text-xs text-neutral-500 font-medium">Status: Operational</span>

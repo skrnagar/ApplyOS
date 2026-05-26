@@ -8,9 +8,9 @@ const sizes = {
 };
 
 /**
- * HireOrbit mark: dual orbit rings + core — premium SaaS, space‑career metaphor.
+ * HireOrbital mark: dual orbit rings + core — premium SaaS, space‑career metaphor.
  */
-export default function HireOrbitLogo({
+export default function HireOrbitalLogo({
   size = "md",
   showWordmark = true,
   variant = "dark",
@@ -83,7 +83,7 @@ export default function HireOrbitLogo({
       </svg>
       {showWordmark && (
         <span className={`${sizeClass} ${textClass}`}>
-          Hire<span className={orbitWordClass}>Orbit</span>
+          Hire<span className={orbitWordClass}>Orbital</span>
         </span>
       )}
     </span>

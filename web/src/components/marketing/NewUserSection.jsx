@@ -55,7 +55,7 @@ export default function NewUserSection() {
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
             <p className="text-[11px] font-semibold tracking-[0.35em] uppercase text-emerald-700 mb-4">
-              New to HireOrbit
+              New to HireOrbital
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-neutral-900 text-balance leading-tight">
               Create your account and open the dashboard in one step.

@@ -42,11 +42,11 @@ export const links = () => [];
 
 export function meta() {
   return [
-    { title: 'HireOrbit — AI career operating system' },
+    { title: 'HireOrbital — AI career operating system' },
     {
       name: 'description',
       content:
-        'HireOrbit optimizes your full job search pipeline: curated applications, resume & LinkedIn upgrades, assistant support, and transparent progress — premium UX, AI-native workflows.',
+        'HireOrbital optimizes your full job search pipeline: curated applications, resume & LinkedIn upgrades, assistant support, and transparent progress — premium UX, AI-native workflows.',
     },
   ];
 }

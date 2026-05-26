@@ -17,9 +17,9 @@ export async function resolveRequestProfile(request) {
   let localId = null;
 
   const authHeader = request.headers.get("authorization");
-  const localIdHeader = request.headers.get("x-hireorbit-user-id");
-  const emailHeader = request.headers.get("x-hireorbit-email");
-  const nameHeader = request.headers.get("x-hireorbit-name");
+  const localIdHeader = request.headers.get("x-hireorbital-user-id");
+  const emailHeader = request.headers.get("x-hireorbital-email");
+  const nameHeader = request.headers.get("x-hireorbital-name");
   const hasBearer = Boolean(authHeader?.startsWith("Bearer "));
 
   if (hasBearer) {

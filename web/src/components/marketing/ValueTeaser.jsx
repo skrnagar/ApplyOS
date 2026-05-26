@@ -20,7 +20,7 @@ export default function ValueTeaser() {
                 The real comparison
               </p>
               <h3 className="text-xl md:text-2xl font-semibold text-neutral-900 tracking-tight text-balance">
-                One overlooked week of search can cost far more than a month of HireOrbit.
+                One overlooked week of search can cost far more than a month of HireOrbital.
               </h3>
               <p className="mt-3 text-sm md:text-base text-neutral-600 leading-relaxed">
                 Transparent applications, curated targets, assistant coverage, and the analytics to

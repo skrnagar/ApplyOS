@@ -29,7 +29,7 @@ Email alerts (leads, contact, chat, signups, resumes, applications) are sent via
 # web/.env.local
 ALERT_EMAIL=hireorbit.1@gmail.com
 RESEND_API_KEY=re_xxxxxxxx
-RESEND_FROM=HireOrbit <onboarding@resend.dev>   # use a verified domain in production
+RESEND_FROM=HireOrbital <onboarding@resend.dev>   # use a verified domain in production
 ```
 
 Restart `npm run dev` after changing env vars.

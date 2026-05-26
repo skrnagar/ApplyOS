@@ -20,7 +20,7 @@ const resources = [
     href: "/tools#interview",
     icon: Mic,
     title: "Interview story bank",
-    desc: "STAR prompts that pair with mock interviews in HireOrbit.",
+    desc: "STAR prompts that pair with mock interviews in HireOrbital.",
   },
   {
     href: "/tools#ats",

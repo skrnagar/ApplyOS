@@ -99,10 +99,10 @@ function UserProviderInner({ children, session, status }) {
       if (!local && status !== "authenticated") setLocalUser(null);
     };
     syncLocal();
-    window.addEventListener("hireorbit:auth-changed", syncLocal);
+    window.addEventListener("hireorbital:auth-changed", syncLocal);
     window.addEventListener("applyai:auth-changed", syncLocal);
     return () => {
-      window.removeEventListener("hireorbit:auth-changed", syncLocal);
+      window.removeEventListener("hireorbital:auth-changed", syncLocal);
       window.removeEventListener("applyai:auth-changed", syncLocal);
     };
   }, [status, supabaseMode]);

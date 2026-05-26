@@ -52,7 +52,7 @@ export default function CTA() {
               transition={{ delay: 0.06 }}
               className="mt-5 text-neutral-600 max-w-xl mx-auto text-base leading-relaxed"
             >
-              Stop juggling tabs and ghost applications. HireOrbit coordinates outreach, applications,
+              Stop juggling tabs and ghost applications. HireOrbital coordinates outreach, applications,
               and prep so you walk into interviews ready.
             </motion.p>
 

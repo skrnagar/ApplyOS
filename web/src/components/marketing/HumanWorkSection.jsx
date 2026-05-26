@@ -42,7 +42,7 @@ export default function HumanWorkSection() {
               <span className="text-emerald-700">high-friction work</span>.
             </h2>
             <p className="mt-5 text-neutral-600 text-base md:text-lg leading-relaxed max-w-xl">
-              Forms, follow-ups, rewrites, and scheduling — the parts that drain you — run through HireOrbit’s
+              Forms, follow-ups, rewrites, and scheduling — the parts that drain you — run through HireOrbital’s
               assistant layer. You stay in decision mode: targets, stories, and offers.
             </p>
             <ul className="mt-8 space-y-3 text-sm text-neutral-700">

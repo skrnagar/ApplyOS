@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { ChevronLeft } from "lucide-react";
-import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
+import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
 
 /**
  * Shared account pages shell — matches marketing light UI (readable, professional).
@@ -60,7 +60,7 @@ export default function AccountAuthShell({
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <a href="/" className="inline-flex justify-center mb-6">
-              <HireOrbitLogo size="lg" variant="light" />
+              <HireOrbitalLogo size="lg" variant="light" />
             </a>
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-neutral-900 mb-2">
               {title}

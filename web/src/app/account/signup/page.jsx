@@ -77,7 +77,7 @@ export default function SignUpPage() {
   return (
     <AccountAuthShell
       title="Create your account"
-      subtitle="Launch your job search pipeline with HireOrbit."
+      subtitle="Launch your job search pipeline with HireOrbital."
       backHref="/"
       backLabel="Home"
       secondaryBackHref="/account/signin"

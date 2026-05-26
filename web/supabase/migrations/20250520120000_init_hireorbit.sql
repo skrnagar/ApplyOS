@@ -1,4 +1,4 @@
--- HireOrbit initial schema + auth → profiles sync
+-- HireOrbital initial schema + auth → profiles sync
 -- Apply: Supabase Dashboard → SQL Editor → paste this file → Run
 -- Then run: 20250520120100_backfill_profiles_from_auth.sql (if users already signed up)
 -- Storage: create public bucket "resumes" in Dashboard → Storage

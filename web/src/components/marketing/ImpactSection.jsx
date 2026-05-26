@@ -12,7 +12,7 @@ const metrics = [
   {
     icon: Users,
     value: "700+",
-    label: "Professionals who trust HireOrbit for transparent, high-velocity search.",
+    label: "Professionals who trust HireOrbital for transparent, high-velocity search.",
   },
   {
     icon: Timer,
@@ -34,7 +34,7 @@ export default function ImpactSection() {
           </h2>
           <p className="mt-4 text-neutral-600 leading-relaxed text-base md:text-lg">
             We obsess over relevance, reply quality, and a search that stays legible inside your
-            HireOrbit workspace — not noisy spray-and-pray bots.
+            HireOrbital workspace — not noisy spray-and-pray bots.
           </p>
         </div>
 

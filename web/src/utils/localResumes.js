@@ -1,4 +1,4 @@
-const KEY_NEW = (userId) => `hireorbit_local_resumes_${userId || "guest"}`;
+const KEY_NEW = (userId) => `hireorbital_local_resumes_${userId || "guest"}`;
 const KEY_OLD = (userId) => `applyai_local_resumes_${userId || "guest"}`;
 
 function safeParse(value, fallback) {

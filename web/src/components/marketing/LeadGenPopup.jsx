@@ -8,8 +8,8 @@ import { getLocalSession } from "@/utils/localAuth";
 import LeadGenPopupProof from "./LeadGenPopupProof";
 import { captureLead } from "@/utils/captureLead";
 
-const STORAGE_KEY = "hireorbit_lead_popup_dismissed";
-const LEADS_KEY = "hireorbit_lead_captures";
+const STORAGE_KEY = "hireorbital_lead_popup_dismissed";
+const LEADS_KEY = "hireorbital_lead_captures";
 const DELAY_MS = 3500;
 
 function shouldShowOnPath(pathname) {

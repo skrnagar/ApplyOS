@@ -367,7 +367,7 @@ export default function AdminPage() {
       <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white/95 backdrop-blur">
         <motion.div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-lg font-semibold text-neutral-900">HireOrbit Admin</h1>
+            <h1 className="text-lg font-semibold text-neutral-900">HireOrbital Admin</h1>
             <p className="text-xs text-neutral-500">
               {adminEmail ? `Signed in as ${adminEmail}` : "View & manage all Supabase data"}
               {" · "}

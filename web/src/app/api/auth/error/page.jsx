@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, ArrowLeft } from "lucide-react";
-import HireOrbitLogo from "@/components/ui/HireOrbitLogo";
+import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
 import AmbientBackground from "@/components/AmbientBackground";
 
 const ERROR_MESSAGES = {
@@ -46,7 +46,7 @@ export default function AuthErrorPage() {
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <a href="/" className="inline-flex justify-center mb-6">
-            <HireOrbitLogo size="lg" variant="dark" />
+            <HireOrbitalLogo size="lg" variant="dark" />
           </a>
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-red-500/15 border border-red-500/25 mb-4">
             <AlertCircle className="text-red-400" size={28} />

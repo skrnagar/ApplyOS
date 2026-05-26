@@ -18,7 +18,7 @@ export function getAlertEmail() {
  */
 export async function notifyTeam({ subject, text, html, tags = {} }) {
   const to = getAlertEmail();
-  const subjectLine = `[HireOrbit] ${subject}`;
+  const subjectLine = `[HireOrbital] ${subject}`;
   const bodyText = text || "";
   const bodyHtml =
     html ||
@@ -32,13 +32,13 @@ export async function notifyTeam({ subject, text, html, tags = {} }) {
 
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
-    console.info("[HireOrbit alert →", to + "]", subjectLine, bodyText.slice(0, 500));
+    console.info("[HireOrbital alert →", to + "]", subjectLine, bodyText.slice(0, 500));
     return { sent: false, logged: true, to };
   }
 
   try {
     const from =
-      process.env.RESEND_FROM?.trim() || "HireOrbit <onboarding@resend.dev>";
+      process.env.RESEND_FROM?.trim() || "HireOrbital <onboarding@resend.dev>";
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {

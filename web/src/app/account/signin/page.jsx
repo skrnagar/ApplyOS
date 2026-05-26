@@ -75,7 +75,7 @@ export default function SignInPage() {
   return (
     <AccountAuthShell
       title="Welcome back"
-      subtitle="Sign in to your HireOrbit workspace."
+      subtitle="Sign in to your HireOrbital workspace."
       backHref="/"
       backLabel="Home"
       secondaryBackHref="/account/signup"

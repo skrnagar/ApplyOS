@@ -45,7 +45,7 @@ export default function JobFeedMock({ className = "" }) {
           </span>
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
-              HireOrbit pipeline
+              HireOrbital pipeline
             </p>
             <p className="truncate text-sm font-semibold text-neutral-900">This week’s top matches</p>
           </div>
