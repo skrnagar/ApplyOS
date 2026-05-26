@@ -1,4 +1,5 @@
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
+import { notifyContactForm } from "../utils/notifyTeam.js";
 
 const TEAM_INBOX =
   process.env.CONTACT_EMAIL || process.env.SUPPORT_EMAIL || "hireorbit.1@gmail.com";
@@ -51,6 +52,8 @@ export async function POST(request) {
         team_inbox: TEAM_INBOX,
       },
     });
+
+    void notifyContactForm({ email, name, message });
 
     return Response.json(
       { ok: true, stored: true, submission: data, teamEmail: TEAM_INBOX },

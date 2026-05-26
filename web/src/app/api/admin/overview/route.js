@@ -19,7 +19,7 @@ async function safeQuery(label, fn) {
 }
 
 export async function GET(request) {
-  const auth = verifyAdminRequest(request);
+  const auth = await verifyAdminRequest(request);
   if (!auth.ok) {
     return Response.json(
       { error: auth.error, hint: auth.hint },

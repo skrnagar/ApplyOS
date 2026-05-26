@@ -1,4 +1,5 @@
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
+import { notifyNewLead } from "../utils/notifyTeam.js";
 
 export async function POST(request) {
   try {
@@ -36,6 +37,8 @@ export async function POST(request) {
       console.error("POST /api/leads:", error);
       return Response.json({ error: "Failed to save lead" }, { status: 500 });
     }
+
+    void notifyNewLead({ email, name, source, metadata });
 
     return Response.json({ ok: true, stored: true, lead: data }, { status: 201 });
   } catch (error) {

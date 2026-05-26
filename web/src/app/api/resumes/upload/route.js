@@ -1,6 +1,7 @@
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
 import { resolveRequestProfile } from "../../utils/supabaseUser.js";
 import { scoreResumeAts } from "@/utils/atsScore";
+import { notifyResumeUpload } from "../../utils/notifyTeam.js";
 
 const BUCKET = "resumes";
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -106,6 +107,13 @@ export async function POST(request) {
     console.error("resume insert:", insertError);
     return Response.json({ error: "Failed to save resume record" }, { status: 500 });
   }
+
+  void notifyResumeUpload({
+    userEmail: profile.email,
+    userName: profile.full_name,
+    fileName,
+    atsScore: ats_score,
+  });
 
   const mapped = mapResumeRow(resume);
   return Response.json({ resume: mapped, source: "supabase" }, { status: 201 });

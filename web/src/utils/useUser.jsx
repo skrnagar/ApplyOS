@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useSession } from "@auth/create/react";
 import { getLocalSession, signOutLocal } from "./localAuth";
-import { isSupabaseAuthEnabled } from "./authMode";
+import { isSupabaseAuthEnabled, usesSupabaseAuthOnly } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
 import { syncAuthProfile } from "./apiAuthHeaders";
 
@@ -17,11 +17,8 @@ function mapSupabaseUser(user) {
 
 const UserContext = React.createContext(undefined);
 
-/** Wrap the app (inside SessionProvider) so all routes share one auth session. */
-export function UserProvider({ children }) {
-  const { data: session, status } = useSession();
+function UserProviderInner({ children, session, status }) {
   const id = session?.user?.id;
-
   const supabaseMode = isSupabaseAuthEnabled();
 
   const [sbUser, setSbUser] = React.useState(null);
@@ -144,6 +141,27 @@ export function UserProvider({ children }) {
   ]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+function UserProviderWithAuthJs({ children }) {
+  const { data: session, status } = useSession();
+  return (
+    <UserProviderInner session={session} status={status}>
+      {children}
+    </UserProviderInner>
+  );
+}
+
+/** Wrap the app so all routes share one auth session (Supabase and/or Auth.js). */
+export function UserProvider({ children }) {
+  if (usesSupabaseAuthOnly()) {
+    return (
+      <UserProviderInner session={null} status="unauthenticated">
+        {children}
+      </UserProviderInner>
+    );
+  }
+  return <UserProviderWithAuthJs>{children}</UserProviderWithAuthJs>;
 }
 
 function useUser() {

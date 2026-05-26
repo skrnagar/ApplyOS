@@ -1,5 +1,8 @@
+import { getApiAuthHeaders } from "@/utils/apiAuthHeaders";
+
 const ADMIN_KEY = "hireorbit_admin_secret";
 
+/** Legacy optional secret (fallback if ADMIN_EMAILS not used). */
 export function getAdminSecret() {
   if (typeof window === "undefined") return null;
   try {
@@ -16,28 +19,21 @@ export function setAdminSecret(secret) {
 }
 
 export async function adminFetch(url, options = {}) {
+  const authHeaders = await getApiAuthHeaders(options.headers || {});
   const secret = getAdminSecret();
   const headers = {
-    ...(options.headers || {}),
-    "X-Admin-Secret": secret || "",
+    ...authHeaders,
+    ...(secret ? { "X-Admin-Secret": secret } : {}),
   };
 
-  const res = await fetch(url, {
+  return fetch(url, {
     ...options,
     headers,
     credentials: options.credentials ?? "same-origin",
   });
-
-  return res;
 }
 
-/** Parse JSON admin API response; throws with a clear message on failure. */
 export async function adminFetchJson(url, options = {}) {
-  const secret = getAdminSecret();
-  if (!secret?.trim()) {
-    throw new Error("Enter your admin secret to unlock the dashboard.");
-  }
-
   let res;
   try {
     res = await adminFetch(url, options);
@@ -77,4 +73,16 @@ export async function adminFetchJson(url, options = {}) {
 export async function adminDeleteRecord(table, id) {
   const params = new URLSearchParams({ table, id });
   return adminFetchJson(`/api/admin/record?${params}`, { method: "DELETE" });
+}
+
+export async function checkAdminSession() {
+  return adminFetchJson("/api/admin/session");
+}
+
+export async function setProfileAdmin(profileId, isAdmin) {
+  return adminFetchJson("/api/admin/profile", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ profileId, is_admin: isAdmin }),
+  });
 }

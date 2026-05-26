@@ -301,6 +301,23 @@ app.use('/api/auth/*', async (c, next) => {
     return next();
   }
   if (!process.env.AUTH_SECRET) {
+    const path = c.req.path.replace(/\/$/, '');
+    if (path.endsWith('/session') && c.req.method === 'GET') {
+      return c.json(null);
+    }
+    if (path.endsWith('/csrf') && c.req.method === 'GET') {
+      return c.json({ csrfToken: '' });
+    }
+    if (isSupabaseConfigured()) {
+      return c.json(
+        {
+          error: 'Configuration',
+          message:
+            'Auth.js is disabled. Sign in with Supabase email/password (AUTH_SECRET not required).',
+        },
+        503,
+      );
+    }
     return c.json(
       {
         error: 'Configuration',

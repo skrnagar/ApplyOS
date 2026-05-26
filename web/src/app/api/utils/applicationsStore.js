@@ -3,6 +3,7 @@ import { isNeonDatabaseConfigured } from "./dbConfig.js";
 import { getOrCreateUser } from "./getUser.js";
 import { resolveRequestProfile } from "./supabaseUser.js";
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
+import { notifyNewApplication } from "./notifyTeam.js";
 
 function mapSupabaseRow(row) {
   return {
@@ -92,6 +93,13 @@ export async function createApplication(request, body) {
     console.error("createApplication supabase:", error);
     return { error: error.message || "Internal server error", status: 500 };
   }
+
+  void notifyNewApplication({
+    email: profile.email,
+    company: body.company_name,
+    jobTitle: body.job_title,
+  });
+
   return { data: mapSupabaseRow(data), status: 201 };
 }
 

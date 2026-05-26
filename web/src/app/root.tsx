@@ -28,6 +28,7 @@ import fetch from '@/__create/fetch';
 // @ts-expect-error -- generated auth module, no type declarations available
 import { SessionProvider } from '@auth/create/react';
 import { UserProvider } from '@/utils/useUser';
+import { usesSupabaseAuthOnly } from '@/utils/authMode';
 import { toPng } from 'html-to-image';
 import { useNavigate } from 'react-router';
 import { serializeError } from 'serialize-error';
@@ -475,11 +476,15 @@ export function Layout({ children }: { children: ReactNode }) {
 export const ErrorBoundary = InternalErrorBoundary;
 
 export default function App() {
-  return (
-    <SessionProvider>
-      <UserProvider>
-        <Outlet />
-      </UserProvider>
-    </SessionProvider>
+  const content = (
+    <UserProvider>
+      <Outlet />
+    </UserProvider>
   );
+
+  if (usesSupabaseAuthOnly()) {
+    return content;
+  }
+
+  return <SessionProvider>{content}</SessionProvider>;
 }

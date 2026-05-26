@@ -15,11 +15,24 @@
 | Dashboard chat | Postgres table `public.chat_messages` |
 | Job applications | Postgres table `public.applications` |
 | Profile + job preferences | `public.profiles` (+ `job_preferences` jsonb column) |
+| Admin login | Supabase Auth email/password (`auth.users`) |
+| Admin permission | `public.profiles.is_admin = true` (see migration `20250523120000_admin_on_profiles.sql`) |
 | Admin view | `/admin` + `GET /api/admin/overview` (service role) |
 
 Legacy **Neon** (`DATABASE_URL`) is only used if `AUTH_SECRET` + Auth.js paths are enabled; Supabase is the primary store when configured.
 
-Team inbox for the site: **hireorbit.1@gmail.com** (see `src/config/site.js`). Form submissions are saved in Supabase; check `/admin` or the Supabase dashboard — email delivery to the inbox is not automatic unless you add a provider (e.g. Resend).
+Team inbox for alerts: **hireorbit.1@gmail.com** (override with `ALERT_EMAIL` in `.env.local`).
+
+Email alerts (leads, contact, chat, signups, resumes, applications) are sent via [Resend](https://resend.com) when `RESEND_API_KEY` is set. Without it, alerts are logged to the dev server console.
+
+```bash
+# web/.env.local
+ALERT_EMAIL=hireorbit.1@gmail.com
+RESEND_API_KEY=re_xxxxxxxx
+RESEND_FROM=HireOrbit <onboarding@resend.dev>   # use a verified domain in production
+```
+
+Restart `npm run dev` after changing env vars.
 
 ---
 

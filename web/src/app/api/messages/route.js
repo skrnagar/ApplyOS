@@ -2,6 +2,7 @@ import sql from "../utils/sql.js";
 import { getOrCreateUser } from "../utils/getUser.js";
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
 import { resolveRequestProfile } from "../utils/supabaseUser.js";
+import { notifyUserChat } from "../utils/notifyTeam.js";
 
 function mapChatRow(row) {
   return {
@@ -70,6 +71,11 @@ export async function POST(request) {
         .single();
 
       if (error) throw error;
+      void notifyUserChat({
+        userEmail: profile.email,
+        userName: profile.full_name,
+        content: content.trim(),
+      });
       return Response.json(mapChatRow(data), { status: 201 });
     }
 

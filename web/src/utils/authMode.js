@@ -12,6 +12,11 @@ export function isServerAuthEnabled() {
   return false;
 }
 
+/** Supabase auth without Auth.js — skip SessionProvider and /api/auth/session polling. */
+export function usesSupabaseAuthOnly() {
+  return isSupabaseAuthEnabled() && !isServerAuthEnabled();
+}
+
 /** True when Supabase URL + anon/publishable key are set (email/password + OAuth via Supabase). */
 export function isSupabaseAuthEnabled() {
   const url =
