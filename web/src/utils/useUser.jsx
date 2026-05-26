@@ -60,7 +60,7 @@ function UserProviderInner({ children, session, status }) {
   }, [supabaseMode]);
 
   const [localUser, setLocalUser] = React.useState(() =>
-    supabaseMode ? null : session?.user ?? getLocalSession(),
+    supabaseMode ? null : session?.user ?? null,
   );
 
   const fetchUser = React.useCallback(async (sess) => {

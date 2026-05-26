@@ -2,8 +2,8 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import useUser from "@/utils/useUser";
-import { getLocalSession } from "@/utils/localAuth";
 import { isSupabaseAuthEnabled } from "@/utils/authMode";
+import { useLocalSession } from "@/utils/useClientSnapshot";
 
 /**
  * Protects all `/dashboard/*` routes: unauthenticated users go to sign-in with return URL.
@@ -13,20 +13,19 @@ export default function DashboardRouteLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const supabaseMode = isSupabaseAuthEnabled();
+  const local = useLocalSession();
 
   useEffect(() => {
     if (loading) return;
 
-    const local = typeof window !== "undefined" ? getLocalSession() : null;
     const authenticated = supabaseMode ? Boolean(user) : Boolean(user || local);
 
     if (!authenticated) {
       const returnTo = encodeURIComponent(`${location.pathname}${location.search || ""}`);
       navigate(`/account/signin?callbackUrl=${returnTo}`, { replace: true });
     }
-  }, [user, loading, navigate, location.pathname, location.search, supabaseMode]);
+  }, [user, loading, navigate, location.pathname, location.search, supabaseMode, local]);
 
-  const local = typeof window !== "undefined" ? getLocalSession() : null;
   const ok = supabaseMode ? Boolean(user) : Boolean(user || local);
 
   if (loading || !ok) {

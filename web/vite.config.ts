@@ -16,12 +16,21 @@ import { restartEnvFileChange } from './plugins/restartEnvFileChange';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const serverAuth = Boolean(env.AUTH_SECRET);
+  const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseAuth = Boolean(supabaseUrl && supabaseKey);
+  const supabaseAuthOnly = supabaseAuth && !serverAuth;
 
   return {
   // Keep them available via import.meta.env.NEXT_PUBLIC_*
   envPrefix: 'NEXT_PUBLIC_',
   define: {
     'import.meta.env.NEXT_PUBLIC_SERVER_AUTH': JSON.stringify(serverAuth ? 'true' : 'false'),
+    'import.meta.env.NEXT_PUBLIC_SUPABASE_AUTH': JSON.stringify(supabaseAuth ? 'true' : 'false'),
+    'import.meta.env.NEXT_PUBLIC_SUPABASE_AUTH_ONLY': JSON.stringify(
+      supabaseAuthOnly ? 'true' : 'false',
+    ),
   },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
