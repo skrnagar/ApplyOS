@@ -9,10 +9,11 @@ import updatedFetch from '../src/__create/fetch';
 const API_BASENAME = '/api';
 const api = new Hono();
 
-/** Eager in production so Vercel bundles handlers (dynamic import fails on serverless). */
-const bundledRouteModules = import.meta.glob('../src/app/api/**/route.js', {
-  eager: import.meta.env.PROD,
-});
+/**
+ * Eager glob only — Vite requires static `import.meta.glob` options (no `import.meta.env.*` in the options object).
+ * Used only when `import.meta.env.PROD`; dev still registers routes via filesystem + dynamic import below.
+ */
+const bundledRouteModules = import.meta.glob('../src/app/api/**/route.js', { eager: true });
 
 const candidateApiDirs = [
   join(process.cwd(), 'src/app/api'),
