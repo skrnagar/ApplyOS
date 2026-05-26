@@ -6,23 +6,50 @@ import nodeConsole from 'node:console';
 import { skipCSRFCheck } from '@auth/core';
 import Credentials from '@auth/core/providers/credentials';
 import { authHandler, initAuthConfig } from '@hono/auth-js';
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { hash, verify } from 'argon2';
 import { Hono } from 'hono';
-import { contextStorage, getContext } from 'hono/context-storage';
+import { contextStorage } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
 import { requestId } from 'hono/request-id';
 import { serializeError } from 'serialize-error';
-import ws from 'ws';
-import NeonAdapter from './adapter';
+import type NeonAdapterType from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
 import { isSupabaseConfigured } from '../src/utils/supabase/config';
 import { supabaseSessionMiddleware } from '../src/utils/supabase/middleware';
-neonConfig.webSocketConstructor = ws;
+
+type LegacyAuthDeps = {
+  adapter: ReturnType<typeof NeonAdapterType>;
+  hash: (password: string) => Promise<string>;
+  verify: (hash: string, password: string) => Promise<boolean>;
+};
+
+let legacyAuthDepsPromise: Promise<LegacyAuthDeps> | null = null;
+
+/** Neon + argon2 are only needed for legacy Auth.js; load lazily to avoid Vercel cold-start crashes. */
+function getLegacyAuthDeps(): Promise<LegacyAuthDeps> {
+  if (!legacyAuthDepsPromise) {
+    legacyAuthDepsPromise = (async () => {
+      const [{ Pool, neonConfig }, { default: ws }, argon2, { default: NeonAdapter }] =
+        await Promise.all([
+          import('@neondatabase/serverless'),
+          import('ws'),
+          import('argon2'),
+          import('./adapter'),
+        ]);
+      neonConfig.webSocketConstructor = ws;
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+      return {
+        adapter: NeonAdapter(pool),
+        hash: argon2.hash,
+        verify: argon2.verify,
+      };
+    })();
+  }
+  return legacyAuthDepsPromise;
+}
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
 
@@ -38,11 +65,6 @@ for (const method of ['log', 'info', 'warn', 'error', 'debug'] as const) {
     }
   };
 }
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-const adapter = NeonAdapter(pool);
 
 const app = new Hono();
 
@@ -92,7 +114,7 @@ for (const method of ['post', 'put', 'patch'] as const) {
   );
 }
 
-if (process.env.AUTH_SECRET) {
+if (process.env.AUTH_SECRET && process.env.DATABASE_URL) {
   app.use(
     '*',
     initAuthConfig((c) => ({
@@ -152,6 +174,7 @@ if (process.env.AUTH_SECRET) {
                   const { email, name, provider } = credentials;
                   if (!email || typeof email !== 'string') return null;
 
+                  const { adapter } = await getLegacyAuthDeps();
                   const existing = await adapter.getUserByEmail(email);
                   if (existing) return existing;
 
@@ -201,7 +224,7 @@ if (process.env.AUTH_SECRET) {
               return null;
             }
 
-            // logic to verify if user exists
+            const { adapter, verify } = await getLegacyAuthDeps();
             const user = await adapter.getUserByEmail(email);
             if (!user) {
               return null;
@@ -247,7 +270,7 @@ if (process.env.AUTH_SECRET) {
               return null;
             }
 
-            // logic to verify if user exists
+            const { adapter, hash } = await getLegacyAuthDeps();
             const user = await adapter.getUserByEmail(email);
             if (!user) {
               const newUser = await adapter.createUser({

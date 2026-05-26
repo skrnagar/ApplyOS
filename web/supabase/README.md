@@ -34,6 +34,10 @@ RESEND_FROM=HireOrbital <onboarding@resend.dev>   # use a verified domain in pro
 
 Restart `npm run dev` after changing env vars.
 
+## SEO
+
+Set `NEXT_PUBLIC_SITE_URL=https://hireorbital.com` in production for canonical URLs, Open Graph, and sitemap. Public files: `public/robots.txt`, `public/sitemap.xml`. Dynamic sitemap: `GET /api/sitemap`.
+
 ---
 
 Schema lives in `migrations/`. Apply it to your **hosted** project:

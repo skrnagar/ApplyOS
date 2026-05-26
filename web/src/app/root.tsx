@@ -37,18 +37,22 @@ import { Toaster, toast } from 'sonner';
 import { useDevServerHeartbeat } from '../__create/useDevServerHeartbeat';
 import '../__create/design-mode';
 import type { Route } from './+types/root';
+import StructuredData from '@/components/seo/StructuredData';
+import { SITE_URL } from '@/config/site';
+import { buildMeta } from '@/utils/seo';
 
-export const links = () => [];
+export const links = () => [
+  { rel: 'icon', href: '/favicon.png', type: 'image/png' },
+  { rel: 'apple-touch-icon', href: '/favicon.png' },
+  { rel: 'manifest', href: '/site.webmanifest' },
+];
 
+/** Fallback meta; per-route overrides come from `layout.jsx` meta(). */
 export function meta() {
-  return [
-    { title: 'HireOrbital — AI career operating system' },
-    {
-      name: 'description',
-      content:
-        'HireOrbital optimizes your full job search pipeline: curated applications, resume & LinkedIn upgrades, assistant support, and transparent progress — premium UX, AI-native workflows.',
-    },
-  ];
+  return buildMeta({
+    title: 'HireOrbital — AI career operating system',
+    path: '/',
+  });
 }
 
 if (globalThis.window && globalThis.window !== undefined) {
@@ -458,12 +462,19 @@ export function Layout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="format-detection" content="telephone=no" />
         <Meta />
         <Links />
+        <StructuredData pathname={pathname} />
         {import.meta.env.DEV ? (
           <script type="module" src="/src/__create/dev-error-overlay.js" />
         ) : null}
-        <link rel="icon" href="/src/__create/favicon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <meta name="application-name" content="HireOrbital" />
+        <meta name="apple-mobile-web-app-title" content="HireOrbital" />
+        <meta property="og:site_name" content="HireOrbital" />
+        <meta name="twitter:domain" content={new URL(SITE_URL).hostname} />
         {LoadFontsSSR ? <LoadFontsSSR /> : null}
       </head>
       <body className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900">

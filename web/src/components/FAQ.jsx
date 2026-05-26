@@ -2,25 +2,9 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
+import { FAQ_ITEMS } from "@/config/faq";
 
-const items = [
-  {
-    q: "How many jobs do assistants apply to each week?",
-    a: "Most users average 35–90 targeted applications per week depending on plan and role availability.",
-  },
-  {
-    q: "Can I control which companies are included?",
-    a: "Yes. You can set preferred industries, company size, blacklist rules, and must-have filters in your dashboard.",
-  },
-  {
-    q: "Is this fully automated or human-assisted?",
-    a: "It is AI-powered with dedicated human assistants, so strategy quality remains high and applications stay personalized.",
-  },
-  {
-    q: "Can I track interviews and offers?",
-    a: "Yes. Your tracker shows each stage, assistant notes, and interview reminders in one workspace.",
-  },
-];
+const items = FAQ_ITEMS;
 
 export default function FAQ() {
   const [open, setOpen] = useState(0);

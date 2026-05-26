@@ -1,0 +1,11 @@
+# https://hireorbital.com/robots.txt
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /account/logout
+Disallow: /errors/
+
+Sitemap: https://hireorbital.com/sitemap.xml

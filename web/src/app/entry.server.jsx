@@ -1,3 +1,4 @@
+/** @see https://vercel.com/docs/frameworks/react-router#using-a-custom-appentryserver-file */
 import { handleRequest as vercelHandleRequest } from '@vercel/react-router/entry.server';
 import { app } from '../../__create/hono-app.js';
 
