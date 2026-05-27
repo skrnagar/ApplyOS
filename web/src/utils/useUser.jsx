@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useSession } from "@auth/create/react";
 import { getLocalSession, signOutLocal } from "./localAuth";
-import { isSupabaseAuthEnabled, usesSupabaseAuthOnly } from "./authMode";
+import { isSupabaseAuthEnabled, shouldUseAuthJsSession } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
 import { syncAuthProfile } from "./apiAuthHeaders";
 
@@ -32,6 +32,7 @@ function UserProviderInner({ children, session, status }) {
       return;
     }
 
+    setSbLoading(true);
     let cancelled = false;
 
     const applySession = (sessionData) => {
@@ -154,7 +155,7 @@ function UserProviderWithAuthJs({ children }) {
 
 /** Wrap the app so all routes share one auth session (Supabase and/or Auth.js). */
 export function UserProvider({ children }) {
-  if (usesSupabaseAuthOnly()) {
+  if (!shouldUseAuthJsSession()) {
     return (
       <UserProviderInner session={null} status="unauthenticated">
         {children}

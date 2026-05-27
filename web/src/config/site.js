@@ -12,11 +12,7 @@ export const SITE_DESCRIPTION =
 
 /** Canonical origin (no trailing slash). Set NEXT_PUBLIC_SITE_URL in production. */
 export function getSiteUrl() {
-  const raw =
-    (typeof import.meta !== "undefined" && import.meta.env?.NEXT_PUBLIC_SITE_URL) ||
-    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_SITE_URL) ||
-    (typeof process !== "undefined" && process.env?.AUTH_URL) ||
-    "https://hireorbital.com";
+  const raw = import.meta.env?.NEXT_PUBLIC_SITE_URL || "https://hireorbital.com";
   return String(raw).replace(/\/$/, "");
 }
 

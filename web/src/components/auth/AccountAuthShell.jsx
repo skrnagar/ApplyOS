@@ -72,7 +72,10 @@ export default function AccountAuthShell({
 
           {banner ? <div className="mb-4">{banner}</div> : null}
 
-          <div className="rounded-2xl border border-neutral-200/90 bg-white/95 backdrop-blur-md shadow-[0_24px_64px_-32px_rgba(15,23,42,0.18)] p-6 sm:p-8">
+          <div
+            className="rounded-2xl border border-neutral-200/90 bg-white/95 backdrop-blur-md shadow-[0_24px_64px_-32px_rgba(15,23,42,0.18)] p-6 sm:p-8"
+            suppressHydrationWarning
+          >
             {children}
           </div>
 

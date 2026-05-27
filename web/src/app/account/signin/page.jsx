@@ -2,6 +2,11 @@
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
 import { isServerAuthEnabled, isSupabaseAuthEnabled } from "@/utils/authMode";
+import { metaForPath } from "@/utils/seo";
+
+export function meta() {
+  return metaForPath("/account/signin");
+}
 import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
@@ -130,7 +135,12 @@ export default function SignInPage() {
         </>
       }
     >
-      <form onSubmit={onSubmit} className="space-y-5">
+      <form
+        onSubmit={onSubmit}
+        onReset={(e) => e.preventDefault()}
+        className="space-y-5"
+        autoComplete="on"
+      >
         <AccountInput
           id="signin-email"
           label="Email"
@@ -165,6 +175,9 @@ export default function SignInPage() {
               placeholder="Enter your password"
               required
               autoComplete="current-password"
+              data-1p-ignore="true"
+              data-lpignore="true"
+              data-form-type="other"
               className="w-full px-4 py-3 pr-12 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60 transition-shadow"
             />
             <button

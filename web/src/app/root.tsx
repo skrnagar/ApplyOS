@@ -28,7 +28,8 @@ import fetch from '@/__create/fetch';
 // @ts-expect-error -- generated auth module, no type declarations available
 import { SessionProvider } from '@auth/create/react';
 import { UserProvider } from '@/utils/useUser';
-import { usesSupabaseAuthOnly } from '@/utils/authMode';
+import { shouldUseAuthJsSession } from '@/utils/authMode';
+import { useInIframe } from '@/utils/useInIframe';
 import { useIsMobile } from '@/utils/useClientSnapshot';
 import { toPng } from 'html-to-image';
 import { useNavigate } from 'react-router';
@@ -383,9 +384,10 @@ export function useHmrConnection(): boolean {
 }
 
 const healthyResponseType = 'sandbox:web:healthcheck:response';
-const useHandshakeParent = () => {
+const useHandshakeParent = (enabled: boolean) => {
   const isHmrConnected = useHmrConnection();
   useEffect(() => {
+    if (!enabled) return;
     const healthyResponse = {
       type: healthyResponseType,
       healthy: isHmrConnected,
@@ -397,13 +399,11 @@ const useHandshakeParent = () => {
       }
     };
     window.addEventListener('message', handleMessage);
-    // Immediately respond to the parent window with a healthy response in
-    // case we missed the healthcheck message
     window.parent.postMessage(healthyResponse, '*');
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [isHmrConnected]);
+  }, [enabled, isHmrConnected]);
 };
 
 const waitForScreenshotReady = async () => {
@@ -430,8 +430,9 @@ const waitForScreenshotReady = async () => {
   await new Promise((resolve) => setTimeout(resolve, 250));
 };
 
-export const useHandleScreenshotRequest = () => {
+export const useHandleScreenshotRequest = (enabled: boolean) => {
   useEffect(() => {
+    if (!enabled) return;
     const handleMessage = async (event: MessageEvent) => {
       if (event.data.type === 'sandbox:web:screenshot:request') {
         try {
@@ -472,7 +473,7 @@ export const useHandleScreenshotRequest = () => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, []);
+  }, [enabled]);
 };
 function siteHostname() {
   try {
@@ -483,19 +484,20 @@ function siteHostname() {
 }
 
 export function Layout({ children }: { children: ReactNode }) {
-  useHandshakeParent();
-  useHandleScreenshotRequest();
+  const inIframe = useInIframe();
+  useHandshakeParent(inIframe);
+  useHandleScreenshotRequest(inIframe);
   useDevServerHeartbeat();
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location?.pathname ?? '/';
-  const isMobile = useIsMobile();
   const [clientReady, setClientReady] = useState(false);
 
   useEffect(() => {
     setClientReady(true);
   }, []);
   useEffect(() => {
+    if (!inIframe) return;
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'sandbox:navigation') {
         navigate(event.data.pathname);
@@ -506,19 +508,18 @@ export function Layout({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [navigate]);
+  }, [inIframe, navigate]);
 
   useEffect(() => {
-    if (pathname) {
-      window.parent.postMessage(
-        {
-          type: 'sandbox:web:navigation',
-          pathname,
-        },
-        '*'
-      );
-    }
-  }, [pathname]);
+    if (!inIframe || !pathname) return;
+    window.parent.postMessage(
+      {
+        type: 'sandbox:web:navigation',
+        pathname,
+      },
+      '*'
+    );
+  }, [inIframe, pathname]);
   return (
     <html lang="en">
       <head>
@@ -539,10 +540,13 @@ export function Layout({ children }: { children: ReactNode }) {
         <meta name="twitter:domain" content={siteHostname()} />
         {LoadFontsSSR ? <LoadFontsSSR /> : null}
       </head>
-      <body className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900">
+      <body
+        className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900"
+        suppressHydrationWarning
+      >
         {children}
         {clientReady ? (
-          <Toaster position={isMobile ? 'top-center' : 'bottom-right'} />
+          <Toaster position="bottom-right" suppressHydrationWarning />
         ) : null}
         <ScrollRestoration />
         <Scripts />
@@ -563,7 +567,7 @@ export default function App() {
     </ErrorBoundaryWrapper>
   );
 
-  if (usesSupabaseAuthOnly()) {
+  if (!shouldUseAuthJsSession()) {
     return content;
   }
 

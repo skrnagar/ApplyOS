@@ -2,6 +2,11 @@
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
 import { isServerAuthEnabled, isSupabaseAuthEnabled } from "@/utils/authMode";
+import { metaForPath } from "@/utils/seo";
+
+export function meta() {
+  return metaForPath("/account/signup");
+}
 import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";

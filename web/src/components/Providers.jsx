@@ -1,11 +1,21 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 import Lenis from "lenis";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
+function isStaticAppRoute(pathname) {
+  return (
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/admin")
+  );
+}
+
 export default function Providers({ children }) {
+  const { pathname } = useLocation();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -20,6 +30,7 @@ export default function Providers({ children }) {
   );
 
   useEffect(() => {
+    if (isStaticAppRoute(pathname)) return;
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({
       duration: 1.1,
@@ -41,7 +52,7 @@ export default function Providers({ children }) {
       lenis.destroy();
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
