@@ -28,6 +28,19 @@ function redirectAfterAuth(callbackUrl) {
   window.location.assign(target);
 }
 
+function normalizePostAuthPath(path) {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return "/dashboard";
+  // Never bounce back into auth pages after successful sign-in/sign-up.
+  if (
+    path.startsWith("/account/signin") ||
+    path.startsWith("/account/signup") ||
+    path.startsWith("/account/auth/callback")
+  ) {
+    return "/dashboard";
+  }
+  return path;
+}
+
 function mapSupabaseAuthError(error) {
   const msg = error?.message || "";
   const code = error?.code || "";
@@ -47,7 +60,7 @@ export default function useAuth() {
     const raw = fromUrl ?? options?.callbackUrl ?? "/dashboard";
     try {
       const decoded = decodeURIComponent(raw);
-      if (decoded.startsWith("/") && !decoded.startsWith("//")) return decoded;
+      return normalizePostAuthPath(decoded);
     } catch {
       /* ignore */
     }
@@ -69,6 +82,10 @@ export default function useAuth() {
       await syncAuthProfile().catch(() => {});
       if (shouldRedirect) redirectAfterAuth(finalCallbackUrl);
       return { ok: true };
+    }
+
+    if (import.meta.env.PROD && !isServerAuthEnabled()) {
+      throw new Error("Configuration");
     }
 
     if (isServerAuthEnabled()) {
@@ -144,6 +161,10 @@ export default function useAuth() {
       await syncAuthProfile().catch(() => {});
       if (shouldRedirect) redirectAfterAuth(finalCallbackUrl);
       return { ok: true };
+    }
+
+    if (import.meta.env.PROD && !isServerAuthEnabled()) {
+      throw new Error("Configuration");
     }
 
     if (isServerAuthEnabled()) {

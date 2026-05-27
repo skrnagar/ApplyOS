@@ -16,6 +16,8 @@ const FIELD_ERRORS = {
   CredentialsSignin: "This email is already registered. Try signing in.",
   UserAlreadyRegistered: "This email is already registered. Try signing in.",
   AccessDenied: "Unable to create account. Please try again.",
+  Configuration:
+    "Authentication is not configured in production. Add NEXT_PUBLIC_SUPABASE_* (or AUTH_SECRET + database) and redeploy.",
   EmailConfirmationRequired:
     "Check your email to confirm your account before signing in. (You can disable email confirmation in Supabase for local dev.)",
 };
