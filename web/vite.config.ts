@@ -64,14 +64,16 @@ export default defineConfig(({ mode }) => {
         plugins: ['styled-jsx/babel'],
       },
     }),
+    // Do not restart the dev server on `src/**/route.*` — that closes the SSR
+    // module runner mid-request and spams "Vite module runner has been closed"
+    // while Hono loads `__create/route-builder.ts`. API routes use eager glob;
+    // Vite HMR invalidates that graph when a route file changes.
     restart({
       restart: [
         'src/**/page.jsx',
         'src/**/page.tsx',
         'src/**/layout.jsx',
         'src/**/layout.tsx',
-        'src/**/route.js',
-        'src/**/route.ts',
       ],
     }),
     consoleToParent(),

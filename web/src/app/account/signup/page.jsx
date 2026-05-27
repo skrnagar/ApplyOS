@@ -22,6 +22,7 @@ export default function SignUpPage() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fromLeadPopup, setFromLeadPopup] = useState(false);
   const { signUpWithCredentials } = useAuth();
   const serverAuth = isServerAuthEnabled();
   const supabaseAuth = isSupabaseAuthEnabled();
@@ -32,6 +33,13 @@ export default function SignUpPage() {
     const fromName = params.get("name");
     if (fromEmail) setEmail(fromEmail);
     if (fromName) setName(fromName);
+    if (params.get("from") === "lead_popup") setFromLeadPopup(true);
+
+    const next = new URL(window.location.href);
+    if (next.searchParams.has("from")) {
+      next.searchParams.delete("from");
+      window.history.replaceState({}, "", next.pathname + next.search);
+    }
   }, []);
 
   const onSubmit = async (e) => {
@@ -83,7 +91,11 @@ export default function SignUpPage() {
       secondaryBackHref="/account/signin"
       secondaryBackLabel="Sign in"
       banner={
-        !serverAuth && !supabaseAuth ? (
+        fromLeadPopup ? (
+          <p className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm text-emerald-950 leading-relaxed">
+            You&apos;re one step away — create a password to start your job search pipeline.
+          </p>
+        ) : !serverAuth && !supabaseAuth ? (
           <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
             Demo mode: your account is saved in this browser until you configure Supabase (
             <code className="text-xs">NEXT_PUBLIC_SUPABASE_*</code>) or server auth (

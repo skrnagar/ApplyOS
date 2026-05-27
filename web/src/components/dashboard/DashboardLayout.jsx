@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router";
 import {
   LayoutDashboard,
   Briefcase,
@@ -27,11 +28,19 @@ const navigation = [
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [pathname, setPathname] = useState("");
+  const { pathname } = useLocation();
+  /** Avoid SSR/client timezone mismatches for the header date (#418). */
+  const [headerDate, setHeaderDate] = useState("");
   const { data: user } = useUser();
 
   useEffect(() => {
-    setPathname(window.location.pathname);
+    setHeaderDate(
+      new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      }),
+    );
   }, []);
 
   const initials = user?.name
@@ -114,19 +123,18 @@ export default function DashboardLayout({ children }) {
               {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
             <div className="hidden lg:block">
-              <p className="text-sm text-neutral-400">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                })}
+              <p className="text-sm text-neutral-400 min-h-[1.25rem]">
+                {headerDate || "\u00a0"}
               </p>
             </div>
             <div className="flex items-center gap-3 ml-auto">
               <button className="relative p-2 hover:bg-neutral-100 rounded-lg">
                 <Bell size={19} className="text-neutral-500" />
               </button>
-              <div className="w-9 h-9 bg-gradient-to-tr from-blue-600 to-green-400 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div
+                className="w-9 h-9 bg-gradient-to-tr from-blue-600 to-green-400 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                suppressHydrationWarning
+              >
                 {initials}
               </div>
             </div>

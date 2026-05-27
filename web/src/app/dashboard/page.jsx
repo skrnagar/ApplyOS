@@ -28,7 +28,14 @@ const statusColors = {
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  /** Same on server + first client paint; set after mount to avoid getHours() hydration mismatch (#418). */
+  const [greetingWord, setGreetingWord] = useState("day");
   const { data: authUser, loading: authLoading } = useUser();
+
+  useEffect(() => {
+    const h = new Date().getHours();
+    setGreetingWord(h < 12 ? "morning" : h < 17 ? "afternoon" : "evening");
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -167,13 +174,7 @@ export default function DashboardPage() {
         {/* Greeting */}
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-neutral-900">
-            Good{" "}
-            {new Date().getHours() < 12
-              ? "morning"
-              : new Date().getHours() < 17
-                ? "afternoon"
-                : "evening"}
-            , {firstName}! 👋
+            Good {greetingWord}, {firstName}! 👋
           </h1>
           <p className="text-neutral-500 mt-1 text-sm">
             Here&apos;s your job search overview for today
@@ -194,7 +195,7 @@ export default function DashboardPage() {
             return (
               <motion.div
                 key={stat.title}
-                initial={{ opacity: 0, y: 16 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 className="bg-white rounded-2xl border border-neutral-200 p-5 hover:shadow-md transition-shadow"
