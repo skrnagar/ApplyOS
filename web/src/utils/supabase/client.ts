@@ -1,5 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { getSupabaseConfig } from "./config";
+import { getSupabaseConfig, isSupabaseConfigured } from "./config";
 
 let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
@@ -8,7 +8,7 @@ export function createClient() {
   const { url, key } = getSupabaseConfig();
   if (!url || !key) {
     throw new Error(
-      "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local",
+      "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL (https://YOUR_PROJECT.supabase.co) and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel, then redeploy.",
     );
   }
 
@@ -22,15 +22,22 @@ export function createClient() {
   return createBrowserClient(url, key);
 }
 
-/** Returns browser client or null when env is missing (safe for optional Supabase). */
+/** Returns browser client or null when env is missing or invalid (never throws). */
 export function tryCreateBrowserClient() {
+  if (!isSupabaseConfigured()) return null;
   const { url, key } = getSupabaseConfig();
   if (!url || !key) return null;
-  if (typeof window !== "undefined") {
-    if (!browserClient) {
-      browserClient = createBrowserClient(url, key);
+
+  try {
+    if (typeof window !== "undefined") {
+      if (!browserClient) {
+        browserClient = createBrowserClient(url, key);
+      }
+      return browserClient;
     }
-    return browserClient;
+    return createBrowserClient(url, key);
+  } catch (err) {
+    console.error("[supabase] Invalid client config:", err);
+    return null;
   }
-  return createBrowserClient(url, key);
 }

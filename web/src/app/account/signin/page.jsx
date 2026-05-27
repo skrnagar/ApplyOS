@@ -27,7 +27,9 @@ const FIELD_ERRORS = {
   AccessDenied: "You don't have permission to sign in.",
   EmailNotConfirmed: "Confirm your email first, then try signing in again.",
   Configuration:
-    "Sign-in is not fully configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in Vercel, then redeploy.",
+    "Supabase URL or key is missing or invalid. In Vercel set NEXT_PUBLIC_SUPABASE_URL to https://YOUR_PROJECT.supabase.co and NEXT_PUBLIC_SUPABASE_ANON_KEY to your anon key, then redeploy.",
+  AuthError:
+    "Could not connect to Supabase. Check NEXT_PUBLIC_SUPABASE_URL (must be https://….supabase.co) and redeploy.",
 };
 
 export default function SignInPage() {

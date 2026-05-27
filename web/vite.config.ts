@@ -12,13 +12,16 @@ import { loadFontsFromTailwindSource } from './plugins/loadFontsFromTailwindSour
 import { nextPublicProcessEnv } from './plugins/nextPublicProcessEnv';
 import { restart } from './plugins/restart';
 import { restartEnvFileChange } from './plugins/restartEnvFileChange';
+import { normalizeSupabaseUrl } from './src/utils/supabase/config';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const serverAuth = Boolean(env.AUTH_SECRET);
-  const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
+  const supabaseUrl = normalizeSupabaseUrl(env.NEXT_PUBLIC_SUPABASE_URL);
+  const supabaseKeyRaw =
     env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey =
+    supabaseKeyRaw && supabaseKeyRaw.trim().length >= 20 ? supabaseKeyRaw.trim() : null;
   const supabaseAuth = Boolean(supabaseUrl && supabaseKey);
   const supabaseAuthOnly = supabaseAuth && !serverAuth;
 
