@@ -49,7 +49,17 @@ const PAGE_META = {
   },
 };
 
-const NOINDEX_PREFIXES = ["/admin", "/dashboard", "/api", "/account/logout", "/errors", "/__create"];
+const NOINDEX_PREFIXES = [
+  "/admin",
+  "/dashboard",
+  "/api",
+  "/account/logout",
+  "/account/forgot-password",
+  "/account/reset-password",
+  "/account/auth",
+  "/errors",
+  "/__create",
+];
 
 function normalizePath(pathname) {
   if (!pathname || pathname === "") return "/";

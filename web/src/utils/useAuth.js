@@ -3,6 +3,7 @@ import { signIn, signOut } from "@auth/create/react";
 import { signInLocal, signOutLocal, signUpLocal } from "./localAuth";
 import { isServerAuthEnabled } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
+import { syncAuthProfile } from "./apiAuthHeaders";
 
 function isDevIframe() {
   try {
@@ -65,6 +66,7 @@ export default function useAuth() {
         password: options?.password,
       });
       if (error) throw mapSupabaseAuthError(error);
+      await syncAuthProfile().catch(() => {});
       if (shouldRedirect) redirectAfterAuth(finalCallbackUrl);
       return { ok: true };
     }
@@ -118,7 +120,7 @@ export default function useAuth() {
         email: options?.email?.trim(),
         password: options?.password,
         options: {
-          emailRedirectTo: `${window.location.origin}${finalCallbackUrl}`,
+          emailRedirectTo: `${window.location.origin}/account/auth/callback?next=${encodeURIComponent(finalCallbackUrl)}`,
           data: {
             full_name: options?.name?.trim() || "",
             name: options?.name?.trim() || "",
@@ -139,6 +141,7 @@ export default function useAuth() {
       if (!data.session && data.user) {
         throw new Error("EmailConfirmationRequired");
       }
+      await syncAuthProfile().catch(() => {});
       if (shouldRedirect) redirectAfterAuth(finalCallbackUrl);
       return { ok: true };
     }
@@ -190,7 +193,9 @@ export default function useAuth() {
       signOutLocal();
       void supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}${cb}` },
+        options: {
+          redirectTo: `${window.location.origin}/account/auth/callback?next=${encodeURIComponent(cb)}`,
+        },
       });
       return;
     }
@@ -205,7 +210,9 @@ export default function useAuth() {
       signOutLocal();
       void supabase.auth.signInWithOAuth({
         provider: "facebook",
-        options: { redirectTo: `${window.location.origin}${cb || "/dashboard"}` },
+        options: {
+          redirectTo: `${window.location.origin}/account/auth/callback?next=${encodeURIComponent(cb || "/dashboard")}`,
+        },
       });
       return;
     }
@@ -220,7 +227,9 @@ export default function useAuth() {
       signOutLocal();
       void supabase.auth.signInWithOAuth({
         provider: "twitter",
-        options: { redirectTo: `${window.location.origin}${cb || "/dashboard"}` },
+        options: {
+          redirectTo: `${window.location.origin}/account/auth/callback?next=${encodeURIComponent(cb || "/dashboard")}`,
+        },
       });
       return;
     }
@@ -235,12 +244,48 @@ export default function useAuth() {
       signOutLocal();
       void supabase.auth.signInWithOAuth({
         provider: "apple",
-        options: { redirectTo: `${window.location.origin}${cb}` },
+        options: {
+          redirectTo: `${window.location.origin}/account/auth/callback?next=${encodeURIComponent(cb)}`,
+        },
       });
       return;
     }
     if (isDevIframe()) return devSocialShim("apple", cb);
     return signIn("apple", { ...options, callbackUrl: cb });
+  }, []);
+
+  const requestPasswordReset = useCallback(async ({ email }) => {
+    const trimmed = email?.trim();
+    if (!trimmed) {
+      throw new Error("EmailRequired");
+    }
+
+    const supabase = typeof window !== "undefined" ? tryCreateBrowserClient() : null;
+    if (supabase) {
+      const redirectTo = `${window.location.origin}/account/reset-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, { redirectTo });
+      if (error) throw mapSupabaseAuthError(error);
+      return { ok: true };
+    }
+
+    throw new Error(
+      "Password reset requires Supabase. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
+    );
+  }, []);
+
+  const updatePassword = useCallback(async ({ password }) => {
+    if (!password || password.length < 8) {
+      throw new Error("PasswordTooShort");
+    }
+
+    const supabase = typeof window !== "undefined" ? tryCreateBrowserClient() : null;
+    if (!supabase) {
+      throw new Error("Supabase is not configured.");
+    }
+
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw mapSupabaseAuthError(error);
+    return { ok: true };
   }, []);
 
   return {
@@ -250,6 +295,8 @@ export default function useAuth() {
     signInWithFacebook,
     signInWithTwitter,
     signInWithApple,
+    requestPasswordReset,
+    updatePassword,
     isServerAuthEnabled,
     signOut: async (options = {}) => {
       const supabase = typeof window !== "undefined" ? tryCreateBrowserClient() : null;
@@ -265,7 +312,8 @@ export default function useAuth() {
         /* ignore */
       }
       if (typeof window !== "undefined" && options?.redirect !== false) {
-        window.location.href = options?.callbackUrl || "/";
+        const target = options?.callbackUrl || "/";
+        window.location.replace(target);
       }
     },
   };

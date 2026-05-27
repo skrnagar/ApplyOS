@@ -122,9 +122,19 @@ export default function SignInPage() {
         />
 
         <div className="space-y-1.5">
-          <label htmlFor="signin-password" className="text-sm font-medium text-neutral-700">
-            Password
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor="signin-password" className="text-sm font-medium text-neutral-700">
+              Password
+            </label>
+            {supabaseAuth ? (
+              <a
+                href="/account/forgot-password"
+                className="text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              >
+                Forgot password?
+              </a>
+            ) : null}
+          </div>
           <div className="relative">
             <input
               id="signin-password"

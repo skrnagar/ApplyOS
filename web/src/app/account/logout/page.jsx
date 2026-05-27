@@ -16,7 +16,10 @@ export default function LogoutPage() {
       try {
         await signOutRef.current({ callbackUrl: "/", redirect: true });
       } catch {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          window.location.replace("/");
+        }
       }
     })();
     return () => {

@@ -478,7 +478,7 @@ export function Layout({ children }: { children: ReactNode }) {
         {LoadFontsSSR ? <LoadFontsSSR /> : null}
       </head>
       <body className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900">
-        <ClientOnly loader={() => children} />
+        {children}
         <Toaster position={isMobile ? 'top-center' : 'bottom-right'} />
         <ScrollRestoration />
         <Scripts />
@@ -492,9 +492,11 @@ export const ErrorBoundary = InternalErrorBoundary;
 
 export default function App() {
   const content = (
-    <UserProvider>
-      <Outlet />
-    </UserProvider>
+    <ErrorBoundaryWrapper>
+      <UserProvider>
+        <Outlet />
+      </UserProvider>
+    </ErrorBoundaryWrapper>
   );
 
   if (usesSupabaseAuthOnly()) {
