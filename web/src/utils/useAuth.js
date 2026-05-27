@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { signIn, signOut } from "@auth/create/react";
 import { signInLocal, signOutLocal, signUpLocal } from "./localAuth";
-import { isServerAuthEnabled } from "./authMode";
+import { isServerAuthEnabled, isSupabaseAuthEnabled } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
 import { syncAuthProfile } from "./apiAuthHeaders";
 
@@ -84,7 +84,11 @@ export default function useAuth() {
       return { ok: true };
     }
 
-    if (import.meta.env.PROD && !isServerAuthEnabled()) {
+    if (isSupabaseAuthEnabled()) {
+      throw new Error("Configuration");
+    }
+
+    if (import.meta.env.PROD && !isSupabaseAuthEnabled() && !isServerAuthEnabled()) {
       throw new Error("Configuration");
     }
 
@@ -163,7 +167,11 @@ export default function useAuth() {
       return { ok: true };
     }
 
-    if (import.meta.env.PROD && !isServerAuthEnabled()) {
+    if (isSupabaseAuthEnabled()) {
+      throw new Error("Configuration");
+    }
+
+    if (import.meta.env.PROD && !isSupabaseAuthEnabled() && !isServerAuthEnabled()) {
       throw new Error("Configuration");
     }
 

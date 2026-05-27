@@ -26,6 +26,8 @@ const FIELD_ERRORS = {
   CredentialsSignin: "Incorrect email or password.",
   AccessDenied: "You don't have permission to sign in.",
   EmailNotConfirmed: "Confirm your email first, then try signing in again.",
+  Configuration:
+    "Sign-in is not fully configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in Vercel, then redeploy.",
 };
 
 export default function SignInPage() {

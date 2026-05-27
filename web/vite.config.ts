@@ -31,6 +31,15 @@ export default defineConfig(({ mode }) => {
     'import.meta.env.NEXT_PUBLIC_SUPABASE_AUTH_ONLY': JSON.stringify(
       supabaseAuthOnly ? 'true' : 'false',
     ),
+    ...(supabaseUrl
+      ? { 'import.meta.env.NEXT_PUBLIC_SUPABASE_URL': JSON.stringify(supabaseUrl) }
+      : {}),
+    ...(supabaseKey
+      ? {
+          'import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(supabaseKey),
+          'import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY': JSON.stringify(supabaseKey),
+        }
+      : {}),
   },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
