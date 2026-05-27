@@ -14,7 +14,12 @@ export async function captureLead({ email, name, source, metadata }) {
         error: data.error || `Lead save failed (${res.status})`,
       };
     }
-    return { ok: true, stored: Boolean(data.stored), lead: data.lead };
+    return {
+      ok: true,
+      stored: Boolean(data.stored),
+      lead: data.lead,
+      accountExists: Boolean(data.accountExists),
+    };
   } catch (err) {
     return { ok: false, stored: false, error: err?.message || "Network error" };
   }

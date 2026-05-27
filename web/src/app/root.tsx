@@ -189,9 +189,11 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
       return true;
     }
   }
+  const showDevOverlay = import.meta.env.DEV || isInIframe();
+
   return (
     <>
-      {!isInIframe() && (
+      {showDevOverlay && !isInIframe() && (
         <div
           className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-md z-50 transition-all duration-500 ease-out ${
             isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
@@ -246,19 +248,66 @@ type ErrorBoundaryProps = {
 
 type ErrorBoundaryState = { hasError: boolean; error: unknown | null };
 
+function isHydrationLikeError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /hydrat|418|423|did not match|server HTML/i.test(message);
+}
+
 class ErrorBoundaryWrapper extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = { hasError: false, error: null };
 
   static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
+    if (isHydrationLikeError(error)) {
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 
   componentDidCatch(error: unknown, info: unknown) {
+    if (isHydrationLikeError(error)) {
+      return;
+    }
     console.error(error, info);
   }
 
   render() {
     if (this.state.hasError) {
+      const inSandbox =
+        typeof window !== 'undefined' &&
+        (() => {
+          try {
+            return window.parent !== window;
+          } catch {
+            return true;
+          }
+        })();
+
+      if (import.meta.env.PROD && !inSandbox) {
+        return (
+          <div className="min-h-screen bg-[#f4f6f8] flex flex-col items-center justify-center p-6 text-center">
+            <h1 className="text-xl font-semibold text-neutral-900 mb-2">Something went wrong</h1>
+            <p className="text-sm text-neutral-600 mb-6 max-w-sm">
+              Try refreshing the page. If this keeps happening, return home and sign in again.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="flex-1 py-3 rounded-xl bg-neutral-900 text-white font-semibold text-sm hover:bg-neutral-800"
+              >
+                Refresh
+              </button>
+              <a
+                href="/"
+                className="flex-1 py-3 rounded-xl border border-neutral-200 bg-white text-neutral-900 font-semibold text-sm hover:bg-neutral-50 inline-flex items-center justify-center"
+              >
+                Home
+              </a>
+            </div>
+          </div>
+        );
+      }
+
       return <InternalErrorBoundary error={this.state.error} params={{}} />;
     }
     return this.props.children;
@@ -425,14 +474,27 @@ export const useHandleScreenshotRequest = () => {
     };
   }, []);
 };
+function siteHostname() {
+  try {
+    return new URL(SITE_URL).hostname;
+  } catch {
+    return 'hireorbital.com';
+  }
+}
+
 export function Layout({ children }: { children: ReactNode }) {
   useHandshakeParent();
   useHandleScreenshotRequest();
   useDevServerHeartbeat();
   const navigate = useNavigate();
   const location = useLocation();
-  const pathname = location?.pathname;
+  const pathname = location?.pathname ?? '/';
   const isMobile = useIsMobile();
+  const [clientReady, setClientReady] = useState(false);
+
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'sandbox:navigation') {
@@ -474,12 +536,14 @@ export function Layout({ children }: { children: ReactNode }) {
         <meta name="application-name" content="HireOrbital" />
         <meta name="apple-mobile-web-app-title" content="HireOrbital" />
         <meta property="og:site_name" content="HireOrbital" />
-        <meta name="twitter:domain" content={new URL(SITE_URL).hostname} />
+        <meta name="twitter:domain" content={siteHostname()} />
         {LoadFontsSSR ? <LoadFontsSSR /> : null}
       </head>
       <body className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900">
         {children}
-        <Toaster position={isMobile ? 'top-center' : 'bottom-right'} />
+        {clientReady ? (
+          <Toaster position={isMobile ? 'top-center' : 'bottom-right'} />
+        ) : null}
         <ScrollRestoration />
         <Scripts />
         <script src="https://kit.fontawesome.com/2c15cc0cc7.js" crossOrigin="anonymous" async />

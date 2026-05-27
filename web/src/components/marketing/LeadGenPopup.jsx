@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { X, ArrowRight, Sparkles } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { getLocalSession } from "@/utils/localAuth";
@@ -58,12 +58,14 @@ function saveLead({ email, name }) {
 
 export default function LeadGenPopup() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { data: user, loading } = useUser();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [redirectTarget, setRedirectTarget] = useState("/account/signup");
   const [error, setError] = useState(null);
 
   const close = useCallback(() => {
@@ -118,13 +120,27 @@ export default function LeadGenPopup() {
     if (!leadResult.stored && leadResult.error) {
       console.warn("Lead capture:", leadResult.error);
     }
+
+    // Default to signup when API is down; use sign-in only when server confirms an account.
+    const hasAccount = leadResult.ok && leadResult.accountExists === true;
+    const authPath = hasAccount ? "/account/signin" : "/account/signup";
+    setRedirectTarget(authPath);
+
+    const params = new URLSearchParams({
+      email: trimmed,
+      callbackUrl: "/dashboard",
+    });
+    if (!hasAccount && name.trim()) params.set("name", name.trim());
+    params.set("from", "lead_popup");
+
     setSubmitted(true);
     setSubmitting(false);
+    dismissPopup();
+    setOpen(false);
+
     window.setTimeout(() => {
-      const params = new URLSearchParams({ email: trimmed });
-      if (name.trim()) params.set("name", name.trim());
-      window.location.href = `/account/signup?${params.toString()}`;
-    }, 900);
+      navigate(`${authPath}?${params.toString()}`, { replace: true });
+    }, 600);
   };
 
   if (!shouldShowOnPath(pathname)) return null;
@@ -192,7 +208,9 @@ export default function LeadGenPopup() {
 
               {submitted ? (
                 <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-900 text-sm">
-                  You&apos;re in — taking you to create your account…
+                  {redirectTarget === "/account/signin"
+                    ? "Welcome back — taking you to sign in…"
+                    : "You're in — taking you to create your account…"}
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="mt-5 space-y-3">

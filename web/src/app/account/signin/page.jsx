@@ -29,18 +29,35 @@ export default function SignInPage() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fromLeadPopup, setFromLeadPopup] = useState(false);
   const { signInWithCredentials } = useAuth();
   const serverAuth = isServerAuthEnabled();
   const supabaseAuth = isSupabaseAuthEnabled();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const fromEmail = params.get("email");
+    if (fromEmail) setEmail(fromEmail);
+    if (params.get("from") === "lead_popup") setFromLeadPopup(true);
+
     const code = params.get("error");
-    if (!code) return;
-    setError(URL_ERROR_MESSAGES[code] || URL_ERROR_MESSAGES.Default);
+    if (code) {
+      setError(URL_ERROR_MESSAGES[code] || URL_ERROR_MESSAGES.Default);
+    }
+
     const next = new URL(window.location.href);
-    next.searchParams.delete("error");
-    window.history.replaceState({}, "", next.pathname + next.search);
+    let cleaned = false;
+    if (next.searchParams.has("error")) {
+      next.searchParams.delete("error");
+      cleaned = true;
+    }
+    if (next.searchParams.has("from")) {
+      next.searchParams.delete("from");
+      cleaned = true;
+    }
+    if (cleaned) {
+      window.history.replaceState({}, "", next.pathname + (next.search || ""));
+    }
   }, []);
 
   const onSubmit = async (e) => {
@@ -81,7 +98,11 @@ export default function SignInPage() {
       secondaryBackHref="/account/signup"
       secondaryBackLabel="Sign up"
       banner={
-        !serverAuth && !supabaseAuth ? (
+        fromLeadPopup ? (
+          <p className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm text-emerald-950 leading-relaxed">
+            Welcome back — sign in to open your HireOrbital workspace.
+          </p>
+        ) : !serverAuth && !supabaseAuth ? (
           <p className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 leading-relaxed">
             Demo mode: accounts are stored in this browser until you configure Supabase (
             <code className="text-xs">NEXT_PUBLIC_SUPABASE_*</code>) or server auth (

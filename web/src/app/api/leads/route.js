@@ -27,6 +27,30 @@ export async function POST(request) {
     }
 
     const admin = getSupabaseAdmin();
+
+    const { data: existingProfile } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+
+    let accountExists = Boolean(existingProfile?.id);
+    if (!accountExists) {
+      try {
+        const { data: authList, error: authListError } = await admin.auth.admin.listUsers({
+          page: 1,
+          perPage: 200,
+        });
+        if (!authListError) {
+          accountExists = (authList?.users ?? []).some(
+            (u) => u.email?.toLowerCase() === email,
+          );
+        }
+      } catch {
+        /* keep profile-only result */
+      }
+    }
+
     const { data, error } = await admin
       .from("leads")
       .insert({ email, name, source, metadata })
@@ -40,7 +64,10 @@ export async function POST(request) {
 
     void notifyNewLead({ email, name, source, metadata });
 
-    return Response.json({ ok: true, stored: true, lead: data }, { status: 201 });
+    return Response.json(
+      { ok: true, stored: true, lead: data, accountExists },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("POST /api/leads:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
