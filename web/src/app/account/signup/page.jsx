@@ -64,16 +64,17 @@ export default function SignUpPage() {
       return;
     }
     try {
+      // Capture lead before auth redirect so admin always sees first-touch submissions.
+      await captureLead({
+        email: email.trim(),
+        name: name.trim() || undefined,
+        source: "signup",
+      });
       await signUpWithCredentials({
         email: email.trim(),
         password,
         name: name.trim(),
         redirect: true,
-      });
-      captureLead({
-        email: email.trim(),
-        name: name.trim() || undefined,
-        source: "signup",
       });
     } catch (err) {
       setError(

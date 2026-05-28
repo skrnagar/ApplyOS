@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import useAuth from "@/utils/useAuth";
 import { AccountInput } from "@/components/auth/AccountInput";
+import { captureLead } from "@/utils/captureLead";
 
 /**
  * On-site registration — same flow as `/account/signup` (server auth + local fallback).
@@ -32,6 +33,12 @@ export default function NewUserSection() {
       return;
     }
     try {
+      // Ensure homepage sign-up entries appear in admin leads.
+      await captureLead({
+        email: email.trim(),
+        name: name.trim() || undefined,
+        source: "homepage_signup",
+      });
       await signUpWithCredentials({
         email: email.trim(),
         password,
