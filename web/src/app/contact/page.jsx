@@ -4,6 +4,11 @@ import MarketingShell from "@/components/marketing/MarketingShell";
 import { Mail, MessageCircle, Send } from "lucide-react";
 import { captureLead } from "@/utils/captureLead";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
+import { metaForPath } from "@/utils/seo";
+
+export function meta() {
+  return metaForPath("/contact");
+}
 
 export default function ContactPage() {
   const [name, setName] = useState("");

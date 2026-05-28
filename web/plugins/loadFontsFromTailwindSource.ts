@@ -1584,13 +1584,11 @@ const GOOGLE_FONTS = new Map<string, string>(
   ].map((f) => [f.replaceAll(' ', '-').toLowerCase(), f])
 );
 
-// all combinations of font weights and styles
-// @see https://developers.google.com/fonts/docs/css2#api_url_specification
-const styleString =
-  '0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900';
+// Weights used in the app (normal, medium, semibold, bold) — avoids loading 18 axes per font.
+const styleString = '0,400;0,500;0,600;0,700';
 
 const getFontURL = (font: string) => {
-  return `https://fonts.googleapis.com/css2?${`family=${font.replaceAll(' ', '+')}:ital,wght@${styleString}`}&display=block`;
+  return `https://fonts.googleapis.com/css2?family=${font.replaceAll(' ', '+')}:wght@${styleString}&display=swap`;
 };
 
 const fontBlacklist = new Set([

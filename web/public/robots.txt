@@ -6,6 +6,10 @@ Disallow: /admin
 Disallow: /dashboard
 Disallow: /api/
 Disallow: /account/logout
+Disallow: /account/auth/
+Disallow: /account/forgot-password
+Disallow: /account/reset-password
 Disallow: /errors/
+Disallow: /__create/
 
 Sitemap: https://hireorbital.com/sitemap.xml

@@ -2,6 +2,11 @@
 import React from "react";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FileText, Linkedin, Mic, Sparkles } from "lucide-react";
+import { metaForPath } from "@/utils/seo";
+
+export function meta() {
+  return metaForPath("/tools");
+}
 
 const tools = [
   {

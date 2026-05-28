@@ -532,6 +532,8 @@ export function Layout({ children }: { children: ReactNode }) {
         {import.meta.env.DEV ? (
           <script type="module" src="/src/__create/dev-error-overlay.js" />
         ) : null}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <meta name="application-name" content="HireOrbital" />
@@ -550,7 +552,6 @@ export function Layout({ children }: { children: ReactNode }) {
         ) : null}
         <ScrollRestoration />
         <Scripts />
-        <script src="https://kit.fontawesome.com/2c15cc0cc7.js" crossOrigin="anonymous" async />
       </body>
     </html>
   );

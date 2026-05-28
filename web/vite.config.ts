@@ -110,6 +110,19 @@ export default defineConfig(({ mode }) => {
   clearScreen: false,
   build: {
     target: "esnext",
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('@supabase')) return 'supabase';
+          if (id.includes('three') || id.includes('@react-three')) return 'three';
+          if (id.includes('gsap') || id.includes('lenis') || id.includes('motion/')) return 'motion';
+          if (id.includes('react-router') || id.includes('@remix-run')) return 'router';
+          if (id.includes('@tanstack')) return 'query';
+          return 'vendor';
+        },
+      },
+    },
   },
   // Bundle these for SSR instead of resolving raw ESM files from node_modules on Vercel (avoids GSAP "Cannot use import statement outside a module").
   ssr: {

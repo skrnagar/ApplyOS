@@ -2,9 +2,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
-import Lenis from "lenis";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
 
 function isStaticAppRoute(pathname) {
   return (
@@ -31,26 +28,45 @@ export default function Providers({ children }) {
 
   useEffect(() => {
     if (isStaticAppRoute(pathname)) return;
-    gsap.registerPlugin(ScrollTrigger);
-    const lenis = new Lenis({
-      duration: 1.1,
-      smoothWheel: true,
-      smoothTouch: false,
-    });
 
-    let rafId;
-    const raf = (time) => {
-      lenis.raf(time);
+    let cancelled = false;
+    let teardown = () => {};
+
+    void (async () => {
+      const [{ default: gsap }, { default: ScrollTrigger }, { default: Lenis }] =
+        await Promise.all([
+          import("gsap"),
+          import("gsap/ScrollTrigger"),
+          import("lenis"),
+        ]);
+
+      if (cancelled) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+      const lenis = new Lenis({
+        duration: 1.1,
+        smoothWheel: true,
+        smoothTouch: false,
+      });
+
+      let rafId;
+      const raf = (time) => {
+        lenis.raf(time);
+        rafId = requestAnimationFrame(raf);
+      };
       rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
+      lenis.on("scroll", ScrollTrigger.update);
 
-    lenis.on("scroll", ScrollTrigger.update);
+      teardown = () => {
+        cancelAnimationFrame(rafId);
+        lenis.destroy();
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      };
+    })();
 
     return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      cancelled = true;
+      teardown();
     };
   }, [pathname]);
 

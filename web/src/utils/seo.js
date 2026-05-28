@@ -101,6 +101,7 @@ export function buildMeta({
     { name: "robots", content: robots },
     { name: "googlebot", content: robots },
     { name: "theme-color", content: "#059669" },
+    { name: "author", content: SITE_NAME },
     { tagName: "link", rel: "canonical", href: canonical },
     { property: "og:type", content: type },
     { property: "og:url", content: canonical },
@@ -169,6 +170,7 @@ export function getWebSiteJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     description: SITE_DESCRIPTION,
+    inLanguage: "en-US",
     publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
   };
 }
