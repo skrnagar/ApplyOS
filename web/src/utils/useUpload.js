@@ -1,49 +1,31 @@
-import * as React from 'react';
+import * as React from "react";
+import { getApiAuthHeaders } from "@/utils/apiAuthHeaders";
 
 function useUpload() {
   const [loading, setLoading] = React.useState(false);
   const upload = React.useCallback(async (input) => {
     try {
       setLoading(true);
-      let response;
-      if ("file" in input && input.file) {
-        const formData = new FormData();
-        formData.append("file", input.file);
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
-          body: formData
-        });
-      } else if ("url" in input) {
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ url: input.url })
-        });
-      } else if ("base64" in input) {
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ base64: input.base64 })
-        });
-      } else {
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/octet-stream"
-          },
-          body: input.buffer
-        });
+      if (!("file" in input && input.file)) {
+        return { error: "Only file uploads are supported." };
       }
+
+      const formData = new FormData();
+      formData.append("file", input.file);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        headers: await getApiAuthHeaders(),
+        body: formData,
+      });
+
       if (!response.ok) {
         if (response.status === 413) {
           throw new Error("Upload failed: File too large.");
         }
-        throw new Error("Upload failed");
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Upload failed");
       }
+
       const data = await response.json();
       return { url: data.url, mimeType: data.mimeType || null };
     } catch (uploadError) {

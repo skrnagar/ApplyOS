@@ -1,4 +1,5 @@
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
+import { ensureStorageBucket } from "@/utils/supabase/ensureStorageBucket";
 import { resolveRequestProfile } from "../../utils/supabaseUser.js";
 import { scoreResumeAts } from "@/utils/atsScore";
 import { notifyResumeUpload } from "../../utils/notifyTeam.js";
@@ -45,6 +46,20 @@ export async function POST(request) {
   }
 
   const admin = getSupabaseAdmin();
+  const bucketResult = await ensureStorageBucket(admin, BUCKET, {
+    public: true,
+    fileSizeLimit: MAX_BYTES,
+  });
+  if (!bucketResult.ok) {
+    return Response.json(
+      {
+        error:
+          'Could not create Storage bucket "resumes". Create it in Supabase Dashboard or check service role permissions.',
+      },
+      { status: 500 },
+    );
+  }
+
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const storagePath = `${profile.id}/${Date.now()}-${safeName}`;
   const buffer = Buffer.from(await file.arrayBuffer());

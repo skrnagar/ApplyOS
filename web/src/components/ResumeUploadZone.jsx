@@ -1,12 +1,7 @@
 "use client";
 import React, { useCallback, useId, useState } from "react";
 import { FileText, FileUp, Upload } from "lucide-react";
-import {
-  getResumeFileUrlWithFallback,
-  RESUME_ACCEPT,
-  saveResumeRecord,
-  validateResumeFile,
-} from "@/utils/resumeUpload";
+import { RESUME_ACCEPT, saveResumeRecord, validateResumeFile } from "@/utils/resumeUpload";
 
 /**
  * Shared resume upload: drag-drop, browse, validation, API + local fallback.
@@ -38,19 +33,16 @@ export default function ResumeUploadZone({
       setError(null);
       setProgress(10);
       try {
-        setProgress(35);
-        const fileUrl = await getResumeFileUrlWithFallback(file);
-        setProgress(72);
+        setProgress(40);
         const { resume, resumes, source } = await saveResumeRecord(
           file,
-          fileUrl,
           userId,
           existingCount,
         );
         setProgress(100);
         onSuccess?.({ resume, resumes, source });
-      } catch {
-        setError("Upload failed. Please try again.");
+      } catch (err) {
+        setError(err?.message || "Upload failed. Please try again.");
       } finally {
         setTimeout(() => setProgress(0), 500);
         setUploading(false);

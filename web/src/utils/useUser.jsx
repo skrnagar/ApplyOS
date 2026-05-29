@@ -1,4 +1,5 @@
 import * as React from "react";
+import { startTransition } from "react";
 import { useSession } from "@auth/create/react";
 import { getLocalSession, signOutLocal } from "./localAuth";
 import { isSupabaseAuthEnabled, shouldUseAuthJsSession } from "./authMode";
@@ -38,12 +39,15 @@ function UserProviderInner({ children, session, status }) {
     const applySession = (sessionData) => {
       if (cancelled) return;
       const mapped = mapSupabaseUser(sessionData?.user ?? null);
-      if (mapped) {
-        signOutLocal();
-        void syncAuthProfile();
-      }
-      setSbUser(mapped);
-      setSbLoading(false);
+      startTransition(() => {
+        if (cancelled) return;
+        if (mapped) {
+          signOutLocal();
+          void syncAuthProfile();
+        }
+        setSbUser(mapped);
+        setSbLoading(false);
+      });
     };
 
     void supabase.auth.getSession().then(({ data }) => applySession(data.session));

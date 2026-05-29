@@ -23,6 +23,7 @@ export function validateResumeFile(file) {
   return { ok: true };
 }
 
+/** Upload file to Supabase via POST /api/resumes/upload */
 export async function uploadResumeToStorage(file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -31,43 +32,17 @@ export async function uploadResumeToStorage(file) {
     headers: await getApiAuthHeaders(),
     body: formData,
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || "upload-failed");
+    throw new Error(data.error || "Upload failed");
   }
-  return response.json();
+  return data;
 }
 
-export async function uploadResumeToUrl(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  const uploadRes = await fetch("/_create/api/upload/", {
-    method: "POST",
-    body: formData,
-  });
-  if (!uploadRes.ok) throw new Error("upload-failed");
-  const uploadData = await uploadRes.json();
-  return uploadData?.url;
-}
-
-export function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Failed to read file"));
-    reader.readAsDataURL(file);
-  });
-}
-
-export async function getResumeFileUrlWithFallback(file) {
-  try {
-    return await uploadResumeToUrl(file);
-  } catch {
-    return readFileAsDataUrl(file);
-  }
-}
-
-export async function saveResumeRecord(file, _fileUrl, userId, existingCount) {
+/**
+ * Save resume: Supabase storage + DB row, then JSON API fallback, then local storage.
+ */
+export async function saveResumeRecord(file, userId, existingCount) {
   try {
     const data = await uploadResumeToStorage(file);
     return { resume: data.resume, resumes: null, source: data.source || "supabase" };
@@ -76,15 +51,13 @@ export async function saveResumeRecord(file, _fileUrl, userId, existingCount) {
     const canFallback =
       msg.includes("not configured") ||
       msg.includes("Unauthorized") ||
-      msg.includes("upload-failed") ||
-      msg.includes("storage");
+      msg.includes("503");
     if (!canFallback) throw storageErr;
   }
 
-  const fileUrl = await getResumeFileUrlWithFallback(file);
   const payload = {
     file_name: file.name,
-    file_url: fileUrl,
+    file_url: `local://${file.name}`,
     file_size: file.size,
   };
 
