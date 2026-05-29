@@ -68,8 +68,8 @@ export default defineConfig(({ mode }) => {
       runtime: 'node',
     }),
     babel({
-      include: ['src/**/*.{js,jsx,ts,tsx}'], // or RegExp: /src\/.*\.[tj]sx?$/
-      exclude: /node_modules/, // skip everything else
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
+      exclude: [/node_modules/, /\?noLayout/],
       babelConfig: {
         babelrc: false, // don’t merge other Babel files
         configFile: false,
@@ -109,17 +109,25 @@ export default defineConfig(({ mode }) => {
   },
   clearScreen: false,
   build: {
-    target: "esnext",
+    target: 'esnext',
+    sourcemap: false,
     rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
+        if (warning.message?.includes('dynamic import will not move module into another chunk')) {
+          return;
+        }
+        warn(warning);
+      },
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
           if (id.includes('@supabase')) return 'supabase';
           if (id.includes('three') || id.includes('@react-three')) return 'three';
-          if (id.includes('gsap') || id.includes('lenis') || id.includes('motion/')) return 'motion';
           if (id.includes('react-router') || id.includes('@remix-run')) return 'router';
           if (id.includes('@tanstack')) return 'query';
-          return 'vendor';
+          // Keep motion/gsap/lenis in the default graph — splitting them caused
+          // circular motion ↔ vendor chunks and runtime failures in production.
         },
       },
     },

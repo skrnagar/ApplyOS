@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { motion } from "motion/react";
 import { ChevronRight, MapPin, Building2, Bookmark, Send, ShieldCheck } from "lucide-react";
 
 const roles = [
@@ -64,10 +63,7 @@ export default function HeroWorkspacePreview({ className = "" }) {
   const activeRole = roles[activeIndex] ?? roles[0];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 14, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.55, delay: 0.12 }}
+    <div
       className={`rounded-3xl border border-neutral-200/90 bg-white/95 p-3 sm:p-4 lg:p-4 xl:p-5 shadow-[0_2px_0_rgba(15,23,42,0.02),0_30px_60px_-24px_rgba(15,23,42,0.2)] ${className}`}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[minmax(200px,26%)_minmax(0,1fr)] xl:grid-cols-[minmax(228px,24%)_minmax(0,1fr)] gap-3 sm:gap-4 lg:gap-4 xl:gap-5 items-stretch min-h-0">
@@ -192,6 +188,6 @@ export default function HeroWorkspacePreview({ className = "" }) {
           </footer>
         </section>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -219,7 +219,9 @@ body {
   .cinematic-mesh-drift,
   .cinematic-grid-drift,
   .ambient-shimmer,
-  .hero-atmosphere {
+  .hero-atmosphere,
+  .hero-fade-in,
+  .hero-fade-in-delay {
     animation: none !important;
   }
 }
@@ -242,6 +244,22 @@ body {
     radial-gradient(ellipse 50% 40% at 70% 85%, rgba(129, 140, 248, 0.08), transparent 50%),
     linear-gradient(180deg, #ffffff 0%, #f4f6f8 42%, #eef2f6 100%);
   animation: hero-atmosphere-drift 22s ease-in-out infinite;
+}
+.hero-fade-in {
+  animation: hero-content-in 0.55s ease-out both;
+}
+.hero-fade-in-delay {
+  animation: hero-content-in 0.55s ease-out 0.1s both;
+}
+@keyframes hero-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .hero-atmosphere-grid {
   background-image:

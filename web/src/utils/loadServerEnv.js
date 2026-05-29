@@ -31,8 +31,8 @@ export function loadServerEnv() {
   if (loaded) return;
   loaded = true;
 
-  // Vercel / production: use platform env only.
-  if (process.env.VERCEL === "1" || process.env.NODE_ENV === "production") {
+  // Vercel injects env at deploy time. Local `npm run start` still needs .env.local.
+  if (process.env.VERCEL === "1") {
     return;
   }
 

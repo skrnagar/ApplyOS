@@ -1,5 +1,6 @@
 "use client";
-import React, { useCallback, useEffect, useId, useState } from "react";
+import React, { useCallback, useEffect, useId, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import { X, ArrowRight, Sparkles } from "lucide-react";
@@ -59,8 +60,17 @@ function saveLead({ email, name }) {
 const inputClass =
   "w-full px-4 py-3 min-h-[48px] rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-shadow";
 
+function useIsMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
+
 export default function LeadGenPopup() {
   const formId = useId();
+  const mounted = useIsMounted();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { data: user, loading } = useUser();
@@ -146,9 +156,9 @@ export default function LeadGenPopup() {
     }, 600);
   };
 
-  if (!shouldShowOnPath(pathname)) return null;
+  if (!shouldShowOnPath(pathname) || !mounted) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -158,7 +168,7 @@ export default function LeadGenPopup() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
+          className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
         >
           <button
             type="button"
@@ -168,11 +178,11 @@ export default function LeadGenPopup() {
           />
 
           <motion.div
-            initial={{ opacity: 0, y: "100%" }}
+            initial={{ opacity: 0, y: 48 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "100%" }}
-            transition={{ type: "spring", stiffness: 420, damping: 36 }}
-            className="relative w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl max-h-[94dvh] sm:max-h-[min(90vh,640px)] overflow-hidden rounded-t-3xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.4)] flex flex-col sm:flex-row"
+            exit={{ opacity: 0, y: 32 }}
+            transition={{ type: "spring", stiffness: 400, damping: 34 }}
+            className="relative w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl max-h-[92vh] sm:max-h-[min(90vh,640px)] overflow-hidden rounded-t-3xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.4)] flex flex-col sm:flex-row"
           >
             <button
               type="button"
@@ -307,6 +317,7 @@ export default function LeadGenPopup() {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

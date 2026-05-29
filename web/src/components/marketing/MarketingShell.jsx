@@ -1,12 +1,11 @@
 "use client";
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import ProMarketingBackdrop from "@/components/marketing/ProMarketingBackdrop";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import MobileFooterNav from "@/components/marketing/MobileFooterNav";
-
-const LeadGenPopup = lazy(() => import("@/components/marketing/LeadGenPopup"));
+import LeadGenPopup from "@/components/marketing/LeadGenPopup";
 
 export default function MarketingShell({ children, showBackdrop = true }) {
   return (
@@ -20,9 +19,7 @@ export default function MarketingShell({ children, showBackdrop = true }) {
         </div>
         <Footer />
         <MobileFooterNav />
-        <Suspense fallback={null}>
-          <LeadGenPopup />
-        </Suspense>
+        <LeadGenPopup />
       </div>
     </main>
   );
