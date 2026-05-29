@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import useUser from "@/utils/useUser";
 import { Menu, X } from "lucide-react";
 import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
@@ -11,10 +11,20 @@ const navLinks = [
   { label: "Talk to Us", href: "/contact" },
 ];
 
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
+
 export default function Navbar() {
   const { data: user, loading } = useUser();
+  const hydrated = useHydrated();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const showAuthed = hydrated && !loading && Boolean(user);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -48,21 +58,21 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#difference"
+              href="/#difference"
               className="relative px-3.5 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100"
             >
               The difference
             </a>
             <a
-              href="#how-it-works"
+              href="/#how-it-works"
               className="relative px-3.5 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100"
             >
               How it works
             </a>
           </div>
 
-          <div className="hidden md:flex items-center gap-2">
-            {!loading && user ? (
+          <div className="hidden md:flex items-center gap-2 min-h-[36px]">
+            {showAuthed ? (
               <a
                 href="/dashboard"
                 className="px-5 py-2 text-xs font-semibold text-white bg-neutral-900 rounded-full hover:bg-neutral-800 transition-colors"
@@ -112,14 +122,14 @@ export default function Navbar() {
                 </a>
               ))}
               <a
-                href="#difference"
+                href="/#difference"
                 onClick={() => setMobileOpen(false)}
                 className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
               >
                 The difference
               </a>
               <a
-                href="#how-it-works"
+                href="/#how-it-works"
                 onClick={() => setMobileOpen(false)}
                 className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
               >

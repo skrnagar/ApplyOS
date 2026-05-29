@@ -1,10 +1,17 @@
 "use client";
 import React, { useCallback, useId, useState } from "react";
 import { FileText, FileUp, Upload } from "lucide-react";
-import { RESUME_ACCEPT, saveResumeRecord, validateResumeFile } from "@/utils/resumeUpload";
+import AtsResultPanel from "@/components/AtsResultPanel";
+import useUser from "@/utils/useUser";
+import {
+  RESUME_ACCEPT,
+  saveResumeRecord,
+  validateGuestEmail,
+  validateResumeFile,
+} from "@/utils/resumeUpload";
 
 /**
- * Shared resume upload: drag-drop, browse, validation, API + local fallback.
+ * Shared resume upload: drag-drop, browse, validation, ATS scan, Supabase storage.
  * @param {"marketing" | "dashboard"} variant
  */
 export default function ResumeUploadZone({
@@ -16,10 +23,17 @@ export default function ResumeUploadZone({
   className = "",
 }) {
   const inputId = useId();
+  const emailInputId = useId();
+  const { data: user } = useUser();
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
+  const [email, setEmail] = useState("");
+  const [result, setResult] = useState(null);
+
+  const isMarketing = variant === "marketing";
+  const needsEmail = isMarketing && !user?.email;
 
   const runUpload = useCallback(
     async (file) => {
@@ -29,26 +43,70 @@ export default function ResumeUploadZone({
         return;
       }
 
+      let guestEmail = null;
+      if (needsEmail) {
+        const ev = validateGuestEmail(email);
+        if (!ev.ok) {
+          setError(ev.error);
+          return;
+        }
+        guestEmail = ev.email;
+      }
+
       setUploading(true);
       setError(null);
-      setProgress(10);
+      setResult(null);
+      setProgress(15);
       try {
-        setProgress(40);
-        const { resume, resumes, source } = await saveResumeRecord(
-          file,
-          userId,
-          existingCount,
-        );
+        setProgress(45);
+        const payload = await saveResumeRecord(file, userId, existingCount, {
+          email: guestEmail,
+        });
         setProgress(100);
-        onSuccess?.({ resume, resumes, source });
+        setResult({
+          fileName: file.name,
+          atsScore: payload.ats_score,
+          atsGrade: payload.ats_grade,
+          atsFeedback: payload.ats_feedback,
+          saved: payload.saved !== false,
+          guest: payload.guest || needsEmail,
+          source: payload.source,
+        });
+        onSuccess?.(payload);
       } catch (err) {
-        setError(err?.message || "Upload failed. Please try again.");
+        if (err.needEmail) {
+          setError("Enter your email above to save your resume and ATS report.");
+          if (err.ats_score != null) {
+            setResult({
+              fileName: file.name,
+              atsScore: err.ats_score,
+              atsGrade: err.ats_grade,
+              atsFeedback: err.ats_feedback,
+              saved: false,
+              guest: true,
+              source: "analyze_only",
+            });
+          }
+        } else {
+          setError(err?.message || "Upload failed. Please try again.");
+          if (err.ats_score != null) {
+            setResult({
+              fileName: file.name,
+              atsScore: err.ats_score,
+              atsGrade: err.ats_grade,
+              atsFeedback: err.ats_feedback,
+              saved: false,
+              guest: needsEmail,
+              source: "analyze_only",
+            });
+          }
+        }
       } finally {
         setTimeout(() => setProgress(0), 500);
         setUploading(false);
       }
     },
-    [userId, existingCount, onSuccess],
+    [userId, existingCount, onSuccess, needsEmail, email],
   );
 
   const onInputChange = (e) => {
@@ -64,8 +122,6 @@ export default function ResumeUploadZone({
     if (f) runUpload(f);
   };
 
-  const isMarketing = variant === "marketing";
-
   const shell = isMarketing
     ? `rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center gap-4 bg-neutral-50 ${
         dragActive
@@ -79,7 +135,29 @@ export default function ResumeUploadZone({
       }`;
 
   return (
-    <div className={className}>
+    <div className={`space-y-4 ${className}`}>
+      {needsEmail && (
+        <div>
+          <label
+            htmlFor={emailInputId}
+            className="block text-xs font-semibold text-neutral-700 mb-1.5"
+          >
+            Email — we&apos;ll save your ATS report and resume
+          </label>
+          <input
+            id={emailInputId}
+            type="email"
+            autoComplete="email"
+            placeholder="you@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={disabled || uploading}
+            suppressHydrationWarning
+            className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400"
+          />
+        </div>
+      )}
+
       <label
         htmlFor={inputId}
         className="block cursor-pointer"
@@ -126,11 +204,11 @@ export default function ResumeUploadZone({
               <>
                 <span className="text-neutral-700 block mb-1">
                   {uploading
-                    ? "Uploading your resume…"
+                    ? "Scanning & uploading your resume…"
                     : "Drag & drop your resume"}
                 </span>
                 <span className="text-xs text-neutral-500">
-                  PDF, DOC, DOCX · up to 8 MB
+                  PDF, DOC, DOCX · up to 8 MB · instant ATS score
                 </span>
               </>
             ) : (
@@ -183,6 +261,18 @@ export default function ResumeUploadZone({
           )}
         </div>
       </label>
+
+      {result && (
+        <AtsResultPanel
+          fileName={result.fileName}
+          atsScore={result.atsScore}
+          atsGrade={result.atsGrade}
+          atsFeedback={result.atsFeedback}
+          saved={result.saved}
+          guest={result.guest}
+          source={result.source}
+        />
+      )}
     </div>
   );
 }

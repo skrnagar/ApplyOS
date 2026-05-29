@@ -67,6 +67,10 @@ npx supabase gen types typescript --linked > src/utils/supabase/database.types.t
 
 **Storage:** create a public bucket named `resumes` (Dashboard → Storage) for resume uploads.
 
+**Server key:** in Vercel → Settings → Environment Variables, set `SUPABASE_SERVICE_ROLE_KEY` to the **service_role** secret (Dashboard → Project Settings → API). Do **not** use `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` here — the health check will pass reads but contact/admin writes will fail.
+
+If the service role key is wrong, run `web/supabase/migrations/20250529120000_contact_rpc.sql` in SQL Editor so the contact form can still save via RPC.
+
 **Auth:** the app uses Supabase Auth when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are set. For local email/password, disable “Confirm email” under Authentication → Providers → Email until you configure SMTP, or users will need to confirm before sign-in.
 
 Add **Redirect URLs** under Authentication → URL Configuration, e.g. `http://localhost:4000/**` and your production origin, so OAuth and email links return to the app.

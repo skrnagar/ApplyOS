@@ -65,7 +65,7 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       ref={containerRef}
-      className="py-20 md:py-28 bg-[#fafbfc] relative overflow-hidden border-y border-neutral-200/70"
+      className="py-20 md:py-28 bg-[#fafbfc] relative overflow-hidden border-y border-neutral-200/70 scroll-mt-28"
     >
       <div className="container mx-auto px-5 sm:px-6">
         <div className="mb-14 md:mb-16 text-center max-w-2xl mx-auto">

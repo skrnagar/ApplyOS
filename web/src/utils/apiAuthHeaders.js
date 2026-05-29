@@ -40,5 +40,15 @@ export async function fetchWithAuth(url, options = {}) {
 
 /** Ensure server-side `profiles` row exists after Supabase sign-in. */
 export async function syncAuthProfile() {
-  return fetchWithAuth("/api/auth/sync", { method: "POST" });
+  if (typeof window === "undefined") return null;
+
+  const supabase = tryCreateBrowserClient();
+  if (supabase) {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session?.access_token) return null;
+  }
+
+  const res = await fetchWithAuth("/api/auth/sync", { method: "POST" });
+  if (res.status === 401) return null;
+  return res;
 }

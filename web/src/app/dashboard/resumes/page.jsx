@@ -11,14 +11,18 @@ import {
   Star,
   TrendingUp,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { getLocalResumes, setLocalResumes } from "@/utils/localResumes";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
+import { gradeFromScore } from "@/utils/atsScore";
 
 export default function ResumesPage() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState(null);
   const { data: user, loading: authLoading } = useUser();
 
   useEffect(() => {
@@ -43,9 +47,10 @@ export default function ResumesPage() {
     }
   };
 
-  const handleUploadSuccess = ({ resume, resumes }) => {
-    if (resumes) setResumes(resumes);
+  const handleUploadSuccess = ({ resume, resumes: localList }) => {
+    if (localList) setResumes(localList);
     else setResumes((prev) => [resume, ...prev]);
+    if (resume?.id) setExpandedId(resume.id);
   };
 
   const handleDelete = async (id) => {
@@ -222,7 +227,7 @@ export default function ResumesPage() {
                             {resume.ats_score}%
                           </div>
                           <p className="text-xs text-neutral-600 mt-1">
-                            ATS Score
+                            {resume.ats_grade || gradeFromScore(resume.ats_score)}
                           </p>
                         </div>
 
@@ -254,6 +259,43 @@ export default function ResumesPage() {
                         </div>
                       </div>
                     </div>
+
+                    {Array.isArray(resume.ats_feedback) &&
+                      resume.ats_feedback.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-neutral-100">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedId(expandedId === resume.id ? null : resume.id)
+                            }
+                            className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
+                          >
+                            {expandedId === resume.id ? (
+                              <>
+                                <ChevronUp size={16} />
+                                Hide ATS feedback
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown size={16} />
+                                View ATS feedback ({resume.ats_feedback.length})
+                              </>
+                            )}
+                          </button>
+                          {expandedId === resume.id && (
+                            <ul className="mt-3 space-y-2">
+                              {resume.ats_feedback.map((item, i) => (
+                                <li
+                                  key={i}
+                                  className="text-xs text-neutral-700 bg-neutral-50 border border-neutral-100 rounded-lg px-3 py-2"
+                                >
+                                  {item.text}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
                   </CardContent>
                 </Card>
               </motion.div>

@@ -1,9 +1,11 @@
 import { addLocalResume } from "@/utils/localResumes";
 import { getApiAuthHeaders } from "@/utils/apiAuthHeaders";
+import { gradeFromScore } from "@/utils/atsScore";
 
 export const RESUME_MAX_BYTES = 8 * 1024 * 1024;
 export const RESUME_ACCEPT = ".pdf,.doc,.docx";
 const ALLOWED_EXT = [".pdf", ".doc", ".docx"];
+const GUEST_ATS_KEY = "hireorbital_guest_ats";
 
 export function validateResumeFile(file) {
   if (!file) return { ok: false, error: null };
@@ -23,10 +25,40 @@ export function validateResumeFile(file) {
   return { ok: true };
 }
 
-/** Upload file to Supabase via POST /api/resumes/upload */
-export async function uploadResumeToStorage(file) {
+export function validateGuestEmail(email) {
+  const normalized = String(email || "").trim().toLowerCase();
+  if (!normalized) {
+    return { ok: false, error: "Enter your email to save your resume and ATS report." };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
+    return { ok: false, error: "Enter a valid email address." };
+  }
+  return { ok: true, email: normalized };
+}
+
+/** Instant ATS scan — no auth required */
+export async function analyzeResumeFile(file, email) {
   const formData = new FormData();
   formData.append("file", file);
+  if (email) formData.append("email", email);
+
+  const response = await fetch("/api/resumes/analyze", {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || "Analysis failed");
+  }
+  return data;
+}
+
+/** Upload file to Supabase via POST /api/resumes/upload */
+export async function uploadResumeToStorage(file, email) {
+  const formData = new FormData();
+  formData.append("file", file);
+  if (email) formData.append("email", email);
+
   const response = await fetch("/api/resumes/upload", {
     method: "POST",
     headers: await getApiAuthHeaders(),
@@ -34,31 +66,90 @@ export async function uploadResumeToStorage(file) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.error || "Upload failed");
+    const err = new Error(data.error || "Upload failed");
+    err.code = data.code;
+    err.status = response.status;
+    err.ats_score = data.ats_score;
+    err.ats_grade = data.ats_grade;
+    err.ats_feedback = data.ats_feedback;
+    err.analyzeOnly = data.analyzeOnly;
+    err.hint = data.hint;
+    throw err;
   }
   return data;
 }
 
-/**
- * Save resume: Supabase storage + DB row, then JSON API fallback, then local storage.
- */
-export async function saveResumeRecord(file, userId, existingCount) {
+function stashGuestAts(payload) {
+  if (typeof window === "undefined") return;
   try {
-    const data = await uploadResumeToStorage(file);
-    return { resume: data.resume, resumes: null, source: data.source || "supabase" };
+    sessionStorage.setItem(GUEST_ATS_KEY, JSON.stringify(payload));
+  } catch {
+    /* ignore quota */
+  }
+}
+
+/**
+ * Full pipeline: analyze → Supabase storage + DB, then JSON API / local fallback.
+ */
+export async function saveResumeRecord(file, userId, existingCount, options = {}) {
+  const guestEmail = options.email?.trim().toLowerCase() || null;
+
+  const analysis = await analyzeResumeFile(file, guestEmail);
+
+  try {
+    const data = await uploadResumeToStorage(file, guestEmail);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(GUEST_ATS_KEY);
+    }
+    const resume = {
+      ...data.resume,
+      ats_grade: data.resume?.ats_grade ?? gradeFromScore(data.resume?.ats_score),
+    };
+    return {
+      resume,
+      resumes: null,
+      source: data.source || "supabase",
+      guest: data.guest,
+      ats_score: resume.ats_score ?? analysis.ats_score,
+      ats_grade: resume.ats_grade ?? analysis.ats_grade,
+      ats_feedback: resume.ats_feedback ?? analysis.ats_feedback,
+      saved: true,
+    };
   } catch (storageErr) {
+    const ats = {
+      ats_score: storageErr.ats_score ?? analysis.ats_score,
+      ats_grade: storageErr.ats_grade ?? analysis.ats_grade,
+      ats_feedback: storageErr.ats_feedback ?? analysis.ats_feedback,
+    };
+
+    if (storageErr.code === "AUTH_REQUIRED") {
+      const err = new Error(storageErr.message);
+      err.needEmail = true;
+      Object.assign(err, ats);
+      throw err;
+    }
+
     const msg = storageErr?.message || "";
     const canFallback =
+      storageErr.analyzeOnly ||
+      storageErr.status === 503 ||
       msg.includes("not configured") ||
-      msg.includes("Unauthorized") ||
       msg.includes("503");
-    if (!canFallback) throw storageErr;
+
+    if (!canFallback) {
+      stashGuestAts({ ...ats, file_name: file.name, email: guestEmail });
+      const err = new Error(storageErr.message);
+      Object.assign(err, ats);
+      throw err;
+    }
   }
 
   const payload = {
     file_name: file.name,
     file_url: `local://${file.name}`,
     file_size: file.size,
+    ats_score: analysis.ats_score,
+    ats_feedback: analysis.ats_feedback,
   };
 
   const response = await fetch("/api/resumes", {
@@ -69,15 +160,43 @@ export async function saveResumeRecord(file, userId, existingCount) {
 
   if (response.ok) {
     const created = await response.json();
-    return { resume: created, resumes: null, source: "api" };
+    const resume = {
+      ...created,
+      ats_grade: gradeFromScore(created.ats_score),
+    };
+    return {
+      resume,
+      resumes: null,
+      source: "api",
+      ats_score: resume.ats_score,
+      ats_grade: resume.ats_grade,
+      ats_feedback: resume.ats_feedback,
+      saved: true,
+    };
   }
 
   const localResume = {
     id: `local_${Date.now()}`,
     ...payload,
+    ats_grade: analysis.ats_grade,
     is_primary: existingCount === 0,
     created_at: new Date().toISOString(),
   };
   const next = addLocalResume(userId, localResume);
-  return { resume: localResume, resumes: next, source: "local" };
+  stashGuestAts({
+    ...analysis,
+    file_name: file.name,
+    email: guestEmail,
+    source: "local",
+  });
+
+  return {
+    resume: localResume,
+    resumes: next,
+    source: "local",
+    ats_score: analysis.ats_score,
+    ats_grade: analysis.ats_grade,
+    ats_feedback: analysis.ats_feedback,
+    saved: false,
+  };
 }

@@ -6,7 +6,7 @@ import MagneticButton from "./ui/MagneticButton";
 
 export default function CTA() {
   return (
-    <section id="contact" className="py-20 md:py-28 relative bg-[#f4f6f8]">
+    <section id="contact" className="py-20 md:py-28 relative bg-[#f4f6f8] scroll-mt-28">
       <div className="container mx-auto px-5 sm:px-6">
         <div className="relative max-w-4xl mx-auto rounded-3xl overflow-hidden border border-neutral-200/90 bg-white shadow-[0_2px_0_rgba(15,23,42,0.04),0_32px_64px_-24px_rgba(15,23,42,0.12)]">
           <div
@@ -66,7 +66,7 @@ export default function CTA() {
               <MagneticButton href="/account/signup" variant="cta" icon={ArrowRight}>
                 Launch your pipeline
               </MagneticButton>
-              <MagneticButton href="#how-it-works" variant="outline">
+              <MagneticButton href="/#how-it-works" variant="outline">
                 See how it works
               </MagneticButton>
             </motion.div>

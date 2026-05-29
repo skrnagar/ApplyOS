@@ -1,28 +1,37 @@
-import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
+import {
+  getSupabaseAdmin,
+  getServiceRoleKey,
+} from "@/utils/supabase/admin";
 import { ensureStorageBucket } from "@/utils/supabase/ensureStorageBucket";
-import { resolveRequestProfile } from "../../utils/supabaseUser.js";
+import {
+  resolveOrCreateGuestProfile,
+  resolveRequestProfile,
+} from "../../utils/supabaseUser.js";
 import { scoreResumeAts } from "@/utils/atsScore";
 import { notifyResumeUpload } from "../../utils/notifyTeam.js";
 
 const BUCKET = "resumes";
 const MAX_BYTES = 8 * 1024 * 1024;
 
+function mapResumeRow(row) {
+  return {
+    id: row.id,
+    user_id: row.profile_id,
+    profile_id: row.profile_id,
+    file_name: row.file_name,
+    file_url: row.file_url,
+    storage_path: row.storage_path,
+    file_size: row.file_size,
+    mime_type: row.mime_type,
+    ats_score: row.ats_score,
+    ats_grade: row.ats_grade,
+    ats_feedback: row.ats_feedback,
+    is_primary: row.is_primary,
+    created_at: row.created_at,
+  };
+}
+
 export async function POST(request) {
-  if (!isSupabaseAdminConfigured()) {
-    return Response.json(
-      {
-        error:
-          "Resume storage is not configured. Add SUPABASE_SERVICE_ROLE_KEY and run supabase/schema.sql.",
-      },
-      { status: 503 },
-    );
-  }
-
-  const profile = await resolveRequestProfile(request);
-  if (!profile) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   let formData;
   try {
     formData = await request.formData();
@@ -45,7 +54,67 @@ export async function POST(request) {
     return Response.json({ error: "Only PDF, DOC, and DOCX are supported" }, { status: 400 });
   }
 
+  const emailField = formData.get("email");
+  const guestEmail =
+    typeof emailField === "string" && emailField.trim() ? emailField.trim().toLowerCase() : null;
+
+  const { ats_score, ats_grade, ats_feedback } = scoreResumeAts({
+    fileName,
+    fileSize: file.size,
+    mimeType: file.type,
+    email: guestEmail,
+  });
+
+  if (!getServiceRoleKey()) {
+    return Response.json(
+      {
+        error: "Resume storage is not configured on the server.",
+        code: "STORAGE_NOT_CONFIGURED",
+        analyzeOnly: true,
+        ats_score,
+        ats_grade,
+        ats_feedback,
+        file_name: fileName,
+        hint: "Set SUPABASE_SERVICE_ROLE_KEY in Vercel (service_role secret, not publishable key).",
+      },
+      { status: 503 },
+    );
+  }
+
+  let profile = await resolveRequestProfile(request);
+  if (!profile && guestEmail) {
+    profile = await resolveOrCreateGuestProfile(guestEmail);
+  }
+
+  if (!profile) {
+    return Response.json(
+      {
+        error: "Add your email to save this resume, or sign in first.",
+        code: "AUTH_REQUIRED",
+        ats_score,
+        ats_grade,
+        ats_feedback,
+        file_name: fileName,
+      },
+      { status: 401 },
+    );
+  }
+
   const admin = getSupabaseAdmin();
+  if (!admin) {
+    return Response.json(
+      {
+        error: "Server storage unavailable.",
+        code: "STORAGE_NOT_CONFIGURED",
+        ats_score,
+        ats_grade,
+        ats_feedback,
+        file_name: fileName,
+      },
+      { status: 503 },
+    );
+  }
+
   const bucketResult = await ensureStorageBucket(admin, BUCKET, {
     public: true,
     fileSizeLimit: MAX_BYTES,
@@ -54,7 +123,10 @@ export async function POST(request) {
     return Response.json(
       {
         error:
-          'Could not create Storage bucket "resumes". Create it in Supabase Dashboard or check service role permissions.',
+          'Could not access Storage bucket "resumes". Create it in Supabase Dashboard → Storage.',
+        ats_score,
+        ats_grade,
+        ats_feedback,
       },
       { status: 500 },
     );
@@ -77,6 +149,9 @@ export async function POST(request) {
           uploadError.message?.includes("Bucket not found")
             ? 'Create a public Storage bucket named "resumes" in Supabase.'
             : "Upload to storage failed",
+        ats_score,
+        ats_grade,
+        ats_feedback,
       },
       { status: 500 },
     );
@@ -84,12 +159,6 @@ export async function POST(request) {
 
   const { data: publicUrlData } = admin.storage.from(BUCKET).getPublicUrl(storagePath);
   const fileUrl = publicUrlData.publicUrl;
-
-  const { ats_score, ats_feedback } = scoreResumeAts({
-    fileName,
-    fileSize: file.size,
-    mimeType: file.type,
-  });
 
   const { count } = await admin
     .from("resumes")
@@ -120,7 +189,15 @@ export async function POST(request) {
 
   if (insertError) {
     console.error("resume insert:", insertError);
-    return Response.json({ error: "Failed to save resume record" }, { status: 500 });
+    return Response.json(
+      {
+        error: "Failed to save resume record",
+        ats_score,
+        ats_grade,
+        ats_feedback,
+      },
+      { status: 500 },
+    );
   }
 
   void notifyResumeUpload({
@@ -130,23 +207,30 @@ export async function POST(request) {
     atsScore: ats_score,
   });
 
-  const mapped = mapResumeRow(resume);
-  return Response.json({ resume: mapped, source: "supabase" }, { status: 201 });
-}
+  if (guestEmail) {
+    const { error: leadErr } = await admin.from("leads").insert({
+      email: profile.email,
+      name: profile.full_name,
+      source: "resume_upload",
+      metadata: {
+        file_name: fileName,
+        ats_score,
+        ats_grade,
+      },
+    });
+    if (leadErr) {
+      console.warn("lead insert (resume_upload):", leadErr.message);
+    }
+  }
 
-function mapResumeRow(row) {
-  return {
-    id: row.id,
-    user_id: row.profile_id,
-    profile_id: row.profile_id,
-    file_name: row.file_name,
-    file_url: row.file_url,
-    storage_path: row.storage_path,
-    file_size: row.file_size,
-    mime_type: row.mime_type,
-    ats_score: row.ats_score,
-    ats_feedback: row.ats_feedback,
-    is_primary: row.is_primary,
-    created_at: row.created_at,
-  };
+  const mapped = mapResumeRow({ ...resume, ats_grade });
+  return Response.json(
+    {
+      resume: mapped,
+      source: "supabase",
+      guest: Boolean(guestEmail && !profile.auth_user_id),
+      profile_email: profile.email,
+    },
+    { status: 201 },
+  );
 }

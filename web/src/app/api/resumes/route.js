@@ -3,6 +3,8 @@ import { getOrCreateUser } from "../utils/getUser.js";
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
 import { resolveRequestProfile } from "../utils/supabaseUser.js";
 
+import { gradeFromScore } from "@/utils/atsScore";
+
 function mapResumeRow(row) {
   return {
     id: row.id,
@@ -14,6 +16,7 @@ function mapResumeRow(row) {
     file_size: row.file_size,
     mime_type: row.mime_type,
     ats_score: row.ats_score,
+    ats_grade: row.ats_grade ?? gradeFromScore(row.ats_score),
     ats_feedback: row.ats_feedback,
     is_primary: row.is_primary,
     created_at: row.created_at,

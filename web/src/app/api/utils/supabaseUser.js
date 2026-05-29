@@ -1,4 +1,4 @@
-import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
+import { getSupabaseAdmin, getSupabaseAuthReader, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
 import { loadServerEnv } from "@/utils/loadServerEnv.js";
 import { getOrCreateUserFromAuthJs } from "./getUser.js";
 
@@ -9,7 +9,8 @@ import { getOrCreateUserFromAuthJs } from "./getUser.js";
 export async function resolveRequestProfile(request) {
   loadServerEnv();
   const admin = getSupabaseAdmin();
-  if (!admin) return null;
+  const authReader = getSupabaseAuthReader();
+  if (!authReader) return null;
 
   let email = null;
   let fullName = null;
@@ -24,7 +25,7 @@ export async function resolveRequestProfile(request) {
 
   if (hasBearer) {
     const token = authHeader.slice(7).trim();
-    const { data, error } = await admin.auth.getUser(token);
+    const { data, error } = await authReader.auth.getUser(token);
     if (error) {
       console.error("resolveRequestProfile Bearer:", error.message);
     }
@@ -78,6 +79,8 @@ export async function resolveRequestProfile(request) {
   }
 
   if (!email) return null;
+
+  if (!admin) return null;
 
   const { data: existing } = await admin
     .from("profiles")
@@ -135,6 +138,53 @@ export async function resolveRequestProfile(request) {
       if (retry) return retry;
     }
     console.error("resolveRequestProfile insert:", error);
+    return null;
+  }
+
+  return created;
+}
+
+/** Guest resume upload — find or create profile by email (no auth session required). */
+export async function resolveOrCreateGuestProfile(email, fullName = null) {
+  const admin = getSupabaseAdmin();
+  if (!admin) return null;
+
+  const normalized = String(email || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
+    return null;
+  }
+
+  const { data: existing } = await admin
+    .from("profiles")
+    .select("*")
+    .eq("email", normalized)
+    .maybeSingle();
+
+  if (existing) return existing;
+
+  const guestId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  const { data: created, error } = await admin
+    .from("profiles")
+    .insert({
+      email: normalized,
+      full_name: fullName?.trim() || null,
+      local_id: guestId,
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") {
+      const { data: retry } = await admin
+        .from("profiles")
+        .select("*")
+        .eq("email", normalized)
+        .maybeSingle();
+      return retry;
+    }
+    console.error("resolveOrCreateGuestProfile:", error);
     return null;
   }
 

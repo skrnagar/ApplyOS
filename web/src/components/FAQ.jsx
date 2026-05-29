@@ -9,7 +9,7 @@ const items = FAQ_ITEMS;
 export default function FAQ() {
   const [open, setOpen] = useState(0);
   return (
-    <section id="faq" className="py-20 md:py-28 bg-[#fafbfc] border-t border-neutral-200/80">
+    <section id="faq" className="py-20 md:py-28 bg-[#fafbfc] border-t border-neutral-200/80 scroll-mt-28">
       <div className="container mx-auto px-5 sm:px-6 max-w-3xl">
         <p className="text-[11px] tracking-[0.35em] uppercase text-emerald-700 font-semibold mb-4 text-center">
           FAQ

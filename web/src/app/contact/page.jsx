@@ -43,7 +43,10 @@ export default function ContactPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Could not send message. Try again.");
+        setError(
+          [data.error, data.hint].filter(Boolean).join(" — ") ||
+            "Could not send message. Try again.",
+        );
         return;
       }
       if (!data.stored) {
@@ -103,6 +106,8 @@ export default function ContactPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
+                autoComplete="name"
+                suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
               />
               <input
@@ -111,6 +116,8 @@ export default function ContactPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 required
+                autoComplete="email"
+                suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
               />
               <textarea
@@ -119,6 +126,7 @@ export default function ContactPage() {
                 placeholder="How can we help?"
                 rows={4}
                 required
+                suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm resize-none"
               />
               {error && (
