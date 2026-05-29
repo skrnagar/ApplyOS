@@ -29,16 +29,17 @@ import { UserProvider } from '@/utils/useUser';
 import { shouldUseAuthJsSession } from '@/utils/authMode';
 import { useInIframe } from '@/utils/useInIframe';
 import { useIsMobile } from '@/utils/useClientSnapshot';
-import { toPng } from 'html-to-image';
 import { useNavigate } from 'react-router';
-import { serializeError } from 'serialize-error';
 import { Toaster, toast } from 'sonner';
 import { useDevServerHeartbeat } from '../__create/useDevServerHeartbeat';
-import '../__create/design-mode';
 import type { Route } from './+types/root';
 import StructuredData from '@/components/seo/StructuredData';
 import { SITE_URL } from '@/config/site';
 import { buildMeta } from '@/utils/seo';
+
+if (import.meta.env.DEV) {
+  void import('../__create/design-mode');
+}
 
 const INTER_FONT =
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
@@ -82,37 +83,48 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
   const THROTTLE_MS = 1000;
 
   useEffect(() => {
-    const serialized = serializeError(error);
-    const errorKey = JSON.stringify(serialized);
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
-    // Reset the counter when a genuinely different error arrives
-    if (errorKey !== lastErrorKeyRef.current) {
-      lastErrorKeyRef.current = errorKey;
-      postCountRef.current = 0;
-    }
+    void import('serialize-error').then(({ serializeError }) => {
+      if (cancelled) return;
 
-    if (postCountRef.current >= MAX_ERROR_POSTS_PER_ERROR) {
-      return;
-    }
+      const serialized = serializeError(error);
+      const errorKey = JSON.stringify(serialized);
 
-    const now = Date.now();
-    const timeSinceLastPost = now - lastPostTimeRef.current;
+      if (errorKey !== lastErrorKeyRef.current) {
+        lastErrorKeyRef.current = errorKey;
+        postCountRef.current = 0;
+      }
 
-    const post = () => {
       if (postCountRef.current >= MAX_ERROR_POSTS_PER_ERROR) {
         return;
       }
-      postCountRef.current += 1;
-      lastPostTimeRef.current = Date.now();
-      window.parent.postMessage({ type: 'sandbox:error:detected', error: serialized }, '*');
+
+      const now = Date.now();
+      const timeSinceLastPost = now - lastPostTimeRef.current;
+
+      const post = () => {
+        if (postCountRef.current >= MAX_ERROR_POSTS_PER_ERROR) {
+          return;
+        }
+        postCountRef.current += 1;
+        lastPostTimeRef.current = Date.now();
+        window.parent.postMessage({ type: 'sandbox:error:detected', error: serialized }, '*');
+      };
+
+      if (timeSinceLastPost < THROTTLE_MS) {
+        timer = setTimeout(post, THROTTLE_MS - timeSinceLastPost);
+        return;
+      }
+
+      post();
+    });
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
     };
-
-    if (timeSinceLastPost < THROTTLE_MS) {
-      const timer = setTimeout(post, THROTTLE_MS - timeSinceLastPost);
-      return () => clearTimeout(timer);
-    }
-
-    post();
   }, [error]);
 
   useEffect(() => {
@@ -138,7 +150,9 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
           justifyContent: 'flex-start',
           margin: '0 auto',
         };
-        navigator.clipboard.writeText(JSON.stringify(serializeError(error)));
+        void import('serialize-error').then(({ serializeError }) => {
+          navigator.clipboard.writeText(JSON.stringify(serializeError(error)));
+        });
         toast.custom(
           () => (
             <div style={toastStyle}>
@@ -429,6 +443,7 @@ export const useHandleScreenshotRequest = (enabled: boolean) => {
           const height = Math.floor(width / aspectRatio);
 
           // html-to-image already handles CORS, fonts, and CSS inlining
+          const { toPng } = await import('html-to-image');
           const dataUrl = await toPng(document.body, {
             cacheBust: true,
             skipFonts: false,

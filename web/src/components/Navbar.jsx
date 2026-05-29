@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import useUser from "@/utils/useUser";
 import { Menu, X } from "lucide-react";
 import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
@@ -26,10 +25,7 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      <nav
         className={`fixed top-0 inset-x-0 z-50 transition-all ${
           scrolled
             ? "py-2.5 md:py-3 backdrop-blur-xl bg-white/90 border-b border-neutral-200/90 shadow-sm"
@@ -100,17 +96,11 @@ export default function Navbar() {
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="fixed inset-x-0 top-[56px] z-40 md:hidden px-4 pb-3"
-          >
-            <div className="rounded-2xl border border-neutral-200 bg-white shadow-lg p-2 space-y-0.5">
+      {mobileOpen ? (
+        <div className="fixed inset-x-0 top-[56px] z-40 md:hidden px-4 pb-3 hero-fade-in">
+          <div className="rounded-2xl border border-neutral-200 bg-white shadow-lg p-2 space-y-0.5">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
@@ -151,10 +141,9 @@ export default function Navbar() {
                   Sign Up
                 </a>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

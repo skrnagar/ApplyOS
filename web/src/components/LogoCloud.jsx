@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { motion } from "motion/react";
 
 const logos = [
   "Stripe",
@@ -21,14 +20,9 @@ export default function LogoCloud() {
   return (
     <section className="py-12 md:py-14 border-y border-neutral-200/80 bg-white/50 relative overflow-hidden">
       <div className="container mx-auto px-5 sm:px-6 mb-8 text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-[11px] tracking-[0.35em] uppercase text-neutral-500 font-semibold"
-        >
+        <p className="text-[11px] tracking-[0.35em] uppercase text-neutral-500 font-semibold hero-fade-in">
           Companies &amp; teams our customers join
-        </motion.p>
+        </p>
       </div>
 
       <div className="relative">

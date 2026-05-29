@@ -126,6 +126,12 @@ export default defineConfig(({ mode }) => {
           if (id.includes('three') || id.includes('@react-three')) return 'three';
           if (id.includes('react-router') || id.includes('@remix-run')) return 'router';
           if (id.includes('@tanstack')) return 'query';
+          if (
+            id.includes('/node_modules/react-dom/') ||
+            id.includes('/node_modules/react/')
+          ) {
+            return 'react-vendor';
+          }
           // Keep motion/gsap/lenis in the default graph — splitting them caused
           // circular motion ↔ vendor chunks and runtime failures in production.
         },

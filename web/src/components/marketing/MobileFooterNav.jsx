@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router";
-import { motion, AnimatePresence } from "motion/react";
 import {
   Home,
   Tag,
@@ -62,29 +61,21 @@ export default function MobileFooterNav() {
 
   return (
     <>
-      <AnimatePresence>
-        {menuOpen && (
-          <>
-            <motion.button
-              type="button"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[55] bg-neutral-900/40 md:hidden"
-              aria-label="Close menu"
-              onClick={() => setMenuOpen(false)}
-            />
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label="More navigation"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ type: "spring", stiffness: 420, damping: 34 }}
-              className="fixed inset-x-3 z-[56] md:hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_-8px_40px_rgba(15,23,42,0.12)] overflow-hidden"
-              style={{ bottom: "calc(4.75rem + env(safe-area-inset-bottom, 0px))" }}
-            >
+      {menuOpen ? (
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 z-[55] bg-neutral-900/40 md:hidden hero-fade-in"
+            aria-label="Close menu"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="More navigation"
+            className="fixed inset-x-3 z-[56] md:hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_-8px_40px_rgba(15,23,42,0.12)] overflow-hidden hero-fade-in"
+            style={{ bottom: "calc(4.75rem + env(safe-area-inset-bottom, 0px))" }}
+          >
               <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
                 <p className="text-sm font-semibold text-neutral-900">Menu</p>
                 <button
@@ -139,10 +130,9 @@ export default function MobileFooterNav() {
                   )}
                 </div>
               </nav>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </div>
+        </>
+      ) : null}
 
       <nav
         className="fixed inset-x-0 bottom-0 z-[54] md:hidden border-t border-neutral-200/90 bg-white/95 backdrop-blur-xl shadow-[0_-4px_24px_rgba(15,23,42,0.08)]"

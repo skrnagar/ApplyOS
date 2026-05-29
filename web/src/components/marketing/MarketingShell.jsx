@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import MobileFooterNav from "@/components/marketing/MobileFooterNav";
-import LeadGenPopup from "@/components/marketing/LeadGenPopup";
+import DeferredLeadGenPopup from "@/components/marketing/DeferredLeadGenPopup";
 
 export default function MarketingShell({ children, showBackdrop = true }) {
   return (
@@ -19,7 +19,7 @@ export default function MarketingShell({ children, showBackdrop = true }) {
         </div>
         <Footer />
         <MobileFooterNav />
-        <LeadGenPopup />
+        <DeferredLeadGenPopup />
       </div>
     </main>
   );
