@@ -62,8 +62,6 @@ export default function InsightsPage() {
       if (response.ok) {
         const data = await response.json();
         setInsights(data);
-      } else if (response.status === 401 && typeof window !== "undefined") {
-        window.location.href = "/account/signin";
       }
     } catch (error) {
       console.error("Error fetching insights:", error);

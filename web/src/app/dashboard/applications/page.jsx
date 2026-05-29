@@ -66,8 +66,6 @@ export default function ApplicationsPage() {
     try {
       const res = await fetchWithAuth("/api/applications");
       if (res.ok) setApplications(await res.json());
-      else if (res.status === 401 && typeof window !== "undefined")
-        window.location.href = "/account/signin";
     } catch (e) {
       console.error(e);
     } finally {

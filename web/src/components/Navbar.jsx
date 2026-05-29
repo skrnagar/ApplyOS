@@ -42,7 +42,7 @@ export default function Navbar() {
             : "py-3 md:py-4 backdrop-blur-md bg-white/70 border-b border-transparent"
         }`}
       >
-        <div className="container mx-auto px-5 sm:px-6 flex items-center justify-between gap-4">
+        <div className="container mx-auto px-5 sm:px-6 lg:px-8 xl:px-10 max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1536px] flex items-center justify-between gap-4">
           <a href="/" className="flex items-center group min-w-0">
             <HireOrbitalLogo size="md" variant="light" />
           </a>

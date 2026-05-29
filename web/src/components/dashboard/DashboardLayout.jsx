@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router";
+import { useLocation, Link } from "react-router";
 import {
   LayoutDashboard,
   Briefcase,
@@ -77,9 +77,10 @@ export default function DashboardLayout({ children }) {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
+                onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${
                   isActive
                     ? "bg-blue-50 text-blue-600"
@@ -88,19 +89,24 @@ export default function DashboardLayout({ children }) {
               >
                 <Icon size={19} />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
 
         <div className="p-4 border-t border-neutral-100 space-y-1">
-          <a
-            href="/dashboard/profile"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-600 hover:bg-neutral-100 transition-all text-sm font-medium"
+          <Link
+            to="/dashboard/profile"
+            onClick={() => setSidebarOpen(false)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${
+              pathname === "/dashboard/profile"
+                ? "bg-blue-50 text-blue-600"
+                : "text-neutral-600 hover:bg-neutral-100"
+            }`}
           >
             <User size={19} />
             <span>Profile</span>
-          </a>
+          </Link>
           <a
             href="/account/logout"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all text-sm font-medium"

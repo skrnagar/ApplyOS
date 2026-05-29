@@ -38,8 +38,6 @@ export default function ProfilePage() {
       const res = await fetchWithAuth("/api/users/profile");
       if (res.ok) {
         setProfile(await res.json());
-      } else if (res.status === 401) {
-        window.location.href = "/account/signin";
       }
     } catch (e) {
       console.error(e);

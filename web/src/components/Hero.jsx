@@ -33,8 +33,8 @@ export default function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-14 md:pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-10 lg:gap-14 xl:gap-16 items-center">
+      <div className="relative z-10 mx-auto w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8 xl:px-10 pt-24 sm:pt-28 pb-14 md:pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.1fr)] gap-10 lg:gap-12 xl:gap-16 2xl:gap-20 items-center">
           {/* Copy */}
           <div className="order-1 max-w-xl lg:max-w-none mx-auto lg:mx-0 text-center lg:text-left hero-fade-in">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-200/80 bg-white/90 text-[11px] font-semibold text-emerald-800 shadow-sm mb-5">
@@ -42,12 +42,12 @@ export default function Hero() {
               <span className="tracking-wide uppercase">Dedicated job search assistant</span>
             </div>
 
-            <h1 className="text-[1.875rem] leading-[1.12] sm:text-4xl sm:leading-[1.1] lg:text-[2.65rem] xl:text-[3rem] font-semibold tracking-[-0.035em] text-neutral-900">
+            <h1 className="text-[1.875rem] leading-[1.12] sm:text-4xl sm:leading-[1.1] lg:text-[2.75rem] xl:text-[3.15rem] 2xl:text-[3.35rem] font-semibold tracking-[-0.035em] text-neutral-900">
               <span className="block">We apply to hundreds of jobs.</span>
               <span className="block mt-1.5 text-emerald-600">You get callbacks at top companies.</span>
             </h1>
 
-            <p className="mt-4 sm:mt-5 text-neutral-600 text-[15px] sm:text-base leading-relaxed text-pretty">
+            <p className="mt-4 sm:mt-5 text-neutral-600 text-[15px] sm:text-base xl:text-[17px] leading-relaxed text-pretty max-w-2xl lg:max-w-none">
               HireOrbital assigns you a dedicated assistant who applies to jobs, rewrites your
               resume for ATS, optimizes LinkedIn, and emails recruiters — so you land interviews at{" "}
               <span className="font-semibold text-neutral-900">Google, Amazon, and more</span>.

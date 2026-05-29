@@ -24,17 +24,21 @@ function UserProviderInner({ children, session, status }) {
 
   const [sbUser, setSbUser] = React.useState(null);
   const [sbLoading, setSbLoading] = React.useState(() => supabaseMode);
+  /** False until the first getSession() completes — avoids false logouts from early auth events. */
+  const [sbReady, setSbReady] = React.useState(!supabaseMode);
 
   React.useEffect(() => {
     if (!supabaseMode) return;
     const supabase = tryCreateBrowserClient();
     if (!supabase) {
       setSbLoading(false);
+      setSbReady(true);
       return;
     }
 
     setSbLoading(true);
     let cancelled = false;
+    let initialSessionDone = false;
 
     const applySession = (sessionData) => {
       if (cancelled) return;
@@ -50,11 +54,17 @@ function UserProviderInner({ children, session, status }) {
       });
     };
 
-    void supabase.auth.getSession().then(({ data }) => applySession(data.session));
+    void supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      initialSessionDone = true;
+      applySession(data.session);
+      setSbReady(true);
+    });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, sessionData) => {
+      if (!initialSessionDone) return;
       applySession(sessionData);
     });
 
@@ -117,7 +127,8 @@ function UserProviderInner({ children, session, status }) {
       return {
         user: sbUser,
         data: sbUser,
-        loading: sbLoading,
+        loading: sbLoading || !sbReady,
+        authReady: sbReady,
         refetch: refetchUser,
       };
     }
@@ -139,6 +150,7 @@ function UserProviderInner({ children, session, status }) {
     supabaseMode,
     sbUser,
     sbLoading,
+    sbReady,
     localUser,
     session,
     status,

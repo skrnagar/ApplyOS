@@ -116,7 +116,7 @@ export default function HeroWorkspacePreview({ className = "" }) {
       </div>
 
       {/* Desktop: two-panel workspace */}
-      <div className="hidden lg:grid lg:grid-cols-[minmax(200px,34%)_minmax(0,1fr)] min-h-[440px] xl:min-h-[480px]">
+      <div className="hidden lg:grid lg:grid-cols-[minmax(220px,34%)_minmax(0,1fr)] min-h-[440px] xl:min-h-[500px] 2xl:min-h-[520px]">
         <aside className="border-r border-neutral-200/90 bg-[#fafbfc] flex flex-col min-h-0">
           <div className="px-4 py-3.5 border-b border-neutral-200/80 shrink-0">
             <p className="text-sm font-semibold text-neutral-900">Recommended for you</p>
