@@ -28,9 +28,30 @@ export default function ResetPasswordPage() {
       if (!cancelled) setReady(true);
     };
 
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) markReady();
-    });
+    void (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+
+      if (code) {
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (exchangeError) {
+          console.error("reset-password exchangeCodeForSession:", exchangeError.message);
+          if (!cancelled) {
+            setError("This reset link expired or was already used. Request a new one.");
+          }
+          return;
+        }
+        if (data.session) {
+          markReady();
+          return;
+        }
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        markReady();
+      }
+    })();
 
     const {
       data: { subscription },
@@ -100,6 +121,11 @@ export default function ResetPasswordPage() {
             </a>
             .
           </p>
+          {error ? (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800 text-sm">
+              {error}
+            </div>
+          ) : null}
         </div>
       ) : (
         <form onSubmit={onSubmit} className="space-y-5">

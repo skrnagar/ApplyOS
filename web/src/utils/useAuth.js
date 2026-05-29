@@ -289,17 +289,23 @@ export default function useAuth() {
       throw new Error("EmailRequired");
     }
 
-    const supabase = typeof window !== "undefined" ? tryCreateBrowserClient() : null;
-    if (supabase) {
-      const redirectTo = `${window.location.origin}/account/reset-password`;
-      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, { redirectTo });
-      if (error) throw mapSupabaseAuthError(error);
-      return { ok: true };
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: trimmed }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data.error || data.hint || "Could not send reset email.");
     }
 
-    throw new Error(
-      "Password reset requires Supabase. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
-    );
+    if (data.hint && typeof window !== "undefined" && import.meta.env.DEV) {
+      console.warn("[forgot-password]", data.hint, data.warnings);
+    }
+
+    return { ok: true, delivered: data.delivered };
   }, []);
 
   const updatePassword = useCallback(async ({ password }) => {

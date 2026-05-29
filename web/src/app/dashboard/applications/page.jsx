@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 import useUser from "@/utils/useUser";
+import ApplicationTargetsPanel from "@/components/dashboard/ApplicationTargetsPanel";
 
 const STATUSES = [
   {
@@ -114,6 +115,8 @@ export default function ApplicationsPage() {
             </p>
           </div>
         </div>
+
+        <ApplicationTargetsPanel />
 
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">

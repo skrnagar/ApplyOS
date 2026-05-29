@@ -58,8 +58,15 @@ export default function ForgotPasswordPage() {
       {sent ? (
         <div className="space-y-4 text-center">
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Check your inbox (and spam) for a message from HireOrbital. The link opens a page on
-            this site where you can set a new password.
+            If an account exists for that email, we sent a reset link. Check inbox and spam.
+            The link opens this site where you can set a new password.
+          </p>
+          <p className="text-xs text-neutral-500 leading-relaxed">
+            No email? Confirm you signed up with this address, add{" "}
+            <code className="text-[11px] bg-neutral-100 px-1 rounded">RESEND_API_KEY</code> on
+            Vercel for reliable delivery, and whitelist{" "}
+            <code className="text-[11px] bg-neutral-100 px-1 rounded">/account/auth/callback</code>{" "}
+            in Supabase → Authentication → URL Configuration.
           </p>
           <a
             href="/account/signin"

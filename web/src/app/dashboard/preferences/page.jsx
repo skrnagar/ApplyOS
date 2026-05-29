@@ -15,6 +15,7 @@ export default function PreferencesPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [preferences, setPreferences] = useState({
+    application_types: [],
     target_roles: [],
     preferred_locations: [],
     work_mode: [],
@@ -116,6 +117,53 @@ export default function PreferencesPage() {
             )}
           </Button>
         </div>
+
+        {/* Application types */}
+        <Card>
+          <CardHeader>
+            <h2 className="text-xl font-bold">Application Types</h2>
+            <p className="text-sm text-neutral-600 mt-1">
+              What kinds of roles should our team apply to on your behalf?
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: "full_time", label: "Full-time" },
+                { id: "part_time", label: "Part-time" },
+                { id: "contract", label: "Contract" },
+                { id: "internship", label: "Internship" },
+                { id: "new_grad", label: "New grad" },
+                { id: "senior", label: "Senior" },
+                { id: "faang", label: "FAANG / Big tech" },
+                { id: "startup", label: "Startup" },
+                { id: "remote_only", label: "Remote only" },
+                { id: "visa_sponsor", label: "Visa sponsorship" },
+              ].map(({ id, label }) => (
+                <label
+                  key={id}
+                  className="flex items-center gap-2 px-3 py-2 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    checked={(preferences.application_types || []).includes(id)}
+                    onChange={(e) => {
+                      const current = preferences.application_types || [];
+                      setPreferences({
+                        ...preferences,
+                        application_types: e.target.checked
+                          ? [...current, id]
+                          : current.filter((t) => t !== id),
+                      });
+                    }}
+                    className="rounded"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Target Roles */}
         <Card>
