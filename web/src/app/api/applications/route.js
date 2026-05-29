@@ -1,6 +1,5 @@
 import {
   listApplications,
-  createApplication,
 } from "../utils/applicationsStore.js";
 
 export async function GET(request) {
@@ -18,24 +17,12 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
-  try {
-    const body = await request.json();
-    const { company_name, job_title } = body;
-    if (!company_name || !job_title) {
-      return Response.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
-    }
-
-    const result = await createApplication(request, body);
-    if (result.error) {
-      return Response.json({ error: result.error }, { status: result.status });
-    }
-    return Response.json(result.data, { status: result.status });
-  } catch (error) {
-    console.error("Error creating application:", error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
-  }
+export async function POST() {
+  return Response.json(
+    {
+      error: "Applications are submitted by the HireOrbital team on your behalf.",
+      hint: "You can view your applications in the dashboard once our team logs them.",
+    },
+    { status: 403 },
+  );
 }

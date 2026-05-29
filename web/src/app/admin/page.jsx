@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import {
   adminFetchJson,
   adminDeleteRecord,
-  checkAdminSession,
+  checkAdminSessionSafe,
   setProfileAdmin,
   getAdminSecret,
   setAdminSecret,
@@ -19,13 +19,14 @@ import {
   MessageSquare,
   UserPlus,
   RefreshCw,
-  Lock,
   Briefcase,
   Shield,
   Trash2,
   Inbox,
 } from "lucide-react";
 import AdminChatPanel from "@/components/admin/AdminChatPanel";
+import AdminApplicationsPanel from "@/components/admin/AdminApplicationsPanel";
+import AdminSignInGate from "@/components/admin/AdminSignInGate";
 
 const TABS = [
   { id: "inbox", label: "Inbox", icon: Inbox },
@@ -106,13 +107,9 @@ function DataTable({ columns, rows, empty, onDelete }) {
 
 export default function AdminPage() {
   const { data: authUser, loading: authLoading } = useUser();
-  const { signInWithCredentials, signOut } = useAuth();
+  const { signOut } = useAuth();
   const supabaseAuth = isSupabaseAuthEnabled();
 
-  const [secretInput, setSecretInput] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [signingIn, setSigningIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [adminEmail, setAdminEmail] = useState(null);
@@ -124,33 +121,28 @@ export default function AdminPage() {
   const [errorDetails, setErrorDetails] = useState(null);
   const [errorHint, setErrorHint] = useState(null);
   const [warnings, setWarnings] = useState([]);
-  const [showSecretLogin, setShowSecretLogin] = useState(false);
 
   const verifyAdminAccess = useCallback(async () => {
     if (getAdminSecret()) {
       setUnlocked(true);
       setAuthChecked(true);
-      return;
+      return { admin: true, method: "secret" };
     }
-    try {
-      const session = await checkAdminSession();
-      if (session.admin) {
-        setUnlocked(true);
-        setAdminEmail(session.email || authUser?.email || null);
-        setError(null);
-        setErrorHint(null);
-      } else {
-        setUnlocked(false);
-      }
-    } catch (err) {
+    const session = await checkAdminSessionSafe();
+    if (session.admin) {
+      setUnlocked(true);
+      setAdminEmail(session.email || authUser?.email || null);
+      setError(null);
+      setErrorHint(null);
+    } else {
       setUnlocked(false);
-      if (authUser?.email) {
-        setError(err.message || "Not authorized for admin");
-        setErrorHint(err.hint || null);
+      if (session.error && (authUser?.email || session.status === 403)) {
+        setError(session.error);
+        setErrorHint(session.hint || null);
       }
-    } finally {
-      setAuthChecked(true);
     }
+    setAuthChecked(true);
+    return session;
   }, [authUser?.email]);
 
   useEffect(() => {
@@ -199,44 +191,16 @@ export default function AdminPage() {
     }
   };
 
-  const onSecretUnlock = (e) => {
-    e.preventDefault();
-    if (!secretInput.trim()) return;
-    setAdminSecret(secretInput.trim());
+  const onSecretUnlock = () => {
     setUnlocked(true);
-    setSecretInput("");
     setError(null);
   };
 
-  const onSupabaseSignIn = async (e) => {
-    e.preventDefault();
-    setSigningIn(true);
+  const onAdminUnlocked = (email) => {
+    setUnlocked(true);
+    setAdminEmail(email || authUser?.email || null);
     setError(null);
     setErrorHint(null);
-    try {
-      await signInWithCredentials({
-        email: email.trim(),
-        password,
-        redirect: false,
-      });
-      const session = await checkAdminSession();
-      if (session.admin) {
-        setUnlocked(true);
-        setAdminEmail(session.email || email.trim());
-        setError(null);
-        setErrorHint(null);
-      } else {
-        setError(session.error || "This account is not an admin.");
-        setErrorHint(
-          session.hint ||
-            "Add your email to ADMIN_EMAILS in web/.env.local and restart npm run dev.",
-        );
-      }
-    } catch (err) {
-      setError(err.message || "Sign-in failed");
-    } finally {
-      setSigningIn(false);
-    }
   };
 
   const onLogout = async () => {
@@ -260,103 +224,14 @@ export default function AdminPage() {
 
   if (!unlocked) {
     return (
-      <motion.div className="min-h-screen bg-neutral-50 flex items-center justify-center p-6">
-        <div className="w-full max-w-md space-y-4">
-          <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-            <motion.div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4">
-              <Shield className="text-emerald-700" size={24} />
-            </motion.div>
-            <h1 className="text-xl font-semibold text-neutral-900">Admin sign in</h1>
-            <p className="text-sm text-neutral-600 mt-2 mb-6">
-              Sign in with your <strong>Supabase</strong> email and password (same as the main app).
-              Admin access is stored in the database: <code className="text-xs bg-neutral-100 px-1 rounded">profiles.is_admin</code>.
-              Optional <code className="text-xs bg-neutral-100 px-1 rounded">ADMIN_EMAILS</code> in .env only bootstraps the first admins.
-            </p>
-
-            {error && (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-                <p>{error}</p>
-                {errorHint && <p className="text-xs mt-1 text-red-900/80">{errorHint}</p>}
-              </div>
-            )}
-
-            {supabaseAuth ? (
-              <form onSubmit={onSupabaseSignIn} className="space-y-3">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Admin email"
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
-                  autoComplete="email"
-                  required
-                />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
-                  autoComplete="current-password"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={signingIn}
-                  className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 disabled:opacity-50"
-                >
-                  {signingIn ? "Signing in…" : "Sign in with Supabase"}
-                </button>
-              </form>
-            ) : (
-              <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-                Configure <code className="text-xs">NEXT_PUBLIC_SUPABASE_*</code> in .env.local for
-                Supabase admin login.
-              </p>
-            )}
-
-            <p className="text-xs text-neutral-500 mt-4 text-center">
-              <a href="/account/signin?callbackUrl=%2Fadmin" className="text-emerald-700 hover:underline">
-                Use main sign-in page
-              </a>
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowSecretLogin((v) => !v)}
-            className="w-full text-xs text-neutral-500 hover:text-neutral-800"
-          >
-            {showSecretLogin ? "Hide" : "Use"} legacy admin secret instead
-          </button>
-
-          {showSecretLogin && (
-            <form
-              onSubmit={onSecretUnlock}
-              className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <Lock className="text-neutral-500" size={18} />
-                <span className="text-sm font-medium text-neutral-800">Admin secret</span>
-              </div>
-              <input
-                type="password"
-                value={secretInput}
-                onChange={(e) => setSecretInput(e.target.value)}
-                placeholder="ADMIN_SECRET value"
-                className="w-full px-4 py-3 rounded-xl border border-neutral-200 mb-3 text-sm"
-                autoComplete="off"
-              />
-              <button
-                type="submit"
-                className="w-full py-2.5 rounded-xl border border-neutral-300 text-sm font-medium hover:bg-neutral-50"
-              >
-                Unlock with secret
-              </button>
-            </form>
-          )}
-        </div>
-      </motion.div>
+      <AdminSignInGate
+        authUser={authUser}
+        initialError={error}
+        initialHint={errorHint}
+        onUnlocked={onAdminUnlocked}
+        onSecretUnlock={onSecretUnlock}
+        verifyAdminAccess={verifyAdminAccess}
+      />
     );
   }
 
@@ -595,21 +470,11 @@ export default function AdminPage() {
               />
             )}
             {tab === "applications" && (
-              <DataTable
-                empty="No applications yet. Run applications migration if the table is missing."
+              <AdminApplicationsPanel
+                profiles={data?.profiles}
+                applications={data?.applications}
+                onRefresh={load}
                 onDelete={handleDelete}
-                columns={[
-                  { key: "job_title", label: "Role" },
-                  { key: "company_name", label: "Company" },
-                  { key: "status", label: "Status" },
-                  {
-                    key: "email",
-                    label: "User",
-                    render: (r) => r.profiles?.email || r.profile_id,
-                  },
-                  { key: "created_at", label: "Added", render: (r) => formatDate(r.created_at) },
-                ]}
-                rows={data?.applications}
               />
             )}
             {tab === "resumes" && (

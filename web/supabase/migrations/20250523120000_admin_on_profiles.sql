@@ -9,5 +9,6 @@ update public.profiles
 set is_admin = true
 where lower(email) in (
   'hireorbit.1@gmail.com',
-  'theskrnagar@gmail.com'
+  'theskrnagar@gmail.com',
+  'skngrp@gmail.com'
 );

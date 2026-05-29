@@ -39,6 +39,7 @@ export default function SignInPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fromLeadPopup, setFromLeadPopup] = useState(false);
+  const [adminRedirect, setAdminRedirect] = useState(false);
   const { signInWithCredentials } = useAuth();
   const serverAuth = isServerAuthEnabled();
   const supabaseAuth = isSupabaseAuthEnabled();
@@ -48,6 +49,7 @@ export default function SignInPage() {
     const fromEmail = params.get("email");
     if (fromEmail) setEmail(fromEmail);
     if (params.get("from") === "lead_popup") setFromLeadPopup(true);
+    setAdminRedirect(params.get("callbackUrl") === "/admin" || params.get("callbackUrl") === "%2Fadmin");
 
     const code = params.get("error");
     if (code) {
@@ -107,7 +109,13 @@ export default function SignInPage() {
       secondaryBackHref="/account/signup"
       secondaryBackLabel="Sign up"
       banner={
-        fromLeadPopup ? (
+        adminRedirect ? (
+          <p className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm text-emerald-950 leading-relaxed">
+            Signing in to access <strong>HireOrbital Admin</strong>. After sign-in you&apos;ll return
+            to <code className="text-xs">/admin</code>. Your account also needs{" "}
+            <code className="text-xs">profiles.is_admin = true</code> in Supabase.
+          </p>
+        ) : fromLeadPopup ? (
           <p className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-sm text-emerald-950 leading-relaxed">
             Welcome back — sign in to open your HireOrbital workspace.
           </p>

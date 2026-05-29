@@ -117,7 +117,7 @@ export default function DashboardPage() {
 
   const statCards = [
     {
-      title: "Total Applied",
+      title: "Applications",
       value: stats?.stats?.totalApplications ?? 0,
       icon: Briefcase,
       color: "blue",
@@ -177,7 +177,7 @@ export default function DashboardPage() {
             Good {greetingWord}, {firstName}! 👋
           </h1>
           <p className="text-neutral-500 mt-1 text-sm">
-            Here&apos;s your job search overview for today
+            Applications submitted by our team and your latest activity
           </p>
           {stats?.demoStats ? (
             <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
@@ -277,13 +277,13 @@ export default function DashboardPage() {
                     No applications yet
                   </p>
                   <p className="text-sm text-neutral-400 mt-1">
-                    Start tracking your job applications
+                    Our team will log applications here as we submit them
                   </p>
                   <a
-                    href="/dashboard/applications"
+                    href="/dashboard/messages"
                     className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                   >
-                    Add Application
+                    Message assistant
                   </a>
                 </div>
               )}

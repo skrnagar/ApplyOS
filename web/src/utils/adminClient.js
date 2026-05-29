@@ -79,10 +79,49 @@ export async function checkAdminSession() {
   return adminFetchJson("/api/admin/session");
 }
 
+/** Like checkAdminSession but returns structured result instead of throwing on 401/403. */
+export async function checkAdminSessionSafe() {
+  try {
+    const res = await adminFetch("/api/admin/session");
+    const json = await res.json().catch(() => ({}));
+    return {
+      admin: Boolean(json.admin),
+      email: json.email || null,
+      error: json.error || null,
+      hint: json.hint || null,
+      status: res.status,
+    };
+  } catch (err) {
+    return {
+      admin: false,
+      email: null,
+      error: err.message || "Could not verify admin session",
+      hint: err.hint || null,
+      status: err.status || 500,
+    };
+  }
+}
+
 export async function setProfileAdmin(profileId, isAdmin) {
   return adminFetchJson("/api/admin/profile", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ profileId, is_admin: isAdmin }),
+  });
+}
+
+export async function adminCreateApplication(payload) {
+  return adminFetchJson("/api/admin/applications", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function adminUpdateApplication(id, payload) {
+  return adminFetchJson("/api/admin/applications", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, ...payload }),
   });
 }
