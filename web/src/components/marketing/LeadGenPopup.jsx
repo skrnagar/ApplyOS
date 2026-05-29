@@ -1,11 +1,11 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useId, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import { X, ArrowRight, Sparkles } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { getLocalSession } from "@/utils/localAuth";
-import LeadGenPopupProof from "./LeadGenPopupProof";
+import LeadGenPopupPreview from "./LeadGenPopupPreview";
 import { captureLead } from "@/utils/captureLead";
 
 const STORAGE_KEY = "hireorbital_lead_popup_dismissed";
@@ -56,7 +56,11 @@ function saveLead({ email, name }) {
   }
 }
 
+const inputClass =
+  "w-full px-4 py-3 min-h-[48px] rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-shadow";
+
 export default function LeadGenPopup() {
+  const formId = useId();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { data: user, loading } = useUser();
@@ -107,7 +111,7 @@ export default function LeadGenPopup() {
     setError(null);
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError("Enter a valid email.");
+      setError("Enter a valid email address.");
       return;
     }
     setSubmitting(true);
@@ -121,7 +125,6 @@ export default function LeadGenPopup() {
       console.warn("Lead capture:", leadResult.error);
     }
 
-    // Default to signup when API is down; use sign-in only when server confirms an account.
     const hasAccount = leadResult.ok && leadResult.accountExists === true;
     const authPath = hasAccount ? "/account/signin" : "/account/signup";
     setRedirectTarget(authPath);
@@ -155,131 +158,151 @@ export default function LeadGenPopup() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-3 sm:p-6"
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
         >
           <button
             type="button"
-            className="absolute inset-0 bg-neutral-900/55 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
             aria-label="Close popup"
             onClick={close}
           />
 
           <motion.div
-            initial={{ opacity: 0, y: 32, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            className="relative w-full max-w-md sm:max-w-lg max-h-[min(92vh,680px)] overflow-y-auto rounded-2xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.35)]"
+            initial={{ opacity: 0, y: "100%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "100%" }}
+            transition={{ type: "spring", stiffness: 420, damping: 36 }}
+            className="relative w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl max-h-[94dvh] sm:max-h-[min(90vh,640px)] overflow-hidden rounded-t-3xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.4)] flex flex-col sm:flex-row"
           >
             <button
               type="button"
               onClick={close}
-              className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 shadow-sm"
+              className="absolute top-3 right-3 z-20 p-2.5 rounded-full bg-white/95 border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 shadow-sm min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Close"
             >
               <X size={18} />
             </button>
 
-            <div className="p-5 sm:p-6 border-b border-neutral-100 bg-gradient-to-b from-[#f0f4f8] to-white">
-              <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-neutral-500 mb-1 pr-10">
-                Straight from our DMs
+            {/* Visual panel — hidden on narrow phones, shown sm+ */}
+            <div className="hidden sm:flex sm:w-[42%] md:w-[44%] flex-col justify-center bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-600 p-6 md:p-8 text-white shrink-0">
+              <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-emerald-100/90 mb-2">
+                Pipeline preview
               </p>
-              <p className="text-sm font-semibold text-neutral-900 mb-4 leading-snug">
-                Real chatter from people dodging burnout.
+              <p className="text-lg md:text-xl font-semibold leading-snug text-balance mb-5 pr-6">
+                See momentum in week one — not vanity metrics.
               </p>
-              <LeadGenPopupProof />
+              <div className="[&_*]:text-emerald-950 [&_p]:text-emerald-950/80">
+                <LeadGenPopupPreview />
+              </div>
             </div>
 
-            <div className="p-5 sm:p-6">
-              <div className="inline-flex items-center gap-1.5 w-fit rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 mb-3">
-                <Sparkles size={12} aria-hidden />
-                Free to start
-              </div>
-
-              <h2
-                id="lead-popup-title"
-                className="text-xl font-semibold tracking-tight text-neutral-900 text-balance"
-              >
-                We apply to jobs so you don&apos;t have to.
-              </h2>
-              <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
-                Curated applications, human review, and daily pipeline updates.
-              </p>
-
-              {submitted ? (
-                <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-900 text-sm">
-                  {redirectTarget === "/account/signin"
-                    ? "Welcome back — taking you to sign in…"
-                    : "You're in — taking you to create your account…"}
+            {/* Form panel */}
+            <div className="flex-1 overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="p-5 sm:p-6 md:p-8">
+                <div className="sm:hidden mb-4 pr-10">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 mb-3">
+                    <Sparkles size={12} aria-hidden />
+                    Free to start
+                  </div>
+                  <LeadGenPopupPreview compact />
                 </div>
-              ) : (
-                <form onSubmit={onSubmit} className="mt-5 space-y-3">
-                  <div>
-                    <label htmlFor="lead-name" className="sr-only">
-                      Name
-                    </label>
-                    <input
-                      id="lead-name"
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                      autoComplete="name"
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60 text-sm"
-                    />
+
+                <div className="hidden sm:block">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 mb-4">
+                    <Sparkles size={12} aria-hidden />
+                    Free to start
                   </div>
-                  <div>
-                    <label htmlFor="lead-email" className="sr-only">
-                      Email
-                    </label>
-                    <input
-                      id="lead-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email"
-                      required
-                      autoComplete="email"
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60 text-sm"
-                    />
-                  </div>
+                </div>
 
-                  {error && (
-                    <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                      {error}
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-colors disabled:opacity-60 shadow-sm"
-                  >
-                    {submitting ? "Saving…" : "Start free — claim your pipeline"}
-                    <ArrowRight size={16} aria-hidden />
-                  </button>
-                </form>
-              )}
-
-              <p className="mt-4 text-[11px] text-neutral-500 leading-relaxed">
-                No spam. Prefer a human?{" "}
-                <a
-                  href="/contact#schedule"
-                  className="font-semibold text-emerald-700 hover:underline"
-                  onClick={close}
+                <h2
+                  id="lead-popup-title"
+                  className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 text-balance pr-8 sm:pr-0"
                 >
-                  Schedule a call
-                </a>
-                .
-              </p>
+                  We apply to jobs so you don&apos;t have to.
+                </h2>
+                <p className="mt-2 text-sm sm:text-[15px] text-neutral-600 leading-relaxed">
+                  Curated applications, human review, and daily updates in your dashboard.
+                </p>
 
-              <button
-                type="button"
-                onClick={close}
-                className="mt-3 text-xs text-neutral-400 hover:text-neutral-600"
-              >
-                Not now
-              </button>
+                {submitted ? (
+                  <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-900 text-sm">
+                    {redirectTarget === "/account/signin"
+                      ? "Welcome back — taking you to sign in…"
+                      : "You're in — taking you to create your account…"}
+                  </div>
+                ) : (
+                  <form id={formId} onSubmit={onSubmit} className="mt-6 space-y-4">
+                    <div className="space-y-1.5">
+                      <label htmlFor="lead-name" className="block text-xs font-medium text-neutral-700">
+                        Name <span className="text-neutral-400 font-normal">(optional)</span>
+                      </label>
+                      <input
+                        id="lead-name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Alex Chen"
+                        autoComplete="name"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="lead-email" className="block text-xs font-medium text-neutral-700">
+                        Work or personal email
+                      </label>
+                      <input
+                        id="lead-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@company.com"
+                        required
+                        autoComplete="email"
+                        inputMode="email"
+                        className={inputClass}
+                      />
+                    </div>
+
+                    {error && (
+                      <p
+                        role="alert"
+                        className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5"
+                      >
+                        {error}
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full inline-flex items-center justify-center gap-2 min-h-[48px] py-3.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 active:bg-emerald-800 transition-colors disabled:opacity-60 shadow-sm"
+                    >
+                      {submitting ? "Saving…" : "Start free — open my dashboard"}
+                      <ArrowRight size={16} aria-hidden />
+                    </button>
+                  </form>
+                )}
+
+                <p className="mt-4 text-xs text-neutral-500 leading-relaxed">
+                  No spam. Prefer a human?{" "}
+                  <a
+                    href="/contact#schedule"
+                    className="font-semibold text-emerald-700 hover:underline"
+                    onClick={close}
+                  >
+                    Schedule a call
+                  </a>
+                  .
+                </p>
+
+                <button
+                  type="button"
+                  onClick={close}
+                  className="mt-4 w-full sm:w-auto text-sm text-neutral-400 hover:text-neutral-600 py-2 min-h-[44px] sm:min-h-0"
+                >
+                  Not now
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>

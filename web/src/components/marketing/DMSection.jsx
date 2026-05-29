@@ -1,77 +1,97 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
+import { Quote } from "lucide-react";
 
-const threads = [
+const stories = [
   {
-    handle: "@maya · PM",
-    msg: "I stopped doom-scrolling Indeed. Assistants shipped 40 tailored apps while I slept. Interview pipeline finally moved.",
-    tone: "from",
+    quote:
+      "I stopped rewriting the same cover letter at midnight. The team shipped relevant apps while I prepped for screens.",
+    name: "Maya R.",
+    role: "Product Manager",
+    outcome: "3 screens in 12 days",
     delay: 0,
   },
   {
-    handle: "HireOrbital · Assist",
-    msg: "Weekly digest is live — 12 new matches, 3 replies, 1 phone screen Thurs. Want us to prioritize Series B infra roles?",
-    tone: "brand",
-    delay: 0.05,
+    quote:
+      "Every application showed up in my tracker with notes. Recruiters stopped asking me to explain gaps in my story.",
+    name: "Jordan K.",
+    role: "Software Engineer",
+    outcome: "Offer in 5 weeks",
+    delay: 0.06,
   },
   {
-    handle: "@jordan · Eng",
-    msg: "Cold email angles they wrote for me sounded like *me*. Not cheesy templates. Worth it for the outbound alone.",
-    tone: "from",
-    delay: 0.1,
-  },
-  {
-    handle: "@alex · Designer",
-    msg: "The transparency freaked me out at first… then it became my favorite part. I could explain every apply to recruiters.",
-    tone: "from",
-    delay: 0.15,
+    quote:
+      "Outbound emails sounded like me — not templates. That alone was worth switching from solo applying.",
+    name: "Alex T.",
+    role: "Product Designer",
+    outcome: "2× reply rate",
+    delay: 0.12,
   },
 ];
 
 export default function DMSection() {
   return (
-    <section className="py-20 md:py-28 bg-white border-y border-neutral-200/90">
-      <div className="container mx-auto px-5 sm:px-6">
-        <div className="max-w-2xl mx-auto text-center mb-12 md:mb-14">
-          <p className="text-[11px] font-semibold tracking-[0.35em] uppercase text-neutral-500 mb-4">
-            Straight from our DMs
+    <section className="py-16 sm:py-20 md:py-28 bg-[#f8faf9] border-y border-neutral-200/80">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto text-center mb-10 sm:mb-14">
+          <p className="text-[11px] font-semibold tracking-[0.28em] uppercase text-emerald-700 mb-3">
+            Member outcomes
           </p>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-neutral-900 text-balance">
-            Real chatter from people dodging burnout.
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-neutral-900 text-balance">
+            Less grind. More conversations that matter.
           </h2>
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base text-neutral-600 leading-relaxed max-w-lg mx-auto">
+            Real feedback from people who wanted momentum without burning out on job boards.
+          </p>
         </div>
 
-        <div className="max-w-lg mx-auto space-y-4 md:space-y-5">
-          {threads.map((t) => (
-            <motion.figure
-              key={t.msg.slice(0, 32)}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, margin: "-30px" }}
-              transition={{ duration: 0.4, delay: t.delay }}
-              className={`flex flex-col gap-2 ${t.tone === "brand" ? "items-end" : "items-start"}`}
+        {/* Mobile: horizontal snap scroll */}
+        <div className="md:hidden -mx-4 px-4">
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide">
+            {stories.map((s) => (
+              <StoryCard key={s.name} {...s} className="min-w-[min(88vw,320px)] snap-center shrink-0" />
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: grid */}
+        <div className="hidden md:grid md:grid-cols-3 gap-5 lg:gap-6 max-w-6xl mx-auto">
+          {stories.map((s) => (
+            <motion.div
+              key={s.name}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: s.delay }}
             >
-              <figcaption
-                className={`text-[11px] font-semibold uppercase tracking-wider px-3 ${
-                  t.tone === "brand" ? "text-emerald-700" : "text-neutral-500"
-                }`}
-              >
-                {t.handle}
-              </figcaption>
-              <blockquote
-                className={`max-w-[95%] rounded-2xl px-4 py-3.5 text-[15px] leading-relaxed shadow-sm border ${
-                  t.tone === "brand"
-                    ? "bg-emerald-600 text-white border-emerald-700 rounded-br-md"
-                    : "bg-neutral-100 text-neutral-800 border-neutral-200/90 rounded-bl-md"
-                }`}
-              >
-                {t.msg}
-              </blockquote>
-            </motion.figure>
+              <StoryCard {...s} />
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function StoryCard({ quote, name, role, outcome, className = "" }) {
+  return (
+    <article
+      className={`flex flex-col h-full rounded-2xl border border-neutral-200/90 bg-white p-5 sm:p-6 shadow-sm ${className}`}
+    >
+      <Quote size={20} className="text-emerald-500/80 mb-3 shrink-0" aria-hidden />
+      <blockquote className="text-sm sm:text-[15px] leading-relaxed text-neutral-700 flex-1">
+        &ldquo;{quote}&rdquo;
+      </blockquote>
+      <footer className="mt-5 pt-4 border-t border-neutral-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-neutral-900">{name}</p>
+          <p className="text-xs text-neutral-500">{role}</p>
+        </div>
+        <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 border border-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">
+          {outcome}
+        </span>
+      </footer>
+    </article>
   );
 }

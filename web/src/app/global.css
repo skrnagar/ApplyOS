@@ -105,6 +105,13 @@ body {
   .pro-card {
     @apply rounded-2xl border border-neutral-200/90 bg-white shadow-sm;
   }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes marquee {

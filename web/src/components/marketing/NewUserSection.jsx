@@ -138,7 +138,7 @@ export default function NewUserSection() {
                     required
                     minLength={8}
                     autoComplete="new-password"
-                    className="w-full px-4 py-3 pr-12 rounded-xl border border-neutral-200 bg-neutral-50/80 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/60"
+                    className="w-full px-4 py-3 min-h-[48px] pr-12 rounded-xl border border-neutral-200 bg-white text-base sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500"
                   />
                   <button
                     type="button"
@@ -160,7 +160,7 @@ export default function NewUserSection() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2 min-h-[48px] py-3.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 active:bg-emerald-800 transition-colors disabled:opacity-50 shadow-sm"
               >
                 {loading ? "Creating account…" : "Create account & go to dashboard"}
                 {!loading ? <ArrowRight size={18} aria-hidden /> : null}
