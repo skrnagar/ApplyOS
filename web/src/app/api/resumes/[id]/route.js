@@ -48,7 +48,7 @@ export async function PATCH(request, { params }) {
   try {
     const { id } = params;
     const body = await request.json();
-    const { is_primary, ats_score } = body;
+    const { is_primary, ats_score, job_profile_label } = body;
 
     if (isSupabaseAdminConfigured()) {
       const profile = await resolveRequestProfile(request);
@@ -62,6 +62,9 @@ export async function PATCH(request, { params }) {
       const updates = {};
       if (is_primary !== undefined) updates.is_primary = Boolean(is_primary);
       if (ats_score !== undefined) updates.ats_score = ats_score;
+      if (job_profile_label !== undefined) {
+        updates.job_profile_label = job_profile_label?.trim() || null;
+      }
 
       const { data, error } = await admin
         .from("resumes")
@@ -81,6 +84,7 @@ export async function PATCH(request, { params }) {
         file_url: data.file_url,
         ats_score: data.ats_score,
         is_primary: data.is_primary,
+        job_profile_label: data.job_profile_label,
         created_at: data.created_at,
       });
     }

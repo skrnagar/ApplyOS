@@ -27,6 +27,7 @@ function mapResumeRow(row) {
     ats_grade: row.ats_grade,
     ats_feedback: row.ats_feedback,
     is_primary: row.is_primary,
+    job_profile_label: row.job_profile_label ?? null,
     created_at: row.created_at,
   };
 }
@@ -57,6 +58,10 @@ export async function POST(request) {
   const emailField = formData.get("email");
   const guestEmail =
     typeof emailField === "string" && emailField.trim() ? emailField.trim().toLowerCase() : null;
+
+  const labelField = formData.get("job_profile_label");
+  const jobProfileLabel =
+    typeof labelField === "string" && labelField.trim() ? labelField.trim() : null;
 
   const { ats_score, ats_grade, ats_feedback } = scoreResumeAts({
     fileName,
@@ -183,6 +188,7 @@ export async function POST(request) {
       ats_score,
       ats_feedback,
       is_primary: isPrimary,
+      job_profile_label: jobProfileLabel,
     })
     .select("*")
     .single();

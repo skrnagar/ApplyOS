@@ -4,6 +4,12 @@ import { getOrCreateUser } from "./getUser.js";
 import { resolveRequestProfile } from "./supabaseUser.js";
 import { getSupabaseAdmin, isSupabaseAdminConfigured } from "@/utils/supabase/admin";
 
+import { mergeApplicationProfile, normalizeApplicationProfile } from "@/utils/applicationProfile";
+import {
+  mergeJobPreferences,
+  normalizeJobPreferences,
+} from "@/utils/jobPreferences";
+
 const PROFILE_FIELDS = [
   "full_name",
   "phone",
@@ -18,6 +24,26 @@ const PROFILE_FIELDS = [
   "bio",
 ];
 
+function mapProfileResponse(profile) {
+  return {
+    id: profile.id,
+    email: profile.email,
+    full_name: profile.full_name,
+    phone: profile.phone,
+    profile_image: profile.profile_image,
+    current_title: profile.current_title,
+    current_company: profile.current_company,
+    years_of_experience: profile.years_of_experience,
+    location: profile.location,
+    linkedin_url: profile.linkedin_url,
+    github_url: profile.github_url,
+    portfolio_url: profile.portfolio_url,
+    bio: profile.bio,
+    onboarding_completed: profile.onboarding_completed,
+    application_profile: normalizeApplicationProfile(profile.application_profile),
+  };
+}
+
 export async function getProfileForRequest(request) {
   const user = await getOrCreateUser(request);
   if (!user) return { error: "Unauthorized", status: 401 };
@@ -30,22 +56,7 @@ export async function getProfileForRequest(request) {
     const profile = await resolveRequestProfile(request);
     if (!profile) return { error: "Unauthorized", status: 401 };
     return {
-      data: {
-        id: profile.id,
-        email: profile.email,
-        full_name: profile.full_name,
-        phone: profile.phone,
-        profile_image: profile.profile_image,
-        current_title: profile.current_title,
-        current_company: profile.current_company,
-        years_of_experience: profile.years_of_experience,
-        location: profile.location,
-        linkedin_url: profile.linkedin_url,
-        github_url: profile.github_url,
-        portfolio_url: profile.portfolio_url,
-        bio: profile.bio,
-        onboarding_completed: profile.onboarding_completed,
-      },
+      data: mapProfileResponse(profile),
     };
   }
 
@@ -86,6 +97,12 @@ export async function updateProfileForRequest(request, body) {
   PROFILE_FIELDS.forEach((f) => {
     if (body[f] !== undefined) patch[f] = body[f];
   });
+  if (body.application_profile !== undefined) {
+    patch.application_profile = mergeApplicationProfile(
+      profile.application_profile,
+      body.application_profile,
+    );
+  }
   if (Object.keys(patch).length === 0) {
     return { error: "No fields to update", status: 400 };
   }
@@ -104,22 +121,7 @@ export async function updateProfileForRequest(request, body) {
   }
 
   return {
-    data: {
-      id: data.id,
-      email: data.email,
-      full_name: data.full_name,
-      phone: data.phone,
-      profile_image: data.profile_image,
-      current_title: data.current_title,
-      current_company: data.current_company,
-      years_of_experience: data.years_of_experience,
-      location: data.location,
-      linkedin_url: data.linkedin_url,
-      github_url: data.github_url,
-      portfolio_url: data.portfolio_url,
-      bio: data.bio,
-      onboarding_completed: data.onboarding_completed,
-    },
+    data: mapProfileResponse(data),
   };
 }
 
@@ -141,8 +143,10 @@ export async function getPreferencesForRequest(request) {
   if (!profile) return { error: "Unauthorized", status: 401 };
 
   const prefs = profile.job_preferences;
-  if (!prefs || Object.keys(prefs).length === 0) return { data: null };
-  return { data: prefs };
+  if (!prefs || Object.keys(prefs).length === 0) {
+    return { data: null };
+  }
+  return { data: normalizeJobPreferences(prefs) };
 }
 
 export async function savePreferencesForRequest(request, body) {
@@ -197,10 +201,12 @@ export async function savePreferencesForRequest(request, body) {
   const profile = await resolveRequestProfile(request);
   if (!profile) return { error: "Unauthorized", status: 401 };
 
+  const merged = mergeJobPreferences(profile.job_preferences, body);
+
   const admin = getSupabaseAdmin();
   const { data, error } = await admin
     .from("profiles")
-    .update({ job_preferences: body })
+    .update({ job_preferences: merged })
     .eq("id", profile.id)
     .select("job_preferences")
     .single();
@@ -210,5 +216,5 @@ export async function savePreferencesForRequest(request, body) {
     return { error: "Failed to save preferences", status: 500 };
   }
 
-  return { data: data.job_preferences };
+  return { data: normalizeJobPreferences(data.job_preferences) };
 }

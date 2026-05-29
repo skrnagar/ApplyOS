@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import AdminChatPanel from "@/components/admin/AdminChatPanel";
 import AdminApplicationsPanel from "@/components/admin/AdminApplicationsPanel";
-import AdminSignInGate from "@/components/admin/AdminSignInGate";
+import { formatApplicationTargetsSummary, hasApplicationTargets } from "@/utils/jobPreferences";
 
 const TABS = [
   { id: "inbox", label: "Inbox", icon: Inbox },
@@ -391,6 +391,19 @@ export default function AdminPage() {
                 columns={[
                   { key: "email", label: "Email" },
                   { key: "full_name", label: "Name" },
+                  {
+                    key: "job_preferences",
+                    label: "Apply targets",
+                    wide: true,
+                    render: (r) =>
+                      hasApplicationTargets(r.job_preferences) ? (
+                        <span className="text-emerald-800 text-xs leading-relaxed">
+                          {formatApplicationTargetsSummary(r.job_preferences)}
+                        </span>
+                      ) : (
+                        <span className="text-neutral-400 text-xs">Not set</span>
+                      ),
+                  },
                   {
                     key: "is_admin",
                     label: "Admin",

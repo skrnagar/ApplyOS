@@ -2,6 +2,7 @@
 import React from "react";
 import { AlertCircle, CheckCircle2, Info, Sparkles } from "lucide-react";
 import { gradeFromScore } from "@/utils/atsScore";
+import useUser from "@/utils/useUser";
 
 const TYPE_STYLES = {
   ok: {
@@ -42,8 +43,10 @@ export default function AtsResultPanel({
   source,
   className = "",
 }) {
+  const { data: user, loading: authLoading } = useUser();
   const grade = atsGrade || gradeFromScore(atsScore);
   const feedback = Array.isArray(atsFeedback) ? atsFeedback : [];
+  const showGuestCta = guest && saved && !authLoading && !user?.email;
 
   return (
     <div
@@ -96,7 +99,16 @@ export default function AtsResultPanel({
         </ul>
       )}
 
-      {guest && saved && (
+      <div className="px-4 py-3 sm:px-5 border-t border-neutral-100 bg-neutral-50/50">
+        <a
+          href="/resume-checker/results"
+          className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+        >
+          View full ATS report →
+        </a>
+      </div>
+
+      {showGuestCta && (
         <div className="px-4 py-4 sm:px-5 border-t border-neutral-100 bg-emerald-50/60">
           <p className="text-sm font-medium text-emerald-950 mb-3">
             Create a free account to unlock AI tailoring, job matching, and application tracking.
@@ -115,6 +127,17 @@ export default function AtsResultPanel({
               Log in
             </a>
           </div>
+        </div>
+      )}
+
+      {!showGuestCta && saved && !authLoading && user?.email && (
+        <div className="px-4 py-4 sm:px-5 border-t border-neutral-100 bg-emerald-50/60">
+          <a
+            href="/dashboard"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
+          >
+            Go to dashboard
+          </a>
         </div>
       )}
     </div>

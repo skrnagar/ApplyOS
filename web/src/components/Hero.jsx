@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import MarketingButton from "./ui/MarketingButton";
 import HeroWorkspacePreview from "./marketing/HeroWorkspacePreview";
+import useUser from "@/utils/useUser";
 
 const FEATURES = [
   { icon: Briefcase, label: "Tailored applications" },
@@ -24,6 +25,9 @@ const FEATURES = [
 const TOP_COMPANIES = ["Google", "Amazon", "Microsoft", "Meta", "Apple"];
 
 export default function Hero() {
+  const { data: user, loading } = useUser();
+  const authed = Boolean(user?.email);
+
   return (
     <section className="relative bg-[#f4f6f8]">
       <div className="pointer-events-none absolute inset-0 hero-atmosphere" aria-hidden />
@@ -55,12 +59,12 @@ export default function Hero() {
 
             <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
               <MarketingButton
-                href="/account/signup"
+                href={authed ? "/dashboard" : "/account/signup"}
                 variant="cta"
                 icon={ArrowRight}
                 className="w-full sm:w-auto justify-center shadow-md shadow-emerald-600/15"
               >
-                Start free
+                {loading ? "Loading…" : authed ? "Go to dashboard" : "Start free"}
               </MarketingButton>
               <MarketingButton
                 href="/contact"

@@ -6,6 +6,8 @@ import {
   adminCreateApplication,
   adminUpdateApplication,
 } from "@/utils/adminClient";
+import CandidateJobPreferences from "@/components/admin/CandidateJobPreferences";
+import { normalizeApplicationProfile } from "@/utils/applicationProfile";
 
 const STATUSES = [
   { id: "applied", label: "Applied" },
@@ -91,6 +93,74 @@ function DataTable({ columns, rows, empty, onDelete, onEdit }) {
   );
 }
 
+function CandidateSnapshot({ profile }) {
+  if (!profile) return null;
+  const ap = normalizeApplicationProfile(profile.application_profile);
+  const links = [
+    { label: "LinkedIn", url: profile.linkedin_url },
+    { label: "Naukri", url: ap.naukri_url },
+    { label: "Indeed", url: ap.indeed_url },
+    { label: "GitHub", url: profile.github_url },
+    { label: "Portfolio", url: profile.portfolio_url },
+  ].filter((l) => l.url);
+
+  return (
+    <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-3 text-xs text-neutral-700 space-y-2">
+      <p className="font-semibold text-emerald-900">Candidate application data</p>
+      <div className="grid sm:grid-cols-2 gap-x-4 gap-y-1">
+        <p>
+          <span className="text-neutral-500">Phone:</span> {profile.phone || ap.alternate_phone || "—"}
+        </p>
+        <p>
+          <span className="text-neutral-500">Location:</span>{" "}
+          {[ap.city, ap.state, ap.country].filter(Boolean).join(", ") || profile.location || "—"}
+        </p>
+        <p>
+          <span className="text-neutral-500">Experience:</span>{" "}
+          {[profile.years_of_experience, ap.experience_months ? `${ap.experience_months} mo` : null]
+            .filter(Boolean)
+            .join(" yr ") || "—"}
+        </p>
+        <p>
+          <span className="text-neutral-500">Notice:</span>{" "}
+          {ap.notice_period_days ? `${ap.notice_period_days} days` : "—"}
+        </p>
+        <p>
+          <span className="text-neutral-500">Salary:</span>{" "}
+          {ap.current_salary || ap.expected_salary
+            ? `${ap.current_salary || "?"} → ${ap.expected_salary || "?"} ${ap.salary_currency || ""}`.trim()
+            : "—"}
+        </p>
+        <p>
+          <span className="text-neutral-500">Work auth:</span> {ap.work_authorization || ap.visa_status || "—"}
+        </p>
+      </div>
+      {ap.skills?.length ? (
+        <p>
+          <span className="text-neutral-500">Skills:</span> {ap.skills.slice(0, 8).join(", ")}
+        </p>
+      ) : null}
+      {links.length ? (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {links.map((l) => (
+            <a
+              key={l.label}
+              href={l.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-emerald-800 underline underline-offset-2"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-neutral-500">No portal links saved yet.</p>
+      )}
+    </div>
+  );
+}
+
 export default function AdminApplicationsPanel({
   profiles = [],
   applications = [],
@@ -98,6 +168,10 @@ export default function AdminApplicationsPanel({
   onDelete,
 }) {
   const [form, setForm] = useState(defaultForm);
+  const selectedProfile = useMemo(
+    () => profiles.find((p) => p.id === form.profile_id) || null,
+    [profiles, form.profile_id],
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [editRow, setEditRow] = useState(null);
@@ -225,6 +299,12 @@ export default function AdminApplicationsPanel({
                 </option>
               ))}
             </select>
+            {selectedProfile ? (
+              <div className="mt-3 space-y-3">
+                <CandidateJobPreferences jobPreferences={selectedProfile.job_preferences} />
+                <CandidateSnapshot profile={selectedProfile} />
+              </div>
+            ) : null}
           </div>
           <div>
             <label className="block text-xs font-medium text-neutral-600 mb-1">

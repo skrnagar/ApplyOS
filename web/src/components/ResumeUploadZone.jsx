@@ -1,8 +1,10 @@
 "use client";
 import React, { useCallback, useId, useState } from "react";
 import { FileText, FileUp, Upload } from "lucide-react";
+import { useNavigate } from "react-router";
 import AtsResultPanel from "@/components/AtsResultPanel";
 import useUser from "@/utils/useUser";
+import { saveAtsReport } from "@/utils/atsReportSession";
 import {
   RESUME_ACCEPT,
   saveResumeRecord,
@@ -20,8 +22,13 @@ export default function ResumeUploadZone({
   existingCount = 0,
   disabled = false,
   onSuccess,
+  redirectToResults = false,
+  hideInlineResult = false,
+  jobProfileLabel = "",
+  onJobProfileLabelChange,
   className = "",
 }) {
+  const navigate = useNavigate();
   const inputId = useId();
   const emailInputId = useId();
   const { data: user } = useUser();
@@ -61,18 +68,41 @@ export default function ResumeUploadZone({
         setProgress(45);
         const payload = await saveResumeRecord(file, userId, existingCount, {
           email: guestEmail,
+          job_profile_label: !isMarketing ? jobProfileLabel : undefined,
         });
         setProgress(100);
-        setResult({
+        const resultPayload = {
           fileName: file.name,
           atsScore: payload.ats_score,
           atsGrade: payload.ats_grade,
           atsFeedback: payload.ats_feedback,
+          atsCategories: payload.ats_categories,
+          atsSummary: payload.ats_summary,
           saved: payload.saved !== false,
           guest: payload.guest || needsEmail,
           source: payload.source,
+        };
+        setResult(resultPayload);
+
+        saveAtsReport({
+          file_name: file.name,
+          file_size: file.size,
+          ats_score: payload.ats_score,
+          ats_grade: payload.ats_grade,
+          ats_feedback: payload.ats_feedback,
+          ats_categories: payload.ats_categories,
+          ats_summary: payload.ats_summary,
+          saved: payload.saved !== false,
+          guest: (payload.guest || needsEmail) && !user?.email,
+          source: payload.source,
+          resume_id: payload.resume?.id,
         });
+
         onSuccess?.(payload);
+
+        if (redirectToResults) {
+          navigate("/resume-checker/results");
+        }
       } catch (err) {
         if (err.needEmail) {
           setError("Enter your email above to save your resume and ATS report.");
@@ -106,7 +136,7 @@ export default function ResumeUploadZone({
         setUploading(false);
       }
     },
-    [userId, existingCount, onSuccess, needsEmail, email],
+    [userId, existingCount, onSuccess, needsEmail, email, redirectToResults, navigate, user?.email, jobProfileLabel, isMarketing],
   );
 
   const onInputChange = (e) => {
@@ -136,6 +166,24 @@ export default function ResumeUploadZone({
 
   return (
     <div className={`space-y-4 ${className}`}>
+      {!isMarketing && onJobProfileLabelChange && (
+        <div>
+          <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+            Job profile / role focus
+          </label>
+          <input
+            type="text"
+            value={jobProfileLabel}
+            onChange={(e) => onJobProfileLabelChange(e.target.value)}
+            placeholder="e.g. Backend Engineer, Product Manager, Data Analyst…"
+            disabled={disabled || uploading}
+            className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+          />
+          <p className="text-[11px] text-neutral-400 mt-1">
+            Upload a separate resume for each job profile you target
+          </p>
+        </div>
+      )}
       {needsEmail && (
         <div>
           <label
@@ -262,7 +310,7 @@ export default function ResumeUploadZone({
         </div>
       </label>
 
-      {result && (
+      {result && !hideInlineResult && (
         <AtsResultPanel
           fileName={result.fileName}
           atsScore={result.atsScore}
@@ -272,6 +320,15 @@ export default function ResumeUploadZone({
           guest={result.guest}
           source={result.source}
         />
+      )}
+
+      {result && hideInlineResult && !redirectToResults && (
+        <a
+          href="/resume-checker/results"
+          className="block text-center text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+        >
+          View full ATS report →
+        </a>
       )}
     </div>
   );

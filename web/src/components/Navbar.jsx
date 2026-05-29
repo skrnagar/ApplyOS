@@ -136,20 +136,32 @@ export default function Navbar() {
                 How it works
               </a>
               <div className="grid grid-cols-2 gap-2 p-2 pt-1">
-                <a
-                  href="/account/signin"
-                  onClick={() => setMobileOpen(false)}
-                  className="text-center px-4 py-3 rounded-xl text-sm font-semibold text-neutral-800 border border-neutral-200 hover:bg-neutral-50"
-                >
-                  Log In
-                </a>
-                <a
-                  href="/account/signup"
-                  onClick={() => setMobileOpen(false)}
-                  className="text-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-emerald-600"
-                >
-                  Sign Up
-                </a>
+                {showAuthed ? (
+                  <a
+                    href="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="col-span-2 text-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-neutral-900"
+                  >
+                    Dashboard →
+                  </a>
+                ) : (
+                  <>
+                    <a
+                      href="/account/signin"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-center px-4 py-3 rounded-xl text-sm font-semibold text-neutral-800 border border-neutral-200 hover:bg-neutral-50"
+                    >
+                      Log In
+                    </a>
+                    <a
+                      href="/account/signup"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-emerald-600"
+                    >
+                      Sign Up
+                    </a>
+                  </>
+                )}
               </div>
           </div>
         </div>

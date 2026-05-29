@@ -73,6 +73,7 @@ export default function OnboardingPreview() {
                   variant="marketing"
                   userId={user?.id}
                   existingCount={existingCount}
+                  redirectToResults
                   onSuccess={() => {
                     setStepDone(true);
                     setSyncKey((k) => k + 1);

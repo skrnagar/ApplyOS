@@ -1,9 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { motion } from "motion/react";
 import {
-  User,
   Save,
   CheckCircle,
   Camera,
@@ -17,6 +15,8 @@ import {
 import useUser from "@/utils/useUser";
 import useUpload from "@/utils/useUpload";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
+import ApplicationProfileForm from "@/components/dashboard/ApplicationProfileForm";
+import { normalizeApplicationProfile } from "@/utils/applicationProfile";
 
 export default function ProfilePage() {
   const { data: authUser, loading: authLoading } = useUser();
@@ -37,7 +37,11 @@ export default function ProfilePage() {
     try {
       const res = await fetchWithAuth("/api/users/profile");
       if (res.ok) {
-        setProfile(await res.json());
+        const data = await res.json();
+        setProfile({
+          ...data,
+          application_profile: normalizeApplicationProfile(data.application_profile),
+        });
       }
     } catch (e) {
       console.error(e);
@@ -56,7 +60,11 @@ export default function ProfilePage() {
         body: JSON.stringify(profile),
       });
       if (res.ok) {
-        setProfile(await res.json());
+        const data = await res.json();
+        setProfile({
+          ...data,
+          application_profile: normalizeApplicationProfile(data.application_profile),
+        });
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       } else {
@@ -89,16 +97,17 @@ export default function ProfilePage() {
 
   const inputClass =
     "w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm transition-all";
+  const selectClass = `${inputClass} bg-white`;
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl space-y-6">
+      <div className="max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-neutral-900">Profile</h1>
             <p className="text-neutral-500 text-sm mt-0.5">
-              Manage your personal information
+              Everything our team needs to apply on LinkedIn, Naukri, Indeed, and company sites
             </p>
           </div>
           <button
@@ -328,6 +337,15 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+
+        <ApplicationProfileForm
+          applicationProfile={profile?.application_profile || normalizeApplicationProfile()}
+          onChange={(application_profile) =>
+            setProfile({ ...profile, application_profile })
+          }
+          inputClass={inputClass}
+          selectClass={selectClass}
+        />
 
         {/* Save bottom */}
         <div className="flex justify-end pb-4">

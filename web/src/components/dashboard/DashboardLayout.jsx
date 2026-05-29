@@ -7,7 +7,6 @@ import {
   FileText,
   Settings,
   MessageSquare,
-  Sparkles,
   Bell,
   Menu,
   X,
@@ -20,10 +19,9 @@ import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Applications", href: "/dashboard/applications", icon: Briefcase },
-  { name: "Resumes", href: "/dashboard/resumes", icon: FileText },
+  { name: "Resumes & Insights", href: "/dashboard/resumes", icon: FileText },
   { name: "Preferences", href: "/dashboard/preferences", icon: Settings },
   { name: "Messages", href: "/dashboard/messages", icon: MessageSquare },
-  { name: "AI Insights", href: "/dashboard/insights", icon: Sparkles },
 ];
 
 export default function DashboardLayout({ children }) {

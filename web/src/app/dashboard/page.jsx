@@ -361,8 +361,8 @@ export default function DashboardPage() {
                   },
                   {
                     icon: Sparkles,
-                    label: "View Insights",
-                    href: "/dashboard/insights",
+                    label: "Resume insights",
+                    href: "/dashboard/resumes#insights",
                     color: "text-orange-500 bg-orange-50",
                   },
                 ].map((action) => {

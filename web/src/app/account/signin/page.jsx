@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuth from "@/utils/useAuth";
+import useRedirectIfAuthenticated from "@/utils/useRedirectIfAuthenticated";
 import { isServerAuthEnabled, isSupabaseAuthEnabled } from "@/utils/authMode";
 import { metaForPath } from "@/utils/seo";
 
@@ -43,6 +44,7 @@ export default function SignInPage() {
   const { signInWithCredentials } = useAuth();
   const serverAuth = isServerAuthEnabled();
   const supabaseAuth = isSupabaseAuthEnabled();
+  const { checking } = useRedirectIfAuthenticated();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -99,6 +101,18 @@ export default function SignInPage() {
       setLoading(false);
     }
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center gap-3">
+        <div
+          className="h-10 w-10 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"
+          aria-hidden
+        />
+        <p className="text-sm text-neutral-500">Opening your workspace…</p>
+      </div>
+    );
+  }
 
   return (
     <AccountAuthShell

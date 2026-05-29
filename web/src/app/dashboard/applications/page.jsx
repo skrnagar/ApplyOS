@@ -110,8 +110,12 @@ export default function ApplicationsPage() {
           <div className="text-sm text-emerald-900">
             <p className="font-semibold">We apply for you</p>
             <p className="text-emerald-800/90 mt-0.5 leading-relaxed">
-              Our team submits applications to roles that match your preferences.
-              Status updates appear here as we hear back from employers.
+              Set your targets below — our team uses them when applying. Logged job applications
+              appear in the list; update targets anytime or edit salary details in{" "}
+              <a href="/dashboard/preferences" className="font-semibold underline underline-offset-2">
+                Preferences
+              </a>
+              .
             </p>
           </div>
         </div>

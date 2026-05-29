@@ -31,7 +31,7 @@ export async function POST(request) {
     const email =
       typeof emailRaw === "string" && emailRaw.trim() ? emailRaw.trim().toLowerCase() : null;
 
-    const { ats_score, ats_grade, ats_feedback } = scoreResumeAts({
+    const { ats_score, ats_grade, ats_feedback, ats_categories, ats_summary } = scoreResumeAts({
       fileName,
       fileSize: file.size,
       mimeType: file.type,
@@ -46,6 +46,8 @@ export async function POST(request) {
       ats_score,
       ats_grade,
       ats_feedback,
+      ats_categories,
+      ats_summary,
     });
   } catch (error) {
     console.error("POST /api/resumes/analyze:", error);

@@ -19,6 +19,7 @@ function mapResumeRow(row) {
     ats_grade: row.ats_grade ?? gradeFromScore(row.ats_score),
     ats_feedback: row.ats_feedback,
     is_primary: row.is_primary,
+    job_profile_label: row.job_profile_label ?? null,
     created_at: row.created_at,
   };
 }
@@ -68,7 +69,7 @@ export async function POST(request) {
       if (!profile) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
       const body = await request.json();
-      const { file_name, file_url, file_size, is_primary, ats_score, ats_feedback } = body;
+      const { file_name, file_url, file_size, is_primary, ats_score, ats_feedback, job_profile_label } = body;
       if (!file_name || !file_url) {
         return Response.json({ error: "Missing required fields" }, { status: 400 });
       }
@@ -88,6 +89,7 @@ export async function POST(request) {
           is_primary: Boolean(is_primary),
           ats_score: ats_score ?? null,
           ats_feedback: ats_feedback ?? [],
+          job_profile_label: job_profile_label?.trim() || null,
         })
         .select("*")
         .single();

@@ -1,11 +1,13 @@
 import { addLocalResume } from "@/utils/localResumes";
 import { getApiAuthHeaders } from "@/utils/apiAuthHeaders";
 import { gradeFromScore } from "@/utils/atsScore";
+import { saveAtsReport, ATS_REPORT_KEY } from "@/utils/atsReportSession";
 
 export const RESUME_MAX_BYTES = 8 * 1024 * 1024;
 export const RESUME_ACCEPT = ".pdf,.doc,.docx";
 const ALLOWED_EXT = [".pdf", ".doc", ".docx"];
-const GUEST_ATS_KEY = "hireorbital_guest_ats";
+/** @deprecated use ATS_REPORT_KEY */
+const GUEST_ATS_KEY = ATS_REPORT_KEY;
 
 export function validateResumeFile(file) {
   if (!file) return { ok: false, error: null };
@@ -54,10 +56,13 @@ export async function analyzeResumeFile(file, email) {
 }
 
 /** Upload file to Supabase via POST /api/resumes/upload */
-export async function uploadResumeToStorage(file, email) {
+export async function uploadResumeToStorage(file, email, jobProfileLabel) {
   const formData = new FormData();
   formData.append("file", file);
   if (email) formData.append("email", email);
+  if (jobProfileLabel?.trim()) {
+    formData.append("job_profile_label", jobProfileLabel.trim());
+  }
 
   const response = await fetch("/api/resumes/upload", {
     method: "POST",
@@ -80,12 +85,7 @@ export async function uploadResumeToStorage(file, email) {
 }
 
 function stashGuestAts(payload) {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(GUEST_ATS_KEY, JSON.stringify(payload));
-  } catch {
-    /* ignore quota */
-  }
+  saveAtsReport(payload);
 }
 
 /**
@@ -93,11 +93,12 @@ function stashGuestAts(payload) {
  */
 export async function saveResumeRecord(file, userId, existingCount, options = {}) {
   const guestEmail = options.email?.trim().toLowerCase() || null;
+  const jobProfileLabel = options.job_profile_label?.trim() || null;
 
   const analysis = await analyzeResumeFile(file, guestEmail);
 
   try {
-    const data = await uploadResumeToStorage(file, guestEmail);
+    const data = await uploadResumeToStorage(file, guestEmail, jobProfileLabel);
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(GUEST_ATS_KEY);
     }
@@ -113,6 +114,8 @@ export async function saveResumeRecord(file, userId, existingCount, options = {}
       ats_score: resume.ats_score ?? analysis.ats_score,
       ats_grade: resume.ats_grade ?? analysis.ats_grade,
       ats_feedback: resume.ats_feedback ?? analysis.ats_feedback,
+      ats_categories: analysis.ats_categories,
+      ats_summary: analysis.ats_summary,
       saved: true,
     };
   } catch (storageErr) {
@@ -171,6 +174,8 @@ export async function saveResumeRecord(file, userId, existingCount, options = {}
       ats_score: resume.ats_score,
       ats_grade: resume.ats_grade,
       ats_feedback: resume.ats_feedback,
+      ats_categories: analysis.ats_categories,
+      ats_summary: analysis.ats_summary,
       saved: true,
     };
   }
@@ -178,6 +183,7 @@ export async function saveResumeRecord(file, userId, existingCount, options = {}
   const localResume = {
     id: `local_${Date.now()}`,
     ...payload,
+    job_profile_label: jobProfileLabel,
     ats_grade: analysis.ats_grade,
     is_primary: existingCount === 0,
     created_at: new Date().toISOString(),
@@ -188,6 +194,7 @@ export async function saveResumeRecord(file, userId, existingCount, options = {}
     file_name: file.name,
     email: guestEmail,
     source: "local",
+    saved: false,
   });
 
   return {
@@ -197,6 +204,8 @@ export async function saveResumeRecord(file, userId, existingCount, options = {}
     ats_score: analysis.ats_score,
     ats_grade: analysis.ats_grade,
     ats_feedback: analysis.ats_feedback,
+    ats_categories: analysis.ats_categories,
+    ats_summary: analysis.ats_summary,
     saved: false,
   };
 }

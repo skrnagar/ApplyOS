@@ -3,45 +3,19 @@ import React, { useEffect, useState } from "react";
 import { CheckCircle, Save, Target } from "lucide-react";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
 import useUser from "@/utils/useUser";
+import {
+  APPLICATION_TYPES,
+  EMPTY_JOB_PREFERENCES,
+  formatApplicationTargetsSummary,
+  normalizeJobPreferences,
+  parsePreferenceList,
+} from "@/utils/jobPreferences";
 
-export const APPLICATION_TYPES = [
-  { id: "full_time", label: "Full-time" },
-  { id: "part_time", label: "Part-time" },
-  { id: "contract", label: "Contract" },
-  { id: "internship", label: "Internship" },
-  { id: "new_grad", label: "New grad / Entry" },
-  { id: "mid_level", label: "Mid level" },
-  { id: "senior", label: "Senior / Staff" },
-  { id: "faang", label: "FAANG / Big tech" },
-  { id: "startup", label: "Startup" },
-  { id: "enterprise", label: "Enterprise" },
-  { id: "remote_only", label: "Remote only" },
-  { id: "hybrid_ok", label: "Hybrid OK" },
-  { id: "onsite_ok", label: "On-site OK" },
-  { id: "visa_sponsor", label: "Visa sponsorship" },
-];
-
-const EMPTY_PREFS = {
-  application_types: [],
-  target_roles: [],
-  preferred_locations: [],
-  work_mode: [],
-  preferred_industries: [],
-  additional_notes: "",
-};
-
-function parseList(value) {
-  if (Array.isArray(value)) return value;
-  if (typeof value === "string" && value.trim()) {
-    return value.split(",").map((s) => s.trim()).filter(Boolean);
-  }
-  return [];
-}
+export { APPLICATION_TYPES };
 
 export default function ApplicationTargetsPanel({ className = "" }) {
   const { data: authUser, loading: authLoading } = useUser();
-  const [prefs, setPrefs] = useState(EMPTY_PREFS);
-  const [fullPrefs, setFullPrefs] = useState({});
+  const [prefs, setPrefs] = useState(EMPTY_JOB_PREFERENCES);
   const [rolesInput, setRolesInput] = useState("");
   const [locationsInput, setLocationsInput] = useState("");
   const [loading, setLoading] = useState(true);
@@ -55,25 +29,19 @@ export default function ApplicationTargetsPanel({ className = "" }) {
     void loadPrefs();
   }, [authLoading, authUser?.email]);
 
+  const applyPrefsToForm = (data) => {
+    const normalized = normalizeJobPreferences(data);
+    setPrefs(normalized);
+    setRolesInput(normalized.target_roles.join(", "));
+    setLocationsInput(normalized.preferred_locations.join(", "));
+  };
+
   const loadPrefs = async () => {
     try {
       const res = await fetchWithAuth("/api/preferences");
       if (res.ok) {
         const data = await res.json();
-        if (data) {
-          setFullPrefs(data);
-          setPrefs({
-            ...EMPTY_PREFS,
-            ...data,
-            application_types: parseList(data.application_types),
-            target_roles: parseList(data.target_roles),
-            preferred_locations: parseList(data.preferred_locations),
-            work_mode: parseList(data.work_mode),
-            preferred_industries: parseList(data.preferred_industries),
-          });
-          setRolesInput(parseList(data.target_roles).join(", "));
-          setLocationsInput(parseList(data.preferred_locations).join(", "));
-        }
+        if (data) applyPrefsToForm(data);
       }
     } catch (e) {
       console.error(e);
@@ -112,16 +80,9 @@ export default function ApplicationTargetsPanel({ className = "" }) {
     setSaving(true);
     setError(null);
     const payload = {
-      ...fullPrefs,
       ...prefs,
-      target_roles: rolesInput
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      preferred_locations: locationsInput
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
+      target_roles: parsePreferenceList(rolesInput),
+      preferred_locations: parsePreferenceList(locationsInput),
     };
 
     try {
@@ -132,8 +93,7 @@ export default function ApplicationTargetsPanel({ className = "" }) {
       });
       if (res.ok) {
         const data = await res.json();
-        setFullPrefs(data);
-        setPrefs((prev) => ({ ...prev, ...data }));
+        applyPrefsToForm(data);
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       } else {
@@ -166,7 +126,7 @@ export default function ApplicationTargetsPanel({ className = "" }) {
           <div>
             <h2 className="font-semibold text-neutral-900">What should we apply for?</h2>
             <p className="text-xs text-neutral-600 mt-0.5">
-              Tell our team the roles and application types you want — we match applications to this.
+              Saved to your profile — our team uses this when applying on LinkedIn, Naukri, and company sites.
             </p>
           </div>
         </div>
@@ -291,23 +251,16 @@ export default function ApplicationTargetsPanel({ className = "" }) {
           </p>
         )}
 
-        {prefs.application_types.length > 0 || rolesInput.trim() ? (
+        {(prefs.application_types.length > 0 || rolesInput.trim()) && (
           <div className="rounded-xl bg-neutral-50 border border-neutral-100 px-3 py-2 text-xs text-neutral-600">
             <span className="font-medium text-neutral-800">Active targets: </span>
-            {[
-              ...prefs.application_types.map(
-                (id) => APPLICATION_TYPES.find((t) => t.id === id)?.label || id,
-              ),
-              ...rolesInput
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean)
-                .slice(0, 3),
-            ]
-              .filter(Boolean)
-              .join(" · ") || "None yet"}
+            {formatApplicationTargetsSummary({
+              ...prefs,
+              target_roles: parsePreferenceList(rolesInput),
+              preferred_locations: parsePreferenceList(locationsInput),
+            })}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

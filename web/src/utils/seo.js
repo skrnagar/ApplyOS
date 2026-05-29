@@ -14,6 +14,7 @@ export const SITEMAP_PATHS = [
   { path: "/pricing", changefreq: "weekly", priority: "0.9" },
   { path: "/contact", changefreq: "monthly", priority: "0.8" },
   { path: "/tools", changefreq: "monthly", priority: "0.7" },
+  { path: "/resume-checker", changefreq: "weekly", priority: "0.85" },
   { path: "/account/signin", changefreq: "monthly", priority: "0.5" },
   { path: "/account/signup", changefreq: "monthly", priority: "0.6" },
 ];
@@ -38,6 +39,15 @@ const PAGE_META = {
     description:
       "Free resume, LinkedIn, and interview prep guides from HireOrbital — the same frameworks we use in the product.",
   },
+  "/resume-checker": {
+    title: "Free ATS resume checker",
+    description:
+      "Upload your resume and get an instant ATS compatibility score with actionable feedback — file format, keywords, and content tips for LinkedIn, Naukri, and employer portals.",
+  },
+  "/resume-checker/results": {
+    title: "ATS resume report",
+    description: "Your HireOrbital ATS analysis with score breakdown, passed checks, warnings, and content tips.",
+  },
   "/account/signin": {
     title: "Sign in",
     description: "Sign in to your HireOrbital workspace to track applications, messages, and career progress.",
@@ -53,6 +63,7 @@ const NOINDEX_PREFIXES = [
   "/admin",
   "/dashboard",
   "/api",
+  "/resume-checker/results",
   "/account/logout",
   "/account/forgot-password",
   "/account/reset-password",

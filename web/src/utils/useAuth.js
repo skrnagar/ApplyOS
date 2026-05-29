@@ -4,6 +4,7 @@ import { signInLocal, signOutLocal, signUpLocal } from "./localAuth";
 import { isServerAuthEnabled, isSupabaseAuthEnabled } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
 import { syncAuthProfile } from "./apiAuthHeaders";
+import { normalizePostAuthPath, resolveAuthRedirectPath } from "./authRedirect";
 
 function isDevIframe() {
   try {
@@ -21,24 +22,8 @@ function devSocialShim(provider, callbackUrl) {
 
 function redirectAfterAuth(callbackUrl) {
   if (typeof window === "undefined") return;
-  const target =
-    callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
-      ? callbackUrl
-      : "/dashboard";
+  const target = resolveAuthRedirectPath(callbackUrl);
   window.location.assign(target);
-}
-
-function normalizePostAuthPath(path) {
-  if (!path || !path.startsWith("/") || path.startsWith("//")) return "/dashboard";
-  // Never bounce back into auth pages after successful sign-in/sign-up.
-  if (
-    path.startsWith("/account/signin") ||
-    path.startsWith("/account/signup") ||
-    path.startsWith("/account/auth/callback")
-  ) {
-    return "/dashboard";
-  }
-  return path;
 }
 
 function mapSupabaseAuthError(error) {
@@ -55,16 +40,12 @@ function mapSupabaseAuthError(error) {
 
 export default function useAuth() {
   const resolveCallbackUrl = (options) => {
-    if (typeof window === "undefined") return options?.callbackUrl ?? "/dashboard";
+    if (typeof window === "undefined") {
+      return normalizePostAuthPath(options?.callbackUrl ?? "/dashboard");
+    }
     const fromUrl = new URLSearchParams(window.location.search).get("callbackUrl");
     const raw = fromUrl ?? options?.callbackUrl ?? "/dashboard";
-    try {
-      const decoded = decodeURIComponent(raw);
-      return normalizePostAuthPath(decoded);
-    } catch {
-      /* ignore */
-    }
-    return "/dashboard";
+    return resolveAuthRedirectPath(raw);
   };
 
   const signInWithCredentials = useCallback(async (options) => {

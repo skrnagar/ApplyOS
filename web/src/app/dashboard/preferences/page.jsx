@@ -8,27 +8,18 @@ import { motion } from "motion/react";
 import { Save, CheckCircle } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { fetchWithAuth } from "@/utils/apiAuthHeaders";
+import {
+  APPLICATION_TYPES,
+  EMPTY_JOB_PREFERENCES,
+  normalizeJobPreferences,
+} from "@/utils/jobPreferences";
 
 export default function PreferencesPage() {
   const { data: authUser, loading: authLoading } = useUser();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [preferences, setPreferences] = useState({
-    application_types: [],
-    target_roles: [],
-    preferred_locations: [],
-    work_mode: [],
-    min_salary: "",
-    max_salary: "",
-    currency: "USD",
-    notice_period: "",
-    preferred_industries: [],
-    company_size: [],
-    visa_sponsorship: false,
-    willing_to_relocate: false,
-    additional_notes: "",
-  });
+  const [preferences, setPreferences] = useState(EMPTY_JOB_PREFERENCES);
 
   useEffect(() => {
     if (authLoading) return;
@@ -42,7 +33,7 @@ export default function PreferencesPage() {
       if (response.ok) {
         const data = await response.json();
         if (data) {
-          setPreferences(data);
+          setPreferences(normalizeJobPreferences(data));
         }
       }
     } catch (error) {
@@ -61,6 +52,8 @@ export default function PreferencesPage() {
         body: JSON.stringify(preferences),
       });
       if (response.ok) {
+        const data = await response.json();
+        if (data) setPreferences(normalizeJobPreferences(data));
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       }
@@ -128,18 +121,7 @@ export default function PreferencesPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {[
-                { id: "full_time", label: "Full-time" },
-                { id: "part_time", label: "Part-time" },
-                { id: "contract", label: "Contract" },
-                { id: "internship", label: "Internship" },
-                { id: "new_grad", label: "New grad" },
-                { id: "senior", label: "Senior" },
-                { id: "faang", label: "FAANG / Big tech" },
-                { id: "startup", label: "Startup" },
-                { id: "remote_only", label: "Remote only" },
-                { id: "visa_sponsor", label: "Visa sponsorship" },
-              ].map(({ id, label }) => (
+              {APPLICATION_TYPES.map(({ id, label }) => (
                 <label
                   key={id}
                   className="flex items-center gap-2 px-3 py-2 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 text-sm"

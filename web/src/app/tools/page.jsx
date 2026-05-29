@@ -10,6 +10,14 @@ export function meta() {
 
 const tools = [
   {
+    id: "checker",
+    title: "Free ATS resume checker",
+    icon: Sparkles,
+    body: "Upload PDF or DOCX and get an instant score with category breakdown — same analysis we use before LinkedIn and Naukri applies.",
+    href: "/resume-checker",
+    cta: "Check my resume",
+  },
+  {
     id: "resume",
     title: "Resume readiness checklist",
     icon: FileText,
@@ -64,6 +72,14 @@ export default function FreeToolsPage() {
                 </div>
                 <h2 className="text-xl font-semibold text-neutral-900 mb-2">{t.title}</h2>
                 <p className="text-sm text-neutral-600 leading-relaxed">{t.body}</p>
+                {t.href ? (
+                  <a
+                    href={t.href}
+                    className="inline-flex mt-5 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    {t.cta || "Open tool"} →
+                  </a>
+                ) : null}
               </section>
             );
           })}
