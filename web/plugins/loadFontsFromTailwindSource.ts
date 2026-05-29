@@ -1584,8 +1584,8 @@ const GOOGLE_FONTS = new Map<string, string>(
   ].map((f) => [f.replaceAll(' ', '-').toLowerCase(), f])
 );
 
-// Weights used in the app (normal, medium, semibold, bold) — avoids loading 18 axes per font.
-const styleString = '0,400;0,500;0,600;0,700';
+// Weights used in the app (normal, medium, semibold, bold).
+const styleString = '400;500;600;700';
 
 const getFontURL = (font: string) => {
   return `https://fonts.googleapis.com/css2?family=${font.replaceAll(' ', '+')}:wght@${styleString}&display=swap`;
@@ -1641,6 +1641,8 @@ const extractFonts = (code: string) => {
   return fonts.sort((a, b) => a.localeCompare(b));
 };
 
+const PRIMARY_FONT = 'Inter';
+
 export function loadFontsFromTailwindSource(): PluginOption {
   // Store collected font names
   const collectedFonts = new Set<string>();
@@ -1694,6 +1696,7 @@ export function loadFontsFromTailwindSource(): PluginOption {
         return (
           <>
             ${[...collectedFonts]
+              .filter((font) => font !== PRIMARY_FONT)
               .map((font) => {
                 return `<link rel="stylesheet" href="${getFontURL(font)}" />`;
               })
@@ -1725,7 +1728,9 @@ export function loadFontsFromTailwindSource(): PluginOption {
         server.ws.send({
           type: 'custom',
           event: 'update-font-links',
-          data: [...fontsAfter].map((font) => getFontURL(font)),
+          data: [...fontsAfter]
+            .filter((font) => font !== PRIMARY_FONT)
+            .map((font) => getFontURL(font)),
         });
       },
     },

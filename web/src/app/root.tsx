@@ -42,10 +42,17 @@ import StructuredData from '@/components/seo/StructuredData';
 import { SITE_URL } from '@/config/site';
 import { buildMeta } from '@/utils/seo';
 
+const INTER_FONT =
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
+
 export const links = () => [
   { rel: 'icon', href: '/favicon.png', type: 'image/png' },
   { rel: 'apple-touch-icon', href: '/favicon.png' },
   { rel: 'manifest', href: '/site.webmanifest' },
+  {
+    rel: 'stylesheet',
+    href: INTER_FONT,
+  },
 ];
 
 /** Fallback meta; per-route overrides come from `layout.jsx` meta(). */
@@ -60,7 +67,6 @@ if (globalThis.window && globalThis.window !== undefined) {
   globalThis.window.fetch = fetch;
 }
 
-const LoadFontsSSR = import.meta.env.SSR ? LoadFonts : null;
 if (import.meta.hot) {
   import.meta.hot.on('update-font-links', (urls: string[]) => {
     // remove old font links
@@ -540,10 +546,10 @@ export function Layout({ children }: { children: ReactNode }) {
         <meta name="apple-mobile-web-app-title" content="HireOrbital" />
         <meta property="og:site_name" content="HireOrbital" />
         <meta name="twitter:domain" content={siteHostname()} />
-        {LoadFontsSSR ? <LoadFontsSSR /> : null}
+        <LoadFonts />
       </head>
       <body
-        className="bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900"
+        className="font-sans bg-[#f4f6f8] text-neutral-900 antialiased overflow-x-hidden selection:bg-emerald-200/80 selection:text-neutral-900"
         suppressHydrationWarning
       >
         {children}
