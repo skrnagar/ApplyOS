@@ -62,7 +62,7 @@ export async function GET(request) {
   let resumesR = await safeQuery("resumes", () =>
     admin
       .from("resumes")
-      .select("*, profiles(email, full_name)")
+      .select("*, profiles(email, full_name, phone)")
       .order("created_at", { ascending: false })
       .limit(LIMIT),
   );
@@ -76,7 +76,7 @@ export async function GET(request) {
   let chatR = await safeQuery("chat_messages", () =>
     admin
       .from("chat_messages")
-      .select("*, profiles(email, full_name)")
+      .select("*, profiles(email, full_name, phone)")
       .order("created_at", { ascending: false })
       .limit(LIMIT),
   );
@@ -90,7 +90,7 @@ export async function GET(request) {
   let applicationsR = await safeQuery("applications", () =>
     admin
       .from("applications")
-      .select("*, profiles(email, full_name)")
+      .select("*, profiles(email, full_name, phone)")
       .order("created_at", { ascending: false })
       .limit(LIMIT),
   );

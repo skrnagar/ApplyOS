@@ -6,6 +6,7 @@ import {
 } from "@/utils/supabase/admin";
 import { getSupabaseConfig } from "@/utils/supabase/config";
 import { notifyContactForm } from "../utils/notifyTeam.js";
+import { normalizePhone } from "@/utils/phone";
 
 const TEAM_INBOX =
   process.env.CONTACT_EMAIL || process.env.SUPPORT_EMAIL || "hireorbit.1@gmail.com";
@@ -22,15 +23,15 @@ function isMissingRpc(error) {
   );
 }
 
-async function saveViaServiceRole(admin, { email, name, message }) {
+async function saveViaServiceRole(admin, { email, name, phone, message }) {
   return admin
     .from("contact_submissions")
-    .insert({ email, name, message })
-    .select("id, email, created_at")
+    .insert({ email, name, phone, message })
+    .select("id, email, phone, created_at")
     .single();
 }
 
-async function saveViaRpc({ email, name, message }) {
+async function saveViaRpc({ email, name, phone, message }) {
   const client = getSupabaseServerPublic();
   if (!client) {
     return {
@@ -74,11 +75,12 @@ async function saveContactSubmission(payload) {
   return saveViaRpc(payload);
 }
 
-async function saveLeadRecord({ email, name, message }) {
+async function saveLeadRecord({ email, name, phone, message }) {
   const admin = getSupabaseAdmin();
   const payload = {
     email,
     name,
+    phone,
     source: "contact",
     metadata: {
       message_preview: message.slice(0, 200),
@@ -104,6 +106,7 @@ export async function POST(request) {
       .trim()
       .toLowerCase();
     const name = body.name?.trim() || null;
+    const phone = normalizePhone(body.phone) || null;
     const message = String(body.message || "").trim();
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -132,7 +135,12 @@ export async function POST(request) {
       );
     }
 
-    const { data, error: saveError } = await saveContactSubmission({ email, name, message });
+    const { data, error: saveError } = await saveContactSubmission({
+      email,
+      name,
+      phone,
+      message,
+    });
 
     if (saveError || !data) {
       console.error("POST /api/contact:", saveError);
@@ -148,12 +156,12 @@ export async function POST(request) {
     }
 
     try {
-      await saveLeadRecord({ email, name, message });
+      await saveLeadRecord({ email, name, phone, message });
     } catch (leadError) {
       console.warn("POST /api/contact: lead insert skipped:", leadError);
     }
 
-    void notifyContactForm({ email, name, message });
+    void notifyContactForm({ email, name, phone, message });
 
     return Response.json(
       { ok: true, stored: true, submission: data, teamEmail: TEAM_INBOX },

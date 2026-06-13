@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { Mail, MessageCircle, Send } from "lucide-react";
 import { captureLead } from "@/utils/captureLead";
+import { validateOptionalPhone } from "@/utils/phone";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/site";
 import { metaForPath } from "@/utils/seo";
 
@@ -13,6 +14,7 @@ export function meta() {
 export default function ContactPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -30,6 +32,11 @@ export default function ContactPage() {
       setError("Message must be at least 10 characters.");
       return;
     }
+    const pv = validateOptionalPhone(phone);
+    if (!pv.ok) {
+      setError(pv.error);
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/contact", {
@@ -38,6 +45,7 @@ export default function ContactPage() {
         body: JSON.stringify({
           name: name.trim(),
           email: trimmedEmail,
+          phone: pv.phone,
           message: message.trim(),
         }),
       });
@@ -56,11 +64,13 @@ export default function ContactPage() {
       await captureLead({
         email: trimmedEmail,
         name: name.trim() || undefined,
+        phone: pv.phone || undefined,
         source: "contact",
       });
       setSent(true);
       setName("");
       setEmail("");
+      setPhone("");
       setMessage("");
     } catch {
       setError("Network error. Please try again.");
@@ -117,6 +127,16 @@ export default function ContactPage() {
                 placeholder="Email"
                 required
                 autoComplete="email"
+                suppressHydrationWarning
+                className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
+              />
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Mobile number (optional)"
+                autoComplete="tel"
+                inputMode="tel"
                 suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm"
               />

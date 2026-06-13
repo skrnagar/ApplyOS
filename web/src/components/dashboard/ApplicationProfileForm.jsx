@@ -167,7 +167,7 @@ export default function ApplicationProfileForm({
         description="Current address for applications that ask for location details."
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Alternate phone">
+          <Field label="Alternate mobile">
             <input
               value={ap.alternate_phone || ""}
               onChange={(e) => set({ alternate_phone: e.target.value })}

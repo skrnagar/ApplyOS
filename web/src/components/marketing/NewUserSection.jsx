@@ -5,6 +5,7 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import useAuth from "@/utils/useAuth";
 import { AccountInput } from "@/components/auth/AccountInput";
 import { captureLead } from "@/utils/captureLead";
+import { validateOptionalPhone } from "@/utils/phone";
 
 /**
  * On-site registration — same flow as `/account/signup` (server auth + local fallback).
@@ -12,6 +13,7 @@ import { captureLead } from "@/utils/captureLead";
 export default function NewUserSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(null);
@@ -32,17 +34,24 @@ export default function NewUserSection() {
       setLoading(false);
       return;
     }
+    const pv = validateOptionalPhone(phone);
+    if (!pv.ok) {
+      setError(pv.error);
+      setLoading(false);
+      return;
+    }
     try {
-      // Ensure homepage sign-up entries appear in admin leads.
       await captureLead({
         email: email.trim(),
         name: name.trim() || undefined,
+        phone: pv.phone || undefined,
         source: "homepage_signup",
       });
       await signUpWithCredentials({
         email: email.trim(),
         password,
         name: name.trim(),
+        phone: pv.phone,
         redirect: true,
       });
     } catch (err) {
@@ -122,6 +131,15 @@ export default function NewUserSection() {
                 placeholder="you@company.com"
                 required
                 autoComplete="email"
+              />
+              <AccountInput
+                id="home-signup-phone"
+                label="Mobile number (optional)"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+1 555 123 4567"
+                autoComplete="tel"
               />
 
               <div className="space-y-1.5">

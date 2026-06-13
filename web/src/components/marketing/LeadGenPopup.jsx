@@ -8,6 +8,7 @@ import useUser from "@/utils/useUser";
 import { getLocalSession } from "@/utils/localAuth";
 import LeadGenPopupPreview from "./LeadGenPopupPreview";
 import { captureLead } from "@/utils/captureLead";
+import { validateOptionalPhone } from "@/utils/phone";
 
 const STORAGE_KEY = "hireorbital_lead_popup_dismissed";
 const LEADS_KEY = "hireorbital_lead_captures";
@@ -38,10 +39,11 @@ function dismissPopup() {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ until }));
 }
 
-function saveLead({ email, name }) {
+function saveLead({ email, name, phone }) {
   const entry = {
     email,
     name: name || "",
+    phone: phone || "",
     capturedAt: new Date().toISOString(),
     source: "lead_popup",
   };
@@ -77,6 +79,7 @@ export default function LeadGenPopup() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [redirectTarget, setRedirectTarget] = useState("/account/signup");
@@ -124,11 +127,17 @@ export default function LeadGenPopup() {
       setError("Enter a valid email address.");
       return;
     }
+    const pv = validateOptionalPhone(phone);
+    if (!pv.ok) {
+      setError(pv.error);
+      return;
+    }
     setSubmitting(true);
-    saveLead({ email: trimmed, name: name.trim() });
+    saveLead({ email: trimmed, name: name.trim(), phone: pv.phone });
     const leadResult = await captureLead({
       email: trimmed,
       name: name.trim() || undefined,
+      phone: pv.phone || undefined,
       source: "lead_popup",
     });
     if (!leadResult.stored && leadResult.error) {
@@ -144,6 +153,7 @@ export default function LeadGenPopup() {
       callbackUrl: "/dashboard",
     });
     if (!hasAccount && name.trim()) params.set("name", name.trim());
+    if (pv.phone) params.set("phone", pv.phone);
     params.set("from", "lead_popup");
 
     setSubmitted(true);
@@ -253,6 +263,21 @@ export default function LeadGenPopup() {
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Alex Chen"
                         autoComplete="name"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="lead-phone" className="block text-xs font-medium text-neutral-700">
+                        Mobile number <span className="text-neutral-400 font-normal">(optional)</span>
+                      </label>
+                      <input
+                        id="lead-phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+1 555 123 4567"
+                        autoComplete="tel"
+                        inputMode="tel"
                         className={inputClass}
                       />
                     </div>

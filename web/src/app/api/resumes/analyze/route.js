@@ -1,8 +1,8 @@
-import { scoreResumeAts } from "@/utils/atsScore";
+import { analyzeResumeFile } from "../../utils/runAtsAnalysis.js";
 
 const MAX_BYTES = 8 * 1024 * 1024;
 
-/** POST /api/resumes/analyze — no auth; returns ATS score + feedback from file metadata */
+/** POST /api/resumes/analyze — extracts resume text and scores ATS compatibility */
 export async function POST(request) {
   try {
     let formData;
@@ -31,7 +31,8 @@ export async function POST(request) {
     const email =
       typeof emailRaw === "string" && emailRaw.trim() ? emailRaw.trim().toLowerCase() : null;
 
-    const { ats_score, ats_grade, ats_feedback, ats_categories, ats_summary } = scoreResumeAts({
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const analysis = await analyzeResumeFile(buffer, {
       fileName,
       fileSize: file.size,
       mimeType: file.type,
@@ -43,11 +44,12 @@ export async function POST(request) {
       file_name: fileName,
       file_size: file.size,
       mime_type: file.type || null,
-      ats_score,
-      ats_grade,
-      ats_feedback,
-      ats_categories,
-      ats_summary,
+      ats_score: analysis.ats_score,
+      ats_grade: analysis.ats_grade,
+      ats_feedback: analysis.ats_feedback,
+      ats_categories: analysis.ats_categories,
+      ats_summary: analysis.ats_summary,
+      extraction: analysis.extraction,
     });
   } catch (error) {
     console.error("POST /api/resumes/analyze:", error);

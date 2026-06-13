@@ -16,6 +16,7 @@ import {
   ChevronUp,
   Pencil,
   Layers,
+  RefreshCw,
 } from "lucide-react";
 import useUser from "@/utils/useUser";
 import { getLocalResumes, setLocalResumes } from "@/utils/localResumes";
@@ -30,6 +31,7 @@ export default function ResumesPage() {
   const [editingId, setEditingId] = useState(null);
   const [editLabel, setEditLabel] = useState("");
   const [insightsKey, setInsightsKey] = useState(0);
+  const [rescanningId, setRescanningId] = useState(null);
   const { data: user, loading: authLoading } = useUser();
 
   useEffect(() => {
@@ -137,6 +139,29 @@ export default function ResumesPage() {
     setEditingId(null);
     setEditLabel("");
     refreshAll();
+  };
+
+  const handleRescanAts = async (id) => {
+    setRescanningId(id);
+    try {
+      const response = await fetchWithAuth(`/api/resumes/${id}/reanalyze`, {
+        method: "POST",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.resume) {
+          setResumes((prev) =>
+            prev.map((r) => (r.id === id ? { ...r, ...data.resume } : r)),
+          );
+          setExpandedId(id);
+        }
+      }
+    } catch {
+      // keep existing score on failure
+    } finally {
+      setRescanningId(null);
+      refreshAll();
+    }
   };
 
   const getATSScoreClass = (score) => {
@@ -330,6 +355,18 @@ export default function ResumesPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleRescanAts(resume.id)}
+                          disabled={rescanningId === resume.id}
+                          className="p-2 hover:bg-blue-50 rounded-lg text-neutral-500 hover:text-blue-600 disabled:opacity-50"
+                          title="Re-scan ATS score from resume content"
+                        >
+                          <RefreshCw
+                            size={18}
+                            className={rescanningId === resume.id ? "animate-spin" : ""}
+                          />
+                        </button>
                         {!resume.is_primary && (
                           <button
                             type="button"

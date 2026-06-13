@@ -12,6 +12,7 @@ import { Eye, EyeOff, Calendar } from "lucide-react";
 import AccountAuthShell from "@/components/auth/AccountAuthShell";
 import { AccountInput } from "@/components/auth/AccountInput";
 import { captureLead } from "@/utils/captureLead";
+import { validateOptionalPhone } from "@/utils/phone";
 
 const FIELD_ERRORS = {
   CredentialsSignin: "This email is already registered. Try signing in.",
@@ -26,6 +27,7 @@ const FIELD_ERRORS = {
 export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(null);
@@ -40,8 +42,10 @@ export default function SignUpPage() {
     const params = new URLSearchParams(window.location.search);
     const fromEmail = params.get("email");
     const fromName = params.get("name");
+    const fromPhone = params.get("phone");
     if (fromEmail) setEmail(fromEmail);
     if (fromName) setName(fromName);
+    if (fromPhone) setPhone(fromPhone);
     if (params.get("from") === "lead_popup") setFromLeadPopup(true);
 
     const next = new URL(window.location.href);
@@ -65,17 +69,24 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
+    const pv = validateOptionalPhone(phone);
+    if (!pv.ok) {
+      setError(pv.error);
+      setLoading(false);
+      return;
+    }
     try {
-      // Capture lead before auth redirect so admin always sees first-touch submissions.
       await captureLead({
         email: email.trim(),
         name: name.trim() || undefined,
+        phone: pv.phone || undefined,
         source: "signup",
       });
       await signUpWithCredentials({
         email: email.trim(),
         password,
         name: name.trim(),
+        phone: pv.phone,
         redirect: true,
       });
     } catch (err) {
@@ -164,6 +175,16 @@ export default function SignUpPage() {
           placeholder="you@example.com"
           required
           autoComplete="email"
+        />
+
+        <AccountInput
+          id="signup-phone"
+          label="Mobile number (optional)"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+1 555 123 4567"
+          autoComplete="tel"
         />
 
         <div className="space-y-1.5">

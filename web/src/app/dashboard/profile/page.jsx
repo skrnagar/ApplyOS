@@ -196,7 +196,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-neutral-500 mb-1.5 uppercase tracking-wider">
-                Phone
+                Mobile number
               </label>
               <input
                 value={profile?.phone || ""}
