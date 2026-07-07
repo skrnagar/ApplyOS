@@ -15,7 +15,7 @@ export default function Footer() {
               <HireOrbitalLogo size="md" variant="light" />
             </div>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
-              HireOrbital is your AI career operating system: transparent applications,
+              HireOrbital is your #1 Job Application Service : transparent applications,
               resume &amp; LinkedIn optimization, assistant support, and analytics —
               built for trust, not spam.
             </p>

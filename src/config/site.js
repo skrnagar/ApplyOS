@@ -5,7 +5,7 @@ export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
 
 export const SITE_NAME = "HireOrbital";
 
-export const SITE_TAGLINE = "AI career operating system";
+export const SITE_TAGLINE = "#1 Job Application Service ";
 
 export const SITE_DESCRIPTION =
   "HireOrbital optimizes your full job search pipeline: curated applications, resume and LinkedIn upgrades, assistant support, and transparent progress tracking.";

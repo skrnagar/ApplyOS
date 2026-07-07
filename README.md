@@ -1,3 +1,3 @@
 # HireOrbital
 
-AI career operating system — web app lives in `web/`.
+#1 Job Application Service  — web app lives in `web/`.

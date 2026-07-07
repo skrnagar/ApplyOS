@@ -57,7 +57,7 @@ export const links = () => [
 /** Fallback meta; per-route overrides come from `layout.jsx` meta(). */
 export function meta() {
   return buildMeta({
-    title: 'HireOrbital — AI career operating system',
+    title: 'HireOrbital — #1 Job Application Service ',
     path: '/',
   });
 }
