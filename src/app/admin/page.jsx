@@ -370,6 +370,7 @@ export default function AdminPage() {
                 columns={[
                   { key: "email", label: "Email" },
                   { key: "name", label: "Name" },
+                  { key: "phone", label: "Mobile", render: (r) => r.phone || "—" },
                   { key: "source", label: "Source" },
                   {
                     key: "metadata",
@@ -391,6 +392,11 @@ export default function AdminPage() {
                 columns={[
                   { key: "email", label: "Email" },
                   { key: "full_name", label: "Name" },
+                  {
+                    key: "phone",
+                    label: "Mobile",
+                    render: (r) => r.phone || "—",
+                  },
                   {
                     key: "job_preferences",
                     label: "Apply targets",
@@ -515,6 +521,11 @@ export default function AdminPage() {
                     render: (r) => r.profiles?.email || r.profile_id,
                   },
                   {
+                    key: "phone",
+                    label: "Mobile",
+                    render: (r) => r.profiles?.phone || "—",
+                  },
+                  {
                     key: "ats_score",
                     label: "ATS",
                     render: (r) => (r.ats_score != null ? `${r.ats_score}%` : "—"),
@@ -531,6 +542,7 @@ export default function AdminPage() {
                 columns={[
                   { key: "email", label: "Email" },
                   { key: "name", label: "Name" },
+                  { key: "phone", label: "Mobile", render: (r) => r.phone || "—" },
                   {
                     key: "message",
                     label: "Message",

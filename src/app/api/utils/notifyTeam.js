@@ -76,18 +76,18 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-export async function notifyNewLead({ email, name, source, metadata }) {
+export async function notifyNewLead({ email, name, phone, source, metadata }) {
   return notifyTeam({
     subject: `New lead: ${email}`,
-    text: `Email: ${email}\nName: ${name || "—"}\nSource: ${source}\nMeta: ${JSON.stringify(metadata || {}, null, 2)}`,
+    text: `Email: ${email}\nName: ${name || "—"}\nPhone: ${phone || "—"}\nSource: ${source}\nMeta: ${JSON.stringify(metadata || {}, null, 2)}`,
     tags: { type: "lead", source },
   });
 }
 
-export async function notifyContactForm({ email, name, message }) {
+export async function notifyContactForm({ email, name, phone, message }) {
   return notifyTeam({
     subject: `Contact form: ${email}`,
-    text: `From: ${name || "—"} <${email}>\n\n${message}`,
+    text: `From: ${name || "—"} <${email}>\nPhone: ${phone || "—"}\n\n${message}`,
     tags: { type: "contact" },
   });
 }
@@ -100,10 +100,10 @@ export async function notifyUserChat({ userEmail, userName, content }) {
   });
 }
 
-export async function notifyNewSignup({ email, name }) {
+export async function notifyNewSignup({ email, name, phone }) {
   return notifyTeam({
     subject: `New signup: ${email}`,
-    text: `Email: ${email}\nName: ${name || "—"}`,
+    text: `Email: ${email}\nName: ${name || "—"}\nPhone: ${phone || "—"}`,
     tags: { type: "signup" },
   });
 }

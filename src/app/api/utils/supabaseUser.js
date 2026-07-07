@@ -145,7 +145,7 @@ export async function resolveRequestProfile(request) {
 }
 
 /** Guest resume upload — find or create profile by email (no auth session required). */
-export async function resolveOrCreateGuestProfile(email, fullName = null) {
+export async function resolveOrCreateGuestProfile(email, fullName = null, phone = null) {
   const admin = getSupabaseAdmin();
   if (!admin) return null;
 
@@ -162,7 +162,18 @@ export async function resolveOrCreateGuestProfile(email, fullName = null) {
     .eq("email", normalized)
     .maybeSingle();
 
-  if (existing) return existing;
+  if (existing) {
+    if (phone && !existing.phone) {
+      const { data: updated } = await admin
+        .from("profiles")
+        .update({ phone })
+        .eq("id", existing.id)
+        .select("*")
+        .single();
+      return updated || existing;
+    }
+    return existing;
+  }
 
   const guestId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
   const { data: created, error } = await admin
@@ -170,6 +181,7 @@ export async function resolveOrCreateGuestProfile(email, fullName = null) {
     .insert({
       email: normalized,
       full_name: fullName?.trim() || null,
+      phone: phone || null,
       local_id: guestId,
     })
     .select("*")

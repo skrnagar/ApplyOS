@@ -56,10 +56,11 @@ export async function analyzeResumeFile(file, email) {
 }
 
 /** Upload file to Supabase via POST /api/resumes/upload */
-export async function uploadResumeToStorage(file, email, jobProfileLabel) {
+export async function uploadResumeToStorage(file, email, jobProfileLabel, phone) {
   const formData = new FormData();
   formData.append("file", file);
   if (email) formData.append("email", email);
+  if (phone) formData.append("phone", phone);
   if (jobProfileLabel?.trim()) {
     formData.append("job_profile_label", jobProfileLabel.trim());
   }
@@ -93,12 +94,13 @@ function stashGuestAts(payload) {
  */
 export async function saveResumeRecord(file, userId, existingCount, options = {}) {
   const guestEmail = options.email?.trim().toLowerCase() || null;
+  const guestPhone = options.phone || null;
   const jobProfileLabel = options.job_profile_label?.trim() || null;
 
   const analysis = await analyzeResumeFile(file, guestEmail);
 
   try {
-    const data = await uploadResumeToStorage(file, guestEmail, jobProfileLabel);
+    const data = await uploadResumeToStorage(file, guestEmail, jobProfileLabel, guestPhone);
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(GUEST_ATS_KEY);
     }

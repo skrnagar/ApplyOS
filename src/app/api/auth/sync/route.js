@@ -18,6 +18,7 @@ export async function POST(request) {
       void notifyNewSignup({
         email: profile.email,
         name: profile.full_name,
+        phone: profile.phone,
       });
     }
     return Response.json({

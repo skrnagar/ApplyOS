@@ -1,10 +1,10 @@
 /** Save lead to Supabase via API. Returns { ok, stored, error? }. */
-export async function captureLead({ email, name, source, metadata }) {
+export async function captureLead({ email, name, phone, source, metadata }) {
   try {
     const res = await fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, source, metadata }),
+      body: JSON.stringify({ email, name, phone, source, metadata }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
