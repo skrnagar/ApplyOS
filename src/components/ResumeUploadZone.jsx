@@ -11,6 +11,7 @@ import {
   validateGuestEmail,
   validateResumeFile,
 } from "@/utils/resumeUpload";
+import { validateOptionalPhone } from "@/utils/phone";
 
 /**
  * Shared resume upload: drag-drop, browse, validation, ATS scan, Supabase storage.
@@ -31,12 +32,14 @@ export default function ResumeUploadZone({
   const navigate = useNavigate();
   const inputId = useId();
   const emailInputId = useId();
+  const phoneInputId = useId();
   const { data: user } = useUser();
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [result, setResult] = useState(null);
 
   const isMarketing = variant === "marketing";
@@ -51,6 +54,7 @@ export default function ResumeUploadZone({
       }
 
       let guestEmail = null;
+      let guestPhone = null;
       if (needsEmail) {
         const ev = validateGuestEmail(email);
         if (!ev.ok) {
@@ -58,6 +62,12 @@ export default function ResumeUploadZone({
           return;
         }
         guestEmail = ev.email;
+        const pv = validateOptionalPhone(phone);
+        if (!pv.ok) {
+          setError(pv.error);
+          return;
+        }
+        guestPhone = pv.phone;
       }
 
       setUploading(true);
@@ -68,6 +78,7 @@ export default function ResumeUploadZone({
         setProgress(45);
         const payload = await saveResumeRecord(file, userId, existingCount, {
           email: guestEmail,
+          phone: guestPhone,
           job_profile_label: !isMarketing ? jobProfileLabel : undefined,
         });
         setProgress(100);
@@ -136,7 +147,7 @@ export default function ResumeUploadZone({
         setUploading(false);
       }
     },
-    [userId, existingCount, onSuccess, needsEmail, email, redirectToResults, navigate, user?.email, jobProfileLabel, isMarketing],
+    [userId, existingCount, onSuccess, needsEmail, email, phone, redirectToResults, navigate, user?.email, jobProfileLabel, isMarketing],
   );
 
   const onInputChange = (e) => {
@@ -185,24 +196,46 @@ export default function ResumeUploadZone({
         </div>
       )}
       {needsEmail && (
-        <div>
-          <label
-            htmlFor={emailInputId}
-            className="block text-xs font-semibold text-neutral-700 mb-1.5"
-          >
-            Email — we&apos;ll save your ATS report and resume
-          </label>
-          <input
-            id={emailInputId}
-            type="email"
-            autoComplete="email"
-            placeholder="you@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={disabled || uploading}
-            suppressHydrationWarning
-            className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400"
-          />
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor={emailInputId}
+              className="block text-xs font-semibold text-neutral-700 mb-1.5"
+            >
+              Email — we&apos;ll save your ATS report and resume
+            </label>
+            <input
+              id={emailInputId}
+              type="email"
+              autoComplete="email"
+              placeholder="you@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={disabled || uploading}
+              suppressHydrationWarning
+              className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor={phoneInputId}
+              className="block text-xs font-semibold text-neutral-700 mb-1.5"
+            >
+              Mobile number <span className="font-normal text-neutral-400">(optional)</span>
+            </label>
+            <input
+              id={phoneInputId}
+              type="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              placeholder="+1 555 123 4567"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              disabled={disabled || uploading}
+              suppressHydrationWarning
+              className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400"
+            />
+          </div>
         </div>
       )}
 

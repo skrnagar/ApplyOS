@@ -3,7 +3,7 @@ import { signIn, signOut } from "@auth/create/react";
 import { signInLocal, signOutLocal, signUpLocal } from "./localAuth";
 import { isServerAuthEnabled, isSupabaseAuthEnabled } from "./authMode";
 import { tryCreateBrowserClient } from "./supabase/client";
-import { syncAuthProfile } from "./apiAuthHeaders";
+import { syncAuthProfile, fetchWithAuth } from "./apiAuthHeaders";
 import { normalizePostAuthPath, resolveAuthRedirectPath } from "./authRedirect";
 
 function isDevIframe() {
@@ -144,6 +144,13 @@ export default function useAuth() {
         throw new Error("EmailConfirmationRequired");
       }
       await syncAuthProfile().catch(() => {});
+      if (options?.phone) {
+        await fetchWithAuth("/api/users/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: options.phone }),
+        }).catch(() => {});
+      }
       if (shouldRedirect) redirectAfterAuth(finalCallbackUrl);
       return { ok: true };
     }

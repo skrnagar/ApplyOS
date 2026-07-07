@@ -7,8 +7,9 @@ import {
   resolveOrCreateGuestProfile,
   resolveRequestProfile,
 } from "../../utils/supabaseUser.js";
-import { scoreResumeAts } from "@/utils/atsScore";
+import { analyzeResumeFile } from "../../utils/runAtsAnalysis.js";
 import { notifyResumeUpload } from "../../utils/notifyTeam.js";
+import { normalizePhone } from "@/utils/phone";
 
 const BUCKET = "resumes";
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -59,16 +60,25 @@ export async function POST(request) {
   const guestEmail =
     typeof emailField === "string" && emailField.trim() ? emailField.trim().toLowerCase() : null;
 
+  const phoneField = formData.get("phone");
+  const guestPhone =
+    typeof phoneField === "string" && phoneField.trim()
+      ? normalizePhone(phoneField)
+      : null;
+
   const labelField = formData.get("job_profile_label");
   const jobProfileLabel =
     typeof labelField === "string" && labelField.trim() ? labelField.trim() : null;
 
-  const { ats_score, ats_grade, ats_feedback } = scoreResumeAts({
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const atsResult = await analyzeResumeFile(buffer, {
     fileName,
     fileSize: file.size,
     mimeType: file.type,
     email: guestEmail,
   });
+  const { ats_score, ats_grade, ats_feedback } = atsResult;
 
   if (!getServiceRoleKey()) {
     return Response.json(
@@ -87,8 +97,18 @@ export async function POST(request) {
   }
 
   let profile = await resolveRequestProfile(request);
+  const admin = getSupabaseAdmin();
+
   if (!profile && guestEmail) {
-    profile = await resolveOrCreateGuestProfile(guestEmail);
+    profile = await resolveOrCreateGuestProfile(guestEmail, null, guestPhone);
+  } else if (profile && guestPhone && !profile.phone && admin) {
+    const { data: updated } = await admin
+      .from("profiles")
+      .update({ phone: guestPhone })
+      .eq("id", profile.id)
+      .select("*")
+      .single();
+    if (updated) profile = updated;
   }
 
   if (!profile) {
@@ -105,7 +125,6 @@ export async function POST(request) {
     );
   }
 
-  const admin = getSupabaseAdmin();
   if (!admin) {
     return Response.json(
       {
@@ -139,7 +158,6 @@ export async function POST(request) {
 
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const storagePath = `${profile.id}/${Date.now()}-${safeName}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error: uploadError } = await admin.storage.from(BUCKET).upload(storagePath, buffer, {
     contentType: file.type || "application/octet-stream",
@@ -217,6 +235,7 @@ export async function POST(request) {
     const { error: leadErr } = await admin.from("leads").insert({
       email: profile.email,
       name: profile.full_name,
+      phone: profile.phone || guestPhone,
       source: "resume_upload",
       metadata: {
         file_name: fileName,
