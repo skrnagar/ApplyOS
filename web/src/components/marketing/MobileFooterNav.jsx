@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import {
   Home,
   Tag,
@@ -89,43 +89,43 @@ export default function MobileFooterNav() {
               </div>
               <nav className="p-2 max-h-[min(50vh,320px)] overflow-y-auto">
                 {moreLinks.map(({ label, href, icon: Icon }) => (
-                  <a
+                  <Link
                     key={href}
-                    href={href}
+                    to={href}
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
                   >
                     <Icon size={18} className="text-neutral-500 shrink-0" aria-hidden />
                     {label}
-                  </a>
+                  </Link>
                 ))}
                 <div className="grid grid-cols-2 gap-2 p-2 pt-3 border-t border-neutral-100 mt-1">
                   {!loading && user ? (
-                    <a
-                      href="/dashboard"
+                    <Link
+                      to="/dashboard"
                       onClick={() => setMenuOpen(false)}
                       className="col-span-2 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-neutral-900"
                     >
                       <LayoutDashboard size={16} aria-hidden />
                       Dashboard
-                    </a>
+                    </Link>
                   ) : (
                     <>
-                      <a
-                        href="/account/signin"
+                      <Link
+                        to="/account/signin"
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-semibold text-neutral-800 border border-neutral-200"
                       >
                         <LogIn size={16} aria-hidden />
                         Log in
-                      </a>
-                      <a
-                        href="/account/signup"
+                      </Link>
+                      <Link
+                        to="/account/signup"
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-semibold text-white bg-emerald-600"
                       >
                         Sign up
-                      </a>
+                      </Link>
                     </>
                   )}
                 </div>
@@ -157,15 +157,15 @@ export default function MobileFooterNav() {
             );
           })}
 
-          <a
-            href="/account/signup"
+          <Link
+            to="/account/signup"
             className="flex flex-col items-center justify-center -mt-4"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/35 ring-4 ring-white">
               <Sparkles size={20} aria-hidden />
             </span>
             <span className="text-[10px] font-semibold text-emerald-800 mt-1">Start free</span>
-          </a>
+          </Link>
 
           {primaryTabs.slice(2).map(({ label, href, icon: Icon, match }) => {
             const active = match(pathname);

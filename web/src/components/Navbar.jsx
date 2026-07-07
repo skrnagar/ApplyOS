@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useSyncExternalStore } from "react";
+import { Link } from "react-router";
 import useUser from "@/utils/useUser";
 import { Menu, X } from "lucide-react";
 import HireOrbitalLogo from "@/components/ui/HireOrbitalLogo";
@@ -43,56 +44,56 @@ export default function Navbar() {
         }`}
       >
         <div className="container mx-auto px-5 sm:px-6 lg:px-8 xl:px-10 max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1536px] flex items-center justify-between gap-4">
-          <a href="/" className="flex items-center group min-w-0">
+          <Link to="/" className="flex items-center group min-w-0">
             <HireOrbitalLogo size="md" variant="light" />
-          </a>
+          </Link>
 
           <div className="hidden md:flex items-center gap-0.5 px-1 py-1 rounded-full border border-neutral-200/80 bg-white/80">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                to={link.href}
                 className="relative px-3.5 py-1.5 text-xs font-medium text-neutral-600 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <a
-              href="/#difference"
+            <Link
+              to="/#difference"
               className="relative px-3.5 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100"
             >
               The difference
-            </a>
-            <a
-              href="/#how-it-works"
+            </Link>
+            <Link
+              to="/#how-it-works"
               className="relative px-3.5 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100"
             >
               How it works
-            </a>
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-2 min-h-[36px]">
             {showAuthed ? (
-              <a
-                href="/dashboard"
+              <Link
+                to="/dashboard"
                 className="px-5 py-2 text-xs font-semibold text-white bg-neutral-900 rounded-full hover:bg-neutral-800 transition-colors"
               >
                 Dashboard →
-              </a>
+              </Link>
             ) : (
               <>
-                <a
-                  href="/account/signin"
+                <Link
+                  to="/account/signin"
                   className="text-xs font-medium text-neutral-600 hover:text-neutral-900 px-3 py-2"
                 >
                   Log In
-                </a>
-                <a
-                  href="/account/signup"
+                </Link>
+                <Link
+                  to="/account/signup"
                   className="px-5 py-2 text-xs font-semibold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 transition-colors shadow-sm"
                 >
                   Sign Up
-                </a>
+                </Link>
               </>
             )}
           </div>
@@ -112,54 +113,54 @@ export default function Navbar() {
         <div className="fixed inset-x-0 top-[56px] z-40 md:hidden px-4 pb-3 hero-fade-in">
           <div className="rounded-2xl border border-neutral-200 bg-white shadow-lg p-2 space-y-0.5">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   onClick={() => setMobileOpen(false)}
                   className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
-              <a
-                href="/#difference"
+              <Link
+                to="/#difference"
                 onClick={() => setMobileOpen(false)}
                 className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
               >
                 The difference
-              </a>
-              <a
-                href="/#how-it-works"
+              </Link>
+              <Link
+                to="/#how-it-works"
                 onClick={() => setMobileOpen(false)}
                 className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-800 hover:bg-neutral-50"
               >
                 How it works
-              </a>
+              </Link>
               <div className="grid grid-cols-2 gap-2 p-2 pt-1">
                 {showAuthed ? (
-                  <a
-                    href="/dashboard"
+                  <Link
+                    to="/dashboard"
                     onClick={() => setMobileOpen(false)}
                     className="col-span-2 text-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-neutral-900"
                   >
                     Dashboard →
-                  </a>
+                  </Link>
                 ) : (
                   <>
-                    <a
-                      href="/account/signin"
+                    <Link
+                      to="/account/signin"
                       onClick={() => setMobileOpen(false)}
                       className="text-center px-4 py-3 rounded-xl text-sm font-semibold text-neutral-800 border border-neutral-200 hover:bg-neutral-50"
                     >
                       Log In
-                    </a>
-                    <a
-                      href="/account/signup"
+                    </Link>
+                    <Link
+                      to="/account/signup"
                       onClick={() => setMobileOpen(false)}
                       className="text-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-emerald-600"
                     >
                       Sign Up
-                    </a>
+                    </Link>
                   </>
                 )}
               </div>
