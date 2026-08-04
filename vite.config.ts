@@ -92,7 +92,11 @@ export default defineConfig(({ mode }) => {
     loadFontsFromTailwindSource(),
     addRenderIds(),
     reactRouter(),
-    tsconfigPaths(),
+    // Scoped to this app's tsconfig on purpose. Left unscoped, the plugin
+    // crawls every tsconfig under the repo root — including `mobile/`
+    // (Expo, extends "expo/tsconfig.base", deps not installed here) and the
+    // duplicate `web/` project — and errors on ones it cannot resolve.
+    tsconfigPaths({ projects: [path.resolve(__dirname, 'tsconfig.json')] }),
     aliases(),
     layoutWrapperPlugin(),
   ],

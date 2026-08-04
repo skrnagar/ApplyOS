@@ -5,11 +5,8 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import useAuth from "@/utils/useAuth";
 import { AccountInput } from "@/components/auth/AccountInput";
 import { captureLead } from "@/utils/captureLead";
-<<<<<<< Updated upstream
 import { validateOptionalPhone } from "@/utils/phone";
-=======
 import { Link } from "react-router";
->>>>>>> Stashed changes
 
 /**
  * On-site registration — same flow as `/account/signup` (server auth + local fallback).
