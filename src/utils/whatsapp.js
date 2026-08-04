@@ -4,6 +4,7 @@ import {
   WHATSAPP_HOURS,
   WHATSAPP_NUMBER,
 } from "@/config/site";
+//
 
 /** True when a usable business number is configured. */
 export function isWhatsAppConfigured() {
