@@ -46,8 +46,8 @@ const INTER_FONT =
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
 
 export const links = () => [
-  { rel: 'icon', href: '/favicon.png', type: 'image/png' },
-  { rel: 'apple-touch-icon', href: '/favicon.png' },
+  { rel: 'icon', href: '/favicon.png?v=2', type: 'image/png' },
+  { rel: 'apple-touch-icon', href: '/favicon.png?v=2' },
   { rel: 'manifest', href: '/site.webmanifest' },
   {
     rel: 'stylesheet',
