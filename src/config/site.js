@@ -10,13 +10,10 @@ export const SITE_NAME = "HireOrbital";
  * TODO: replace the fallback with the real business number (or set
  * NEXT_PUBLIC_WHATSAPP_NUMBER); the widget hides itself while it is unset.
  */
-export const WHATSAPP_NUMBER = String(
-  import.meta.env?.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
-).replace(/\D/g, "");
+export const WHATSAPP_NUMBER = "919131458995";
 
 /** Human-facing label for the same number, e.g. "+91 98765 43210". */
-export const WHATSAPP_DISPLAY =
-  import.meta.env?.NEXT_PUBLIC_WHATSAPP_DISPLAY || "";
+export const WHATSAPP_DISPLAY = "+91 91314 58995";
 
 /** Support hours used for the online/away badge (IST by default). */
 export const WHATSAPP_HOURS = {

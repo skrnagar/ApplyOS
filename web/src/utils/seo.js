@@ -27,7 +27,7 @@ const PAGE_META = {
   "/pricing": {
     title: "Pricing",
     description:
-      "Transparent HireOrbital plans for job seekers: application tracking, AI assistant, resume tools, and interview prep. Monthly and yearly options.",
+      "Transparent HireOrbital plans for US job seekers: application tracking, expert support, resume building tools, and interview prep to improve ATS scores. Monthly and yearly options.",
   },
   "/contact": {
     title: "Contact",
@@ -55,7 +55,7 @@ const PAGE_META = {
   "/account/signup": {
     title: "Create account",
     description:
-      "Create your HireOrbital account and launch your AI-powered job search pipeline in minutes.",
+      "Create your HireOrbital account and launch your streamlined US job search pipeline in minutes. Start applying to jobs and improving your resume today.",
   },
 };
 

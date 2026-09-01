@@ -196,9 +196,8 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
     <>
       {showDevOverlay && !isInIframe() && (
         <div
-          className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-md z-50 transition-all duration-500 ease-out ${
-            isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-          }`}
+          className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-md z-50 transition-all duration-500 ease-out ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+            }`}
           style={{ width: '75vw' }}
         >
           <div
@@ -206,9 +205,9 @@ function InternalErrorBoundary({ error: errorArg }: Route.ErrorBoundaryProps) {
             style={
               scaleFactor !== 1
                 ? ({
-                    transform: `scale(${scaleFactor})`,
-                    transformOrigin: 'bottom center',
-                  } as CSSProperties)
+                  transform: `scale(${scaleFactor})`,
+                  transformOrigin: 'bottom center',
+                } as CSSProperties)
                 : undefined
             }
           >

@@ -5,10 +5,30 @@ export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
 
 export const SITE_NAME = "HireOrbital";
 
-export const SITE_TAGLINE = "#1 Job Application Service ";
+/**
+ * WhatsApp support line — digits only, country code first, no `+` or spaces.
+ * TODO: replace the fallback with the real business number (or set
+ * NEXT_PUBLIC_WHATSAPP_NUMBER); the widget hides itself while it is unset.
+ */
+export const WHATSAPP_NUMBER = "919131458995";
+
+/** Human-facing label for the same number, e.g. "+91 98765 43210". */
+export const WHATSAPP_DISPLAY = "+91 91314 58995";
+
+/** Support hours used for the online/away badge (IST by default). */
+export const WHATSAPP_HOURS = {
+  timeZone: "Asia/Kolkata",
+  timeZoneLabel: "IST",
+  /** 0 = Sunday. Days the team is reachable. */
+  days: [1, 2, 3, 4, 5, 6],
+  startHour: 10,
+  endHour: 19,
+};
+
+export const SITE_TAGLINE = "#1 US Job Application Service | Resume Building & ATS Optimization";
 
 export const SITE_DESCRIPTION =
-  "HireOrbital optimizes your full job search pipeline: curated applications, resume and LinkedIn upgrades, assistant support, and transparent progress tracking.";
+  "HireOrbital optimizes your US job search pipeline: curated applications, professional resume building, improve ATS scores, LinkedIn upgrades, and expert support for applying to jobs.";
 
 /** Canonical origin (no trailing slash). Set NEXT_PUBLIC_SITE_URL in production. */
 export function getSiteUrl() {

@@ -36,6 +36,7 @@ import type { Route } from './+types/root';
 import StructuredData from '@/components/seo/StructuredData';
 import { SITE_URL } from '@/config/site';
 import { buildMeta } from '@/utils/seo';
+import WhatsAppWidget from '@/components/marketing/WhatsAppWidget';
 
 if (import.meta.env.DEV) {
   void import('../__create/design-mode');
@@ -550,6 +551,7 @@ export function Layout({ children }: { children: ReactNode }) {
         {clientReady ? (
           <Toaster position="bottom-right" suppressHydrationWarning />
         ) : null}
+        <WhatsAppWidget />
         <ScrollRestoration />
         <Scripts />
       </body>
