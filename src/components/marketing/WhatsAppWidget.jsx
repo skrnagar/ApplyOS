@@ -21,11 +21,11 @@ import {
 } from "@/utils/whatsapp";
 
 const NUDGE_KEY = "hireorbital_whatsapp_nudge_dismissed";
-const NUDGE_DELAY_MS = 9000;
+const NUDGE_DELAY_MS = 0;
 
 function useIsMounted() {
   return useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false,
   );
@@ -204,9 +204,8 @@ export default function WhatsAppWidget({ context = "the HireOrbital website" }) 
                   <p className="truncate text-sm font-semibold">{SITE_NAME} Support</p>
                   <p className="flex items-center gap-1.5 text-[11px] text-emerald-50/90">
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        online ? "bg-emerald-300" : "bg-amber-300"
-                      }`}
+                      className={`h-1.5 w-1.5 rounded-full ${online ? "bg-emerald-300" : "bg-amber-300"
+                        }`}
                       aria-hidden
                     />
                     {online ? "Online now" : "Away — we reply next working hour"}
