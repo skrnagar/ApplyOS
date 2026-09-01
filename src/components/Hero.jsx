@@ -64,7 +64,7 @@ export default function Hero() {
                 icon={ArrowRight}
                 className="w-full sm:w-auto justify-center shadow-md shadow-emerald-600/15"
               >
-                {loading ? "Loading…" : authed ? "Go to dashboard" : "Start free"}
+                {loading ? "Loading…" : authed ? "Go dashboard" : "Start free"}
               </MarketingButton>
               <MarketingButton
                 href="/contact"
