@@ -14,6 +14,7 @@ import Testimonials from "../components/Testimonials";
 import FAQ from "../components/FAQ";
 import CTA from "../components/CTA";
 import NewUserSection from "../components/marketing/NewUserSection";
+import ContactFormSection from "../components/marketing/ContactFormSection";
 
 /** Below-the-fold homepage sections — lazy-loaded to shrink the initial JS bundle. */
 export default function LandingBelowFold() {
@@ -33,6 +34,7 @@ export default function LandingBelowFold() {
       <Testimonials />
       <NewUserSection />
       <FAQ />
+      <ContactFormSection />
       <CTA />
     </>
   );

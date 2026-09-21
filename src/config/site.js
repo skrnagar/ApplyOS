@@ -25,10 +25,10 @@ export const WHATSAPP_HOURS = {
   endHour: 19,
 };
 
-export const SITE_TAGLINE = "#1 US Job Application Service | Resume Building & ATS Optimization";
+export const SITE_TAGLINE = "AI career operating system | Resume Building & ATS Optimization";
 
 export const SITE_DESCRIPTION =
-  "HireOrbital optimizes your US job search pipeline: curated applications, professional resume building, improve ATS scores, LinkedIn upgrades, and expert support for applying to jobs.";
+  "HireOrbital is your AI career operating system that optimizes your US job search pipeline: AI-curated applications, professional resume building, improve ATS scores, LinkedIn upgrades, and expert support.";
 
 /** Canonical origin (no trailing slash). Set NEXT_PUBLIC_SITE_URL in production. */
 export function getSiteUrl() {

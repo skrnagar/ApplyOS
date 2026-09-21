@@ -21,7 +21,7 @@ export const SITEMAP_PATHS = [
 
 const PAGE_META = {
   "/": {
-    title: `${SITE_NAME} — #1 Job Application Service `,
+    title: `${SITE_NAME} — AI career operating system`,
     description: SITE_DESCRIPTION,
   },
   "/pricing": {

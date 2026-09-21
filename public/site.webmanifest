@@ -1,7 +1,7 @@
 {
   "name": "HireOrbital",
   "short_name": "HireOrbital",
-  "description": "#1 Job Application Service  for job search, applications, and interview prep.",
+  "description": "AI career operating system for job search, applications, and interview prep.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f6f8",
