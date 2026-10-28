@@ -38,7 +38,7 @@ export function getSiteUrl() {
 
 export const SITE_URL = getSiteUrl();
 
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-hireorbital.svg`;
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-hireorbital.png`;
 
 export const TWITTER_HANDLE = "@hireorbital";
 

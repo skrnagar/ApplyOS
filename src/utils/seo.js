@@ -101,7 +101,7 @@ export function buildMeta({
   noindex = false,
 }) {
   const canonical = absoluteUrl(path);
-  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME} — AI career operating system`;
   const robots = noindex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
@@ -170,7 +170,7 @@ export function getOrganizationJsonLd() {
     logo: `${SITE_URL}/favicon.png`,
     email: "hireorbit.1@gmail.com",
     description: SITE_DESCRIPTION,
-    sameAs: [],
+    sameAs: ["https://x.com/hireorbital"],
   };
 }
 
