@@ -492,6 +492,20 @@ export function Layout({ children }: { children: ReactNode }) {
   useEffect(() => {
     setClientReady(true);
   }, []);
+
+  // Supabase falls back to its "Site URL" when a redirect isn't allow-listed, which drops
+  // the recovery tokens on `/` instead of the callback page. Forward them so the user
+  // still lands on the reset-password form.
+  useEffect(() => {
+    const { hash, pathname: path } = window.location;
+    if (!hash || path.startsWith('/account/auth/callback')) return;
+    const params = new URLSearchParams(hash.replace(/^#/, ''));
+    if (params.get('type') === 'recovery' && params.get('access_token')) {
+      window.location.replace(
+        `/account/auth/callback?next=${encodeURIComponent('/account/reset-password')}${hash}`,
+      );
+    }
+  }, []);
   useEffect(() => {
     if (!inIframe) return;
     const handleMessage = (event: MessageEvent) => {
