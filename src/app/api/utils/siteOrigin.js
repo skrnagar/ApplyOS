@@ -3,7 +3,7 @@ import { loadServerEnv } from "@/utils/loadServerEnv.js";
 loadServerEnv();
 
 function isLocalHost(hostname) {
-  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(hostname);
+  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|::1)$/.test(hostname);
 }
 
 const PRODUCTION_ORIGIN = "https://hireorbital.com";
@@ -29,10 +29,15 @@ export function getSiteOrigin(request) {
   if (request) {
     try {
       const url = new URL(request.url);
-      const host = request.headers.get("x-forwarded-host") || url.host;
-      const proto = request.headers.get("x-forwarded-proto") || url.protocol.replace(":", "");
-      const hostname = host?.split(":")[0] ?? "";
-      if (host && !(isProd && isLocalHost(hostname))) return `${proto}://${host}`;
+      // Forwarded headers can be comma-separated lists (proxy chains) — use the first entry.
+      const first = (v) => v?.split(",")[0].trim();
+      const host = first(request.headers.get("x-forwarded-host")) || url.host;
+      const proto = first(request.headers.get("x-forwarded-proto")) || url.protocol.replace(":", "");
+      if (host) {
+        // Parse instead of splitting on ":" so IPv6 hosts like [::1]:4000 are handled.
+        const hostname = new URL(`http://${host}`).hostname;
+        if (!(isProd && isLocalHost(hostname))) return `${proto}://${host}`;
+      }
     } catch {
       /* fall through */
     }

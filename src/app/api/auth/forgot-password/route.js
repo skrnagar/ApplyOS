@@ -59,11 +59,16 @@ export async function POST(request) {
         } else {
           warnings.push(error.message);
         }
-      } else if (data?.properties?.action_link) {
-        const mail = await sendPasswordResetEmail({
-          to: email,
-          resetLink: data.properties.action_link,
-        });
+      } else if (data?.properties?.hashed_token || data?.properties?.action_link) {
+        // Prefer a link straight to our own /account/auth/confirm page: it does not depend
+        // on Supabase's Site URL / Redirect URL allowlist. Fall back to Supabase's
+        // action_link only if no hashed token was returned.
+        const tokenHash = data.properties.hashed_token;
+        const resetLink = tokenHash
+          ? `${origin}/account/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}` +
+            `&type=recovery&next=${encodeURIComponent("/account/reset-password")}`
+          : data.properties.action_link;
+        const mail = await sendPasswordResetEmail({ to: email, resetLink });
         if (mail.sent) {
           delivered = true;
           channel = "resend";
