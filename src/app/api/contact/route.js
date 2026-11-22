@@ -161,7 +161,8 @@ export async function POST(request) {
       console.warn("POST /api/contact: lead insert skipped:", leadError);
     }
 
-    void notifyContactForm({ email, name, phone, message });
+    // Awaited: fire-and-forget work is frozen once a serverless response is returned.
+    await notifyContactForm({ email, name, phone, message });
 
     return Response.json(
       { ok: true, stored: true, submission: data, teamEmail: TEAM_INBOX },

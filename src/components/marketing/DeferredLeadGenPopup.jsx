@@ -9,6 +9,8 @@ export default function DeferredLeadGenPopup() {
     let cancelled = false;
 
     const load = () => {
+      // Re-send any lead that failed to save on a previous visit.
+      void import("@/utils/captureLead").then((m) => m.flushPendingLeads());
       void import("./LeadGenPopup").then((m) => {
         if (!cancelled) setPopup(() => m.default);
       });

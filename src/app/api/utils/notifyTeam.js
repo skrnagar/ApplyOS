@@ -32,7 +32,12 @@ export async function notifyTeam({ subject, text, html, tags = {} }) {
 
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
-    console.info("[HireOrbital alert →", to + "]", subjectLine, bodyText.slice(0, 500));
+    console.warn(
+      "[HireOrbital] RESEND_API_KEY is not set — team alert NOT emailed:",
+      to,
+      subjectLine,
+      bodyText.slice(0, 500),
+    );
     return { sent: false, logged: true, to };
   }
 
@@ -41,6 +46,8 @@ export async function notifyTeam({ subject, text, html, tags = {} }) {
       process.env.RESEND_FROM?.trim() || "HireOrbital <onboarding@resend.dev>";
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
+      // Never let a slow mail provider hold up (or fail) the user's request.
+      signal: AbortSignal.timeout(4000),
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",

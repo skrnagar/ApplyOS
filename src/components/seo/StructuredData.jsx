@@ -1,6 +1,7 @@
 import {
   getFaqPageJsonLd,
   getOrganizationJsonLd,
+  getServiceJsonLd,
   getSoftwareApplicationJsonLd,
   getWebSiteJsonLd,
 } from "@/utils/seo";
@@ -9,7 +10,7 @@ import {
 export default function StructuredData({ pathname = "/" }) {
   const graphs = [getOrganizationJsonLd(), getWebSiteJsonLd(), getSoftwareApplicationJsonLd()];
   if (pathname === "/" || pathname === "") {
-    graphs.push(getFaqPageJsonLd());
+    graphs.push(getServiceJsonLd(), getFaqPageJsonLd());
   }
 
   return (

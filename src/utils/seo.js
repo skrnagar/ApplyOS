@@ -6,6 +6,7 @@ import {
   DEFAULT_OG_IMAGE,
   TWITTER_HANDLE,
   SITE_LOCALE,
+  CONTACT_EMAIL,
 } from "@/config/site";
 
 /** Public marketing routes included in sitemap.xml */
@@ -25,12 +26,12 @@ const PAGE_META = {
     description: SITE_DESCRIPTION,
   },
   "/pricing": {
-    title: "Pricing",
+    title: "Pricing — Job Application Service Plans",
     description:
       "Transparent HireOrbital plans for US job seekers: application tracking, expert support, resume building tools, and interview prep to improve ATS scores. Monthly and yearly options.",
   },
   "/contact": {
-    title: "Contact",
+    title: "Contact Us — Talk to a Job Search Expert",
     description:
       "Talk to HireOrbital about your job search. Schedule a walkthrough, ask about plans, or send a message to our team.",
   },
@@ -53,7 +54,7 @@ const PAGE_META = {
     description: "Sign in to your HireOrbital workspace to track applications, messages, and career progress.",
   },
   "/account/signup": {
-    title: "Create account",
+    title: "Create Account — Start Your Job Search",
     description:
       "Create your HireOrbital account and launch your streamlined US job search pipeline in minutes. Start applying to jobs and improving your resume today.",
   },
@@ -120,6 +121,8 @@ export function buildMeta({
     { property: "og:description", content: description },
     { property: "og:image", content: image },
     { property: "og:image:alt", content: `${SITE_NAME} — job search platform` },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
     { property: "og:site_name", content: SITE_NAME },
     { property: "og:locale", content: SITE_LOCALE },
     { name: "twitter:card", content: "summary_large_image" },
@@ -168,8 +171,17 @@ export function getOrganizationJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/favicon.png`,
-    email: "hireorbit.1@gmail.com",
+    email: CONTACT_EMAIL,
     description: SITE_DESCRIPTION,
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: CONTACT_EMAIL,
+        url: `${SITE_URL}/contact`,
+        availableLanguage: ["English"],
+      },
+    ],
     sameAs: ["https://x.com/hireorbital"],
   };
 }
@@ -217,6 +229,19 @@ export function getSoftwareApplicationJsonLd() {
       highPrice: "349",
       offerCount: "4",
     },
+  };
+}
+
+export function getServiceJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Job application service",
+    serviceType: "Job search and application management",
+    provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    description: SITE_DESCRIPTION,
+    areaServed: "US",
+    url: SITE_URL,
   };
 }
 

@@ -1,16 +1,10 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
-const BELOW_FOLD_HASH_IDS = new Set([
-  "difference",
-  "how-it-works",
-  "faq",
-  "signup",
-  "contact",
-  "testimonials",
-  "pricing",
-  "resources",
-]);
+// Code-split, but rendered on the server (Suspense streams it) so crawlers and link
+// previews receive the full page — pricing, FAQ, how-it-works — not an empty spacer.
+// The client hydrates the chunk without blocking the hero (selective hydration).
+const LandingBelowFold = lazy(() => import("./LandingBelowFold"));
 
 function getHashId() {
   if (typeof window === "undefined") return null;
@@ -18,60 +12,34 @@ function getHashId() {
   return id || null;
 }
 
-function scrollToHashId(id, behavior = "smooth") {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior, block: "start" });
+/** Deep links like /#pricing: wait for the lazy sections to mount, then scroll. */
+function useScrollToHash() {
+  useEffect(() => {
+    const hashId = getHashId();
+    if (!hashId) return;
+
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      const el = document.getElementById(hashId);
+      tries += 1;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.clearInterval(timer);
+      } else if (tries >= 40) {
+        window.clearInterval(timer);
+      }
+    }, 100);
+
+    return () => window.clearInterval(timer);
+  }, []);
 }
 
-/** Loads below-fold homepage sections after scroll proximity — keeps initial JS small. */
 export default function DeferredBelowFold() {
-  const sentinelRef = useRef(null);
-  const [BelowFold, setBelowFold] = useState(null);
-
-  useEffect(() => {
-    const hashId = getHashId();
-    const load = () => {
-      void import("./LandingBelowFold").then((m) => setBelowFold(() => m.default));
-    };
-
-    if (hashId && BELOW_FOLD_HASH_IDS.has(hashId)) {
-      load();
-      return;
-    }
-
-    const el = sentinelRef.current;
-    if (!el) return;
-
-    if ("IntersectionObserver" in window) {
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            load();
-            obs.disconnect();
-          }
-        },
-        { rootMargin: "500px 0px" },
-      );
-      obs.observe(el);
-      return () => obs.disconnect();
-    }
-
-    load();
-  }, []);
-
-  useEffect(() => {
-    if (!BelowFold) return;
-    const hashId = getHashId();
-    if (!hashId || !BELOW_FOLD_HASH_IDS.has(hashId)) return;
-
-    const timer = window.setTimeout(() => scrollToHashId(hashId), 50);
-    return () => window.clearTimeout(timer);
-  }, [BelowFold]);
+  useScrollToHash();
 
   return (
-    <>
-      <div ref={sentinelRef} className="h-px w-full" aria-hidden />
-      {BelowFold ? <BelowFold /> : <div className="min-h-[50vh]" aria-hidden />}
-    </>
+    <Suspense fallback={<div className="min-h-[50vh]" aria-hidden />}>
+      <LandingBelowFold />
+    </Suspense>
   );
 }
