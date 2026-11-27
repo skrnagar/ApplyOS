@@ -1,6 +1,7 @@
 import {
   getFaqPageJsonLd,
   getOrganizationJsonLd,
+  // getServiceJsonLd, // (commented out from new SEO)
   getSoftwareApplicationJsonLd,
   getWebSiteJsonLd,
 } from "@/utils/seo";
@@ -9,6 +10,10 @@ import {
 export default function StructuredData({ pathname = "/" }) {
   const graphs = [getOrganizationJsonLd(), getWebSiteJsonLd(), getSoftwareApplicationJsonLd()];
   if (pathname === "/" || pathname === "") {
+    // Current / New SEO (commented out):
+    // graphs.push(getServiceJsonLd(), getFaqPageJsonLd());
+
+    // Old SEO (restored from before commit 93aa79c):
     graphs.push(getFaqPageJsonLd());
   }
 

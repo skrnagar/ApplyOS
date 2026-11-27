@@ -25,10 +25,16 @@ export const WHATSAPP_HOURS = {
   endHour: 19,
 };
 
-export const SITE_TAGLINE = "AI career operating system | Resume Building & ATS Optimization";
+// --- Current SEO (commented out) ---
+// export const SITE_TAGLINE = "AI career operating system | Resume Building & ATS Optimization";
+// export const SITE_DESCRIPTION =
+//   "HireOrbital is your AI career operating system that optimizes your US job search pipeline: AI-curated applications, professional resume building, improve ATS scores, LinkedIn upgrades, and expert support.";
+
+// --- Old SEO (restored from before commit 93aa79c) ---
+export const SITE_TAGLINE = "#1 Job Application Service ";
 
 export const SITE_DESCRIPTION =
-  "HireOrbital is your AI career operating system that optimizes your US job search pipeline: AI-curated applications, professional resume building, improve ATS scores, LinkedIn upgrades, and expert support.";
+  "HireOrbital optimizes your full job search pipeline: curated applications, resume and LinkedIn upgrades, assistant support, and transparent progress tracking.";
 
 /** Canonical origin (no trailing slash). Set NEXT_PUBLIC_SITE_URL in production. */
 export function getSiteUrl() {

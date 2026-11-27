@@ -6,6 +6,7 @@ import {
   DEFAULT_OG_IMAGE,
   TWITTER_HANDLE,
   SITE_LOCALE,
+  // CONTACT_EMAIL, // (commented out from new SEO)
 } from "@/config/site";
 
 /** Public marketing routes included in sitemap.xml */
@@ -19,15 +20,63 @@ export const SITEMAP_PATHS = [
   { path: "/account/signup", changefreq: "monthly", priority: "0.6" },
 ];
 
+// ============================================================================
+// CURRENT / NEW SEO (Commented out):
+// ============================================================================
+/*
 const PAGE_META = {
   "/": {
     title: `${SITE_NAME} — AI career operating system`,
     description: SITE_DESCRIPTION,
   },
   "/pricing": {
-    title: "Pricing",
+    title: "Pricing — Job Application Service Plans",
     description:
       "Transparent HireOrbital plans for US job seekers: application tracking, expert support, resume building tools, and interview prep to improve ATS scores. Monthly and yearly options.",
+  },
+  "/contact": {
+    title: "Contact Us — Talk to a Job Search Expert",
+    description:
+      "Talk to HireOrbital about your job search. Schedule a walkthrough, ask about plans, or send a message to our team.",
+  },
+  "/tools": {
+    title: "Career tools & guides",
+    description:
+      "Free resume, LinkedIn, and interview prep guides from HireOrbital — the same frameworks we use in the product.",
+  },
+  "/resume-checker": {
+    title: "Free ATS resume checker",
+    description:
+      "Upload your resume and get an instant ATS compatibility score with actionable feedback — file format, keywords, and content tips for LinkedIn, Naukri, and employer portals.",
+  },
+  "/resume-checker/results": {
+    title: "ATS resume report",
+    description: "Your HireOrbital ATS analysis with score breakdown, passed checks, warnings, and content tips.",
+  },
+  "/account/signin": {
+    title: "Sign in",
+    description: "Sign in to your HireOrbital workspace to track applications, messages, and career progress.",
+  },
+  "/account/signup": {
+    title: "Create Account — Start Your Job Search",
+    description:
+      "Create your HireOrbital account and launch your streamlined US job search pipeline in minutes. Start applying to jobs and improving your resume today.",
+  },
+};
+*/
+
+// ============================================================================
+// OLD SEO (Restored from before commit 93aa79c):
+// ============================================================================
+const PAGE_META = {
+  "/": {
+    title: `${SITE_NAME} — #1 Job Application Service `,
+    description: SITE_DESCRIPTION,
+  },
+  "/pricing": {
+    title: "Pricing",
+    description:
+      "Transparent HireOrbital plans for job seekers: application tracking, AI assistant, resume tools, and interview prep. Monthly and yearly options.",
   },
   "/contact": {
     title: "Contact",
@@ -55,7 +104,7 @@ const PAGE_META = {
   "/account/signup": {
     title: "Create account",
     description:
-      "Create your HireOrbital account and launch your streamlined US job search pipeline in minutes. Start applying to jobs and improving your resume today.",
+      "Create your HireOrbital account and launch your AI-powered job search pipeline in minutes.",
   },
 };
 
@@ -101,7 +150,13 @@ export function buildMeta({
   noindex = false,
 }) {
   const canonical = absoluteUrl(path);
-  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME} — AI career operating system`;
+
+  // Current / New SEO title formatting (commented out):
+  // const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME} — AI career operating system`;
+
+  // Old SEO title formatting (restored from before commit 93aa79c):
+  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+
   const robots = noindex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
@@ -161,6 +216,32 @@ export function metaForPath(pathname) {
   });
 }
 
+// Current / New SEO Organization Schema (commented out):
+/*
+export function getOrganizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/favicon.png`,
+    email: CONTACT_EMAIL,
+    description: SITE_DESCRIPTION,
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: CONTACT_EMAIL,
+        url: `${SITE_URL}/contact`,
+        availableLanguage: ["English"],
+      },
+    ],
+    sameAs: ["https://x.com/hireorbital"],
+  };
+}
+*/
+
+// Old SEO Organization Schema (restored from before commit 93aa79c):
 export function getOrganizationJsonLd() {
   return {
     "@context": "https://schema.org",
@@ -170,7 +251,7 @@ export function getOrganizationJsonLd() {
     logo: `${SITE_URL}/favicon.png`,
     email: "hireorbit.1@gmail.com",
     description: SITE_DESCRIPTION,
-    sameAs: ["https://x.com/hireorbital"],
+    sameAs: [],
   };
 }
 
@@ -219,6 +300,22 @@ export function getSoftwareApplicationJsonLd() {
     },
   };
 }
+
+// Current / New SEO Service Schema (commented out):
+/*
+export function getServiceJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Job application service",
+    serviceType: "Job search and application management",
+    provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    description: SITE_DESCRIPTION,
+    areaServed: "US",
+    url: SITE_URL,
+  };
+}
+*/
 
 export function buildSitemapXml() {
   const lastmod = new Date().toISOString().slice(0, 10);
